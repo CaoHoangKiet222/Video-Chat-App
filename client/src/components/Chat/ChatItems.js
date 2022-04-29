@@ -44,7 +44,7 @@ const ChatItems = (props) => {
 
   useEffect(() => {
     if (member && user) {
-      socket.emit("joinVideo", { user, friend: member });
+      // socket.emit("joinVideo", { user, friend: member });
       // return () => {
       //    socket.disconnect();
       //    socket.off();

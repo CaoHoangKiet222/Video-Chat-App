@@ -48,25 +48,26 @@ app.get("/", (req, res) => {
 
 app.use(require("./routes/user"));
 
-io.on("connection", (socket) => {
+io.of("/chat-rooms").on("connection", (socket) => {
   console.log("A user connected");
-  // console.log(io.sockets.adapter.rooms);
 
-  // Use for chat
-  socketListen(socket, "join", io);
+  socketListen(socket, "joinRoom", io);
 
-  socketListen(socket, "leave");
+  socketListen(socket, "leaveRoom");
 
   socketListen(socket, "sendMessage", io);
 
   socketListen(socket, "disconnect", io);
+});
 
-  // Use for video
-  socketListen(socket, "joinVideo", io);
+io.of("/meeting-rooms").on("connection", (socket) => {
+  console.log("A user connected");
 
-  socketListen(socket, "callToUser", io);
-
-  socketListen(socket, "answerCall", io);
+  // socketListen(socket, "joinVideo", io);
+  //
+  // socketListen(socket, "callToUser", io);
+  //
+  // socketListen(socket, "answerCall", io);
 });
 
 (async () => {

@@ -13,7 +13,7 @@ const InfoBar = (props) => {
   const { socket } = useSelector((state) => state.socket);
 
   useEffect(() => {
-    socket.emit("join", props.room, (error, messages) => {
+    socket.emit("joinRoom", props.room, (error, messages) => {
       if (error) {
         return setError(error);
       }
@@ -21,7 +21,7 @@ const InfoBar = (props) => {
     });
 
     return () => {
-      socket.emit("leave", props.room);
+      socket.emit("leaveRoom", props.room);
     };
   }, [props.member, props.room, socket]);
 

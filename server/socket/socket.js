@@ -3,24 +3,24 @@ const Conversation = module.require("../models/conversation");
 exports = module.exports = (socket, type, io = null) => {
   switch (type) {
     // Use for chat
-    case "join":
-      socket.on("join", async (room, callback) => {
+    case "joinRoom":
+      socket.on("joinRoom", async (room, callback) => {
         try {
           const conv = await Conversation.findOne({ _id: room }).populate({
             path: "members.userId",
           });
           callback(null, conv.messages);
           socket.join(room);
-          console.log(io.sockets.adapter.rooms);
+          // console.log(io.sockets.adapter.rooms);
+          console.log(io.of("/chat-rooms").adapter.rooms);
         } catch (err) {
           console.error(err);
           callback(err.message, null);
         }
       });
       break;
-    case "leave":
-      socket.on("leave", (room) => {
-        console.log("leave", room);
+    case "leaveRoom":
+      socket.on("leaveRoom", (room) => {
         socket.leave(room);
       });
       break;
@@ -33,7 +33,8 @@ exports = module.exports = (socket, type, io = null) => {
 
           const newMesage = conversation.messages.splice(-1)[0];
 
-          io.to(room).emit("receiveMessage", newMesage);
+          console.log(room === conversation._id.toString());
+          io.of("/chat-rooms").to(room).emit("receiveMessage", newMesage);
 
           callback();
         } catch (err) {
@@ -45,7 +46,8 @@ exports = module.exports = (socket, type, io = null) => {
     case "disconnect":
       socket.on("disconnect", () => {
         console.log("A user disconnected");
-        console.log(io.sockets.adapter.rooms);
+        // console.log(io.sockets.adapter.rooms);
+        console.log(io.of("/chat-rooms").adapter.rooms);
       });
       break;
     // Use for video
