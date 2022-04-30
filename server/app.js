@@ -42,32 +42,36 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
   res.send("Server is running");
 });
 
 app.use(require("./routes/user"));
 
-io.of("/chat-rooms").on("connection", (socket) => {
-  console.log("A user connected");
+const io_chat = io.of("/chat-rooms");
+io_chat.on("connection", (socket) => {
+  console.log("A user connected to channel chat-rooms");
 
-  socketListen(socket, "joinRoom", io);
+  socketListen(socket, "joinRoom", io_chat);
 
   socketListen(socket, "leaveRoom");
 
-  socketListen(socket, "sendMessage", io);
+  socketListen(socket, "sendMessage", io_chat);
 
-  socketListen(socket, "disconnect", io);
+  socketListen(socket, "disconnect");
 });
 
-io.of("/meeting-rooms").on("connection", (socket) => {
-  console.log("A user connected");
+const io_meeting = io.of("/meeting-rooms");
+io_meeting.on("connection", (socket) => {
+  console.log("A user connected to channel meeting-rooms");
 
-  // socketListen(socket, "joinVideo", io);
-  //
-  // socketListen(socket, "callToUser", io);
-  //
+  socketListen(socket, "joinVideo", io_meeting);
+
+  socketListen(socket, "callToUser");
+
   // socketListen(socket, "answerCall", io);
+
+  socketListen(socket, "notAnswerCall", io_meeting);
 });
 
 (async () => {

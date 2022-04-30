@@ -10,10 +10,10 @@ const InfoBar = (props) => {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState(props.messages);
-  const { socket } = useSelector((state) => state.socket);
+  const chatSocket = useSelector((state) => state.socket.chatSocket);
 
   useEffect(() => {
-    socket.emit("joinRoom", props.room, (error, messages) => {
+    chatSocket.emit("joinRoom", props.room, (error, messages) => {
       if (error) {
         return setError(error);
       }
@@ -21,12 +21,12 @@ const InfoBar = (props) => {
     });
 
     return () => {
-      socket.emit("leaveRoom", props.room);
+      chatSocket.emit("leaveRoom", props.room);
     };
-  }, [props.member, props.room, socket]);
+  }, [props.member, props.room, chatSocket]);
 
   useEffect(() => {
-    socket.on("receiveMessage", (message) => {
+    chatSocket.on("receiveMessage", (message) => {
       console.log(message);
       setMessages((preMessages) => [...preMessages, message]);
     });
@@ -41,7 +41,7 @@ const InfoBar = (props) => {
           senderId: props.user._id,
           messageDate: new Date(Date.now()),
         };
-        socket.emit("sendMessage", newMesage, props.room, (error) => {
+        chatSocket.emit("sendMessage", newMesage, props.room, (error) => {
           if (error) {
             return setError(error);
           }

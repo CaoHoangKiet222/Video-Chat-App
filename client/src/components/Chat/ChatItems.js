@@ -24,15 +24,14 @@ const formatDate = (date) => {
 
 const ChatItems = (props) => {
   const member = props.member;
-  const { user } = useSelector((state) => state.user);
+  const user = useSelector((state) => state.user.user);
   const { stream } = useSelector((state) => state.video);
-  const ENDPOINT_SERVER = process.env.REACT_APP_ENDPOINT_SERVER;
   const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const userVideo = useRef();
   const connectionRef = useRef();
-  const { socket } = useSelector((state) => state.socket);
+  const meetingSocket = useSelector((state) => state.socket.meetingSocket);
 
   let pathname;
   if (props.header === "Friends") {
@@ -44,41 +43,51 @@ const ChatItems = (props) => {
 
   useEffect(() => {
     if (member && user) {
-      // socket.emit("joinVideo", { user, friend: member });
-      // return () => {
-      //    socket.disconnect();
-      //    socket.off();
-      // }
+      meetingSocket.emit("joinVideo", { user, friend: member });
     }
-  }, [member, user, socket]);
+  }, [member, user, meetingSocket]);
 
   useEffect(() => {
-    socket.on("callToUser", ({ callId, signal, caller, callee }) => {
-      console.log("callId", callId);
-      console.log("signal", signal);
-      dispatch(
-        videoActions.setCall({
-          call: {
-            callId,
-            callee,
-            caller,
-            signal,
-          },
-        })
-      );
-      navigate(`/video-chat/Chats/meeting/${encodeURIComponent(callId)}`);
+    meetingSocket.on(
+      "callToUser",
+      ({ callId, signal, caller, callee, isReceiving }) => {
+        console.log("callId", callId);
+
+        dispatch(
+          videoActions.setCall({
+            call: {
+              callId,
+              callee,
+              caller,
+              isReceiving,
+              signal,
+            },
+          })
+        );
+        navigate(`/video-chat/Chats/meeting/${encodeURIComponent(callId)}`);
+      }
+    );
+
+    meetingSocket.on("notAnswerCall", () => {
+      console.log(stream);
+      stream?.getTracks().forEach(function (track) {
+        track.stop();
+      });
+
+      navigate("/video-chat/Chats");
+
+      dispatch(videoActions.setStateAgain());
     });
-  }, []);
+  }, [dispatch, navigate, meetingSocket]);
 
   useEffect(() => {
     if (stream) {
-      console.log("hello");
-      dispatch(callToUser(socket, userVideo, connectionRef));
+      dispatch(callToUser(meetingSocket, userVideo, connectionRef));
     }
     return () => {
-      dispatch(videoActions.setStream({ currentStream: null }));
+      // dispatch(videoActions.setStream({ currentStream: null }));
     };
-  }, [stream]);
+  }, [stream, dispatch, meetingSocket]);
 
   return (
     <>

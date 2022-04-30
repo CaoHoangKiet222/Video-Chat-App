@@ -9,10 +9,13 @@ exports = module.exports = (socket, type, io = null) => {
           const conv = await Conversation.findOne({ _id: room }).populate({
             path: "members.userId",
           });
+
           callback(null, conv.messages);
+
           socket.join(room);
-          // console.log(io.sockets.adapter.rooms);
-          console.log(io.of("/chat-rooms").adapter.rooms);
+
+          console.log("A user joins chat-rooms");
+          console.log(io.adapter.rooms);
         } catch (err) {
           console.error(err);
           callback(err.message, null);
@@ -30,11 +33,9 @@ exports = module.exports = (socket, type, io = null) => {
           const conversation = await Conversation.findOne({ _id: room });
           conversation.messages.push(message);
           await conversation.save();
-
           const newMesage = conversation.messages.splice(-1)[0];
 
-          console.log(room === conversation._id.toString());
-          io.of("/chat-rooms").to(room).emit("receiveMessage", newMesage);
+          io.to(room).emit("receiveMessage", newMesage);
 
           callback();
         } catch (err) {
@@ -46,16 +47,14 @@ exports = module.exports = (socket, type, io = null) => {
     case "disconnect":
       socket.on("disconnect", () => {
         console.log("A user disconnected");
-        // console.log(io.sockets.adapter.rooms);
-        console.log(io.of("/chat-rooms").adapter.rooms);
       });
       break;
     // Use for video
     case "joinVideo":
       socket.on("joinVideo", async ({ user, friend }) => {
         try {
-          console.log("user", user._id);
-          console.log("friend", friend._id);
+          console.log("A user joins meeting-rooms");
+
           const conversation = await Conversation.findOne({
             $and: [
               { "members.userId": user._id },
@@ -63,8 +62,10 @@ exports = module.exports = (socket, type, io = null) => {
             ],
           }).select({ _id: 1 });
 
-          console.log("joinVideo", conversation._id.toString());
+          // console.log("joinVideo", conversation._id.toString());
           socket.join(conversation._id.toString());
+
+          console.log(io.adapter.rooms);
         } catch (err) {
           console.error(err);
         }
@@ -72,19 +73,19 @@ exports = module.exports = (socket, type, io = null) => {
       break;
     case "callToUser":
       socket.on("callToUser", async ({ callId, signalData, caller }) => {
-        // console.log("caller", caller);
-        // console.log(callId);
         const conversation = await Conversation.findById(callId)
           .populate({ path: "members.userId" })
           .select({ members: 1, meetings: 1 });
-        // console.log(conversation.members);
+
         const { userId } = conversation.members.find(
           (member) => member.userId._id.toString() !== caller._id.toString()
         );
-        io.to(callId).emit("callToUser", {
+
+        socket.broadcast.to(callId).emit("callToUser", {
           signal: signalData,
           callId,
           caller,
+          isReceiving: true,
           callee: userId,
         });
       });
@@ -92,7 +93,12 @@ exports = module.exports = (socket, type, io = null) => {
     case "answerCall":
       socket.on("answerCall", ({ signal, callId }) => {
         console.log("callId", callId);
-        io.to(callId).emit("callAccepted", signal);
+        io.of("/meeting-rooms").to(callId).emit("callAccepted", signal);
+      });
+      break;
+    case "notAnswerCall":
+      socket.on("notAnswerCall", (callId) => {
+        io.to(callId).emit("notAnswerCall");
       });
       break;
   }

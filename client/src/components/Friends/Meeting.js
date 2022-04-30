@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Avatar } from "../Chat/ChatItems.styled";
 import {
   Buttons,
@@ -10,32 +10,25 @@ import {
   RoundedButton,
 } from "./Meeting.styled";
 import { FiPhoneOff, FiPhone, FiVideo } from "react-icons/fi";
-import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { postData } from "../../utilities/utilities";
+import { useParams } from "react-router-dom";
 
 const Meeting = () => {
+  console.log("Meeting running");
   const params = useParams();
-  const ENDPOINT_SERVER = process.env.REACT_APP_ENDPOINT_SERVER;
   const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
-  const {
-    call: { callee, caller },
-  } = useSelector((state) => state.video);
-  // const [callee, setCallee] = useState({});
-  // console.log(call);
-  //
-  // useEffect(() => {
-  //   if (params.meetingId) {
-  //     const fetchCallee = async () => {
-  //       const data = await postData(
-  //         `${ENDPOINT_SERVER}/meeting/${params.meetingId}`,
-  //         "post"
-  //       );
-  //       setCallee(data.friend);
-  //     };
-  //     fetchCallee();
-  //   }
-  // }, [params.meetingId, ENDPOINT_SERVER]);
+  const { isReceiving, callee, caller } = useSelector(
+    (state) => state.video.call
+  );
+  const { meetingSocket } = useSelector((state) => state.socket);
+
+  const closePhone = () => {
+    meetingSocket.emit("notAnswerCall", params.meetingId);
+  };
+
+  const acceptPhone = () => {
+    console.log("acceptPhone");
+  };
 
   return (
     <Container>
@@ -43,30 +36,33 @@ const Meeting = () => {
         <Join>
           <img
             src={`/images/${
-              caller?.name === callee?.name
-                ? "outgoing-call.svg"
-                : "incoming-call.svg"
+              !isReceiving ? "outgoing-call.svg" : "incoming-call.svg"
             }`}
             alt=""
           />
           <p className="name">
-            {caller?.name !== callee?.name ? "OUTGOING CALL" : "INCOMING CALL"}
+            {!isReceiving ? "OUTGOING CALL" : "INCOMING CALL"}
           </p>
-          <p className="title">{callee?.name}</p>
+          <p className="title">{isReceiving ? callee.name : caller.name}</p>
           <Picture>
             <ImgWrapper>
               <Avatar>
-                <img src={`${ENDPOINT_CLIENT}/${callee?.avata}`} alt="" />
+                <img
+                  src={`${ENDPOINT_CLIENT}/${
+                    isReceiving ? callee.avata : caller.avata
+                  }`}
+                  alt=""
+                />
               </Avatar>
             </ImgWrapper>
           </Picture>
           <Buttons>
-            <RoundedButton className="close">
+            <RoundedButton className="close" onClick={closePhone}>
               <FiPhoneOff />
             </RoundedButton>
-            {caller?.name === callee?.name && (
+            {isReceiving && (
               <>
-                <RoundedButton className="accept">
+                <RoundedButton className="accept" onClick={acceptPhone}>
                   <FiPhone />
                 </RoundedButton>
                 <RoundedButton>
