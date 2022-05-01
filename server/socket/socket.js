@@ -71,29 +71,27 @@ exports = module.exports = (socket, type, io = null) => {
         }
       });
       break;
-    case "callToUser":
-      socket.on("callToUser", async ({ callId, signalData, caller }) => {
-        const conversation = await Conversation.findById(callId)
-          .populate({ path: "members.userId" })
-          .select({ members: 1, meetings: 1 });
-
-        const { userId } = conversation.members.find(
-          (member) => member.userId._id.toString() !== caller._id.toString()
-        );
-
-        socket.broadcast.to(callId).emit("callToUser", {
-          signal: signalData,
-          callId,
+    case "meetingConnection":
+      socket.on("meetingConnection", ({ room, callee, caller }, callback) => {
+        socket.broadcast.to(room).emit("meetingConnection", {
+          callId: room,
           caller,
           isReceiving: true,
-          callee: userId,
+          callee,
         });
+        callback();
+      });
+      break;
+    case "callToUser":
+      socket.on("callToUser", ({ callId, signalData }) => {
+        console.log("callId", callId);
+        socket.broadcast.to(callId).emit("callToUser", { signal: signalData });
       });
       break;
     case "answerCall":
       socket.on("answerCall", ({ signal, callId }) => {
-        console.log("callId", callId);
-        io.of("/meeting-rooms").to(callId).emit("callAccepted", signal);
+        io.to(callId).emit("callAccepted", signal);
+        console.log("answerCall done");
       });
       break;
     case "notAnswerCall":

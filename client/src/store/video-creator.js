@@ -19,34 +19,35 @@ const waitCallDone = (callee, caller, room, dispatch) => {
 };
 
 export const videoStart = (callee, caller, room, navigate) => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     try {
-      const currentStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
+      const {
+        socket: { meetingSocket },
+      } = getState();
 
-      dispatch(videoActions.setCallId({ callId: room }));
-
-      await waitCallDone(callee, caller, room, dispatch);
-
-      dispatch(videoActions.setStream({ currentStream }));
-
-      navigate(`/video-chat/Chats/meeting/${encodeURIComponent(room)}`);
-
-      // myVideo.current.srcObject = currentStream;
+      meetingSocket.emit(
+        "meetingConnection",
+        { callee, caller, room },
+        async () => {
+          dispatch(videoActions.setCallId({ callId: room }));
+          await waitCallDone(callee, caller, room, dispatch);
+          navigate(`/video-chat/Chats/meeting/${encodeURIComponent(room)}`);
+        }
+      );
     } catch (err) {
       console.error(err);
     }
   };
 };
 
-export const answerCall = (socket, userVideo, connectionRef) => {
+export const answerCall = (userVideo, connectionRef) => {
   return async (dispatch, getState) => {
     try {
-      // console.log("current state", getState());
-
-      const { video } = getState();
+      const {
+        video,
+        socket: { meetingSocket },
+      } = getState();
+      console.log("answerCall video", video);
 
       dispatch(videoActions.setCallAccepted({ callAccepted: true }));
 
@@ -58,15 +59,21 @@ export const answerCall = (socket, userVideo, connectionRef) => {
       });
 
       peer.on("signal", (data) => {
-        // console.log(data);
-        socket.emit("answerCall", { signal: data, callId: video.callId });
+        console.log("peer on signal answerCall running");
+        meetingSocket.emit("answerCall", {
+          signal: data,
+          callId: video.callId,
+        });
       });
 
       peer.on("stream", (currentStream) => {
+        console.log("peer stream answerCall running");
         userVideo.current.srcObject = currentStream;
       });
 
+      // video.call.signal is signal of caller
       peer.signal(video.call.signal);
+      console.log("peer signal answerCall done");
 
       connectionRef.current = peer;
     } catch (err) {
@@ -75,14 +82,14 @@ export const answerCall = (socket, userVideo, connectionRef) => {
   };
 };
 
-export const callToUser = (socket, userVideo, connectionRef) => {
+export const callToUser = (userVideo, connectionRef) => {
   return async (dispatch, getState) => {
     try {
       console.log("current state callToUser", getState());
 
       const {
         video,
-        user: { user: caller },
+        socket: { meetingSocket },
       } = getState();
 
       const peer = new Peer({
@@ -93,22 +100,25 @@ export const callToUser = (socket, userVideo, connectionRef) => {
 
       // Fired when the peer wants to send signaling data to the remote peer (always run)
       peer.on("signal", (data) => {
-        socket.emit("callToUser", {
+        console.log("peer on signal callToUser running");
+        meetingSocket.emit("callToUser", {
           callId: video.callId,
           signalData: data,
-          caller,
         });
       });
 
       peer.on("stream", (currentStream) => {
+        console.log("peer stream callToUser running");
         userVideo.current.srcObject = currentStream;
       });
 
       // Wait for user accept
-      socket.on("callAccepted", (signal) => {
+      meetingSocket.on("callAccepted", (signal) => {
         dispatch(videoActions.setCallAccepted({ callAccepted: true }));
 
+        // signal of callee answering to caller
         peer.signal(signal);
+        console.log("peer signal callToUser done");
       });
 
       connectionRef.current = peer;

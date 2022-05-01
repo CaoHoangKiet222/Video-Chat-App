@@ -10,7 +10,6 @@ import {
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { videoActions } from "../../store/video-slice";
-import { callToUser } from "../../store/video-creator";
 
 const formatDate = (date) => {
   date = new Date(date);
@@ -29,8 +28,6 @@ const ChatItems = (props) => {
   const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userVideo = useRef();
-  const connectionRef = useRef();
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
 
   let pathname;
@@ -49,18 +46,15 @@ const ChatItems = (props) => {
 
   useEffect(() => {
     meetingSocket.on(
-      "callToUser",
-      ({ callId, signal, caller, callee, isReceiving }) => {
-        console.log("callId", callId);
-
+      "meetingConnection",
+      ({ callId, caller, callee, isReceiving }) => {
+        dispatch(videoActions.setCallId({ callId }));
         dispatch(
           videoActions.setCall({
             call: {
-              callId,
               callee,
               caller,
               isReceiving,
-              signal,
             },
           })
         );
@@ -79,15 +73,6 @@ const ChatItems = (props) => {
       dispatch(videoActions.setStateAgain());
     });
   }, [dispatch, navigate, meetingSocket]);
-
-  useEffect(() => {
-    if (stream) {
-      dispatch(callToUser(meetingSocket, userVideo, connectionRef));
-    }
-    return () => {
-      // dispatch(videoActions.setStream({ currentStream: null }));
-    };
-  }, [stream, dispatch, meetingSocket]);
 
   return (
     <>

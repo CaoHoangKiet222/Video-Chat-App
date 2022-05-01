@@ -67,9 +67,11 @@ io_meeting.on("connection", (socket) => {
 
   socketListen(socket, "joinVideo", io_meeting);
 
+  socketListen(socket, "meetingConnection", io_meeting);
+
   socketListen(socket, "callToUser");
 
-  // socketListen(socket, "answerCall", io);
+  socketListen(socket, "answerCall", io_meeting);
 
   socketListen(socket, "notAnswerCall", io_meeting);
 });

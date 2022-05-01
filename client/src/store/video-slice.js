@@ -19,6 +19,9 @@ export const videoSlice = createSlice({
     setCall(state, action) {
       state.call = action.payload.call;
     },
+    setCallSignal(state, action) {
+      state.call.signal = action.payload.signal;
+    },
     setCallAccepted(state, action) {
       state.callAccepted = action.payload.callAccepted;
     },

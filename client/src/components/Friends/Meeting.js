@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Avatar } from "../Chat/ChatItems.styled";
 import {
   Buttons,
@@ -10,8 +10,11 @@ import {
   RoundedButton,
 } from "./Meeting.styled";
 import { FiPhoneOff, FiPhone, FiVideo } from "react-icons/fi";
-import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { answerCall, callToUser } from "../../store/video-creator";
+import { getUserMedia } from "../../utilities/utilities";
+import { videoActions } from "../../store/video-slice";
 
 const Meeting = () => {
   console.log("Meeting running");
@@ -20,7 +23,34 @@ const Meeting = () => {
   const { isReceiving, callee, caller } = useSelector(
     (state) => state.video.call
   );
+  const { callAccepted, callEnded, stream } = useSelector(
+    (state) => state.video
+  );
   const { meetingSocket } = useSelector((state) => state.socket);
+  const myVideo = useRef(),
+    userVideo = useRef(),
+    connectionRef = useRef();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const currentStream = getUserMedia();
+    dispatch(videoActions.setStream({ currentStream }));
+  }, [dispatch]);
+
+  useEffect(() => {
+    meetingSocket.on("callToUser", ({ signal }) => {
+      dispatch(videoActions.setCallSignal({ signal }));
+    });
+  });
+
+  useEffect(() => {
+    if (stream) {
+      console.log("stream", stream);
+      dispatch(callToUser(meetingSocket, userVideo, connectionRef));
+      // myVideo.current.srcObject = stream;
+      console.log("myVideo stream done");
+    }
+  }, [stream, dispatch, meetingSocket]);
 
   const closePhone = () => {
     meetingSocket.emit("notAnswerCall", params.meetingId);
@@ -28,9 +58,11 @@ const Meeting = () => {
 
   const acceptPhone = () => {
     console.log("acceptPhone");
+    dispatch(answerCall(userVideo, connectionRef));
   };
+  console.log(isReceiving, callee.name, caller.name);
 
-  return (
+  return !callAccepted ? (
     <Container>
       <Content>
         <Join>
@@ -43,7 +75,7 @@ const Meeting = () => {
           <p className="name">
             {!isReceiving ? "OUTGOING CALL" : "INCOMING CALL"}
           </p>
-          <p className="title">{isReceiving ? callee.name : caller.name}</p>
+          <p className="title">{isReceiving ? caller.name : callee.name}</p>
           <Picture>
             <ImgWrapper>
               <Avatar>
@@ -74,6 +106,32 @@ const Meeting = () => {
         </Join>
       </Content>
     </Container>
+  ) : (
+    <>
+      {stream && (
+        <>
+          <h1>Hello myVideo</h1>
+          <video
+            ref={myVideo}
+            muted={true}
+            playsInline={true}
+            autoPlay={true}
+          />
+        </>
+      )}
+
+      {!callEnded && (
+        <>
+          <h1>Hello userVideo</h1>
+          <video
+            ref={userVideo}
+            muted={true}
+            playsInline={true}
+            autoPlay={true}
+          />
+        </>
+      )}
+    </>
   );
 };
 
