@@ -131,9 +131,12 @@ export const callToUser = (userVideo, connectionRef) => {
 export const leaveCall = (connectionRef) => {
   return (dispatch) => {
     connectionRef.current.destroy();
+    connectionRef.current.on("error", (err) => {
+      console.log(err);
+    });
 
     dispatch(videoActions.setCallEnded({ callEnded: true }));
 
-    window.location.reload();
+    // window.location.reload();
   };
 };

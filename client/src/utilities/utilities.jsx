@@ -40,14 +40,9 @@ export const formatDate = (date) => {
   return `${newdate}, ${h.slice(-2)}:${m.slice(-2)} am`;
 };
 
-export const getUserMedia = () => {
-  let currentStream;
-  const getStream = async () => {
-    currentStream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    });
-  };
-  getStream();
-  return currentStream;
+export const getUserMedia = async () => {
+  return await navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: true,
+  });
 };

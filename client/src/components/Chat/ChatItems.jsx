@@ -61,17 +61,6 @@ const ChatItems = (props) => {
         navigate(`/video-chat/Chats/meeting/${encodeURIComponent(callId)}`);
       }
     );
-
-    meetingSocket.on("notAnswerCall", () => {
-      console.log(stream);
-      stream?.getTracks().forEach(function (track) {
-        track.stop();
-      });
-
-      navigate("/video-chat/Chats");
-
-      dispatch(videoActions.setStateAgain());
-    });
   }, [dispatch, navigate, meetingSocket]);
 
   return (

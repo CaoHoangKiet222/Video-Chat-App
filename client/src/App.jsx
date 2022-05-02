@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Chat from "./components/Chat/Chat";
 import Login from "./components/Login/Login";

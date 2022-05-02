@@ -12,7 +12,7 @@ import {
 import { FiPhoneOff, FiPhone, FiVideo } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { answerCall, callToUser } from "../../store/video-creator";
+import { answerCall, callToUser, leaveCall } from "../../store/video-creator";
 import { getUserMedia } from "../../utilities/utilities";
 import { videoActions } from "../../store/video-slice";
 
@@ -31,36 +31,64 @@ const Meeting = () => {
     userVideo = useRef(),
     connectionRef = useRef();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const currentStream = getUserMedia();
-    dispatch(videoActions.setStream({ currentStream }));
+    getUserMedia()
+      .then((currentStream) => {
+        console.log(currentStream);
+        dispatch(videoActions.setStream({ currentStream }));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, [dispatch]);
+
+  useEffect(() => {
+    if (callAccepted && stream) {
+      myVideo.current.srcObject = stream;
+    }
+  }, [callAccepted, stream]);
 
   useEffect(() => {
     meetingSocket.on("callToUser", ({ signal }) => {
       dispatch(videoActions.setCallSignal({ signal }));
     });
-  });
+  }, [dispatch, meetingSocket]);
 
   useEffect(() => {
-    if (stream) {
-      console.log("stream", stream);
-      dispatch(callToUser(meetingSocket, userVideo, connectionRef));
-      // myVideo.current.srcObject = stream;
-      console.log("myVideo stream done");
-    }
-  }, [stream, dispatch, meetingSocket]);
+    // Off stream when close video
+    meetingSocket.on("notAnswerCall", () => {
+      stream?.getTracks().forEach(function (track) {
+        track.stop();
+      });
 
-  const closePhone = () => {
-    meetingSocket.emit("notAnswerCall", params.meetingId);
+      navigate("/video-chat/Chats");
+
+      dispatch(videoActions.setStateAgain());
+    });
+
+    return () => {
+      meetingSocket.off("notAnswerCall");
+    };
+  }, [dispatch, meetingSocket, navigate, stream]);
+
+  useEffect(() => {
+    if (stream && !isReceiving) {
+      dispatch(callToUser(userVideo, connectionRef));
+    }
+  }, [stream, dispatch, isReceiving]);
+
+  const closeVideo = () => {
+    meetingSocket.emit("notAnswerCall", {
+      callId: params.meetingId,
+    });
+    // dispatch(leaveCall(connectionRef));
   };
 
-  const acceptPhone = () => {
-    console.log("acceptPhone");
+  const acceptVideo = () => {
     dispatch(answerCall(userVideo, connectionRef));
   };
-  console.log(isReceiving, callee.name, caller.name);
 
   return !callAccepted ? (
     <Container>
@@ -89,15 +117,15 @@ const Meeting = () => {
             </ImgWrapper>
           </Picture>
           <Buttons>
-            <RoundedButton className="close" onClick={closePhone}>
+            <RoundedButton className="close" onClick={closeVideo}>
               <FiPhoneOff />
             </RoundedButton>
             {isReceiving && (
               <>
-                <RoundedButton className="accept" onClick={acceptPhone}>
+                <RoundedButton className="accept">
                   <FiPhone />
                 </RoundedButton>
-                <RoundedButton>
+                <RoundedButton onClick={acceptVideo}>
                   <FiVideo />
                 </RoundedButton>
               </>

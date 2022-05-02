@@ -95,7 +95,7 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "notAnswerCall":
-      socket.on("notAnswerCall", (callId) => {
+      socket.on("notAnswerCall", ({ callId }) => {
         io.to(callId).emit("notAnswerCall");
       });
       break;
