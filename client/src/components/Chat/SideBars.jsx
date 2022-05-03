@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import {
   ChatsHeader,
@@ -11,11 +11,39 @@ import {
 import ChatItems from "./ChatItems";
 import { BsBell, BsSearch } from "react-icons/bs";
 import { BiDotsVerticalRounded } from "react-icons/bi";
+import { searchUser } from "../../utilities/utilities";
 
 const SideBars = (props) => {
-  const { conversation } = useSelector((state) => state.conversation);
-  const { friends } = useSelector((state) => state.friends);
+  const conversation = useSelector((state) => state.conversation.conversation);
+  const friends = useSelector((state) => state.friends.friends);
   const isDiff = useRef(false);
+  const [searchName, setSearchName] = useState("");
+  const chatsList = useRef(null);
+
+  useEffect(() => {
+    console.log("hello");
+    if (conversation && chatsList.current !== null) {
+      console.log("hello");
+      const removeAllBackground = () => {
+        chatsList.current.querySelectorAll("li > a").forEach((chatItems) => {
+          chatItems.style.background = "none";
+        });
+      };
+      console.log(chatsList.current.querySelectorAll("li > a"));
+      chatsList.current.querySelectorAll("li > a").forEach((chatItems) => {
+        console.log(chatItems);
+        chatItems.addEventListener("click", () => {
+          console.log(chatItems);
+          removeAllBackground();
+          chatItems.style.background = "#665dfe";
+        });
+      });
+    }
+  }, [conversation]);
+
+  const startSearch = (e) => {
+    setSearchName(e.target.value);
+  };
 
   return (
     <SideBar>
@@ -41,7 +69,11 @@ const SideBars = (props) => {
               <button type="button">All Chats</button>
             </div>
             <div>
-              <input type="text" placeholder="Search users..."></input>
+              <input
+                type="text"
+                placeholder="Search users..."
+                onChange={startSearch}
+              ></input>
               <div>
                 <div>
                   <BsSearch />
@@ -50,50 +82,61 @@ const SideBars = (props) => {
             </div>
           </ChatsSubHeader>
         </ChatsHeader>
-        <ChatsList>
+        <ChatsList ref={chatsList}>
           {
             // Chats
             props.header === "Chats" &&
-              conversation?.conv.map(({ members, messages, _id }) => {
-                const { userId: member } = members.find(
-                  (member) => member.userId._id !== conversation.user._id
-                );
-                const lastMessage = messages?.slice(-1)[0];
-                return (
-                  <ChatItems
-                    key={_id}
-                    member={member}
-                    messages={messages}
-                    user={conversation.user}
-                    header={props.header}
-                    messageDate={lastMessage?.messageDate}
-                    content={lastMessage?.content}
-                    room={_id}
-                  />
-                );
-              })
+              conversation?.conv
+                .filter(({ members }) => {
+                  const { userId: member } = members.find(
+                    (member) => member.userId._id !== conversation.user._id
+                  );
+                  return searchUser(member, searchName);
+                })
+                .map(({ members, messages, _id }) => {
+                  const { userId: member } = members.find(
+                    (member) => member.userId._id !== conversation.user._id
+                  );
+                  const lastMessage = messages?.slice(-1)[0];
+                  return (
+                    <ChatItems
+                      key={_id}
+                      member={member}
+                      messages={messages}
+                      user={conversation.user}
+                      header={props.header}
+                      messageDate={lastMessage?.messageDate}
+                      content={lastMessage?.content}
+                      room={_id}
+                    />
+                  );
+                })
           }
           {
             // Friends
             props.header === "Friends" &&
-              friends?.map((friend, index) => {
-                if (
-                  index === 0 ||
-                  friends[index - 1].name[0] !== friend.name[0]
-                ) {
-                  isDiff.current = true;
-                } else isDiff.current = false;
+              friends
+                ?.filter((friend) => {
+                  return searchUser(friend, searchName);
+                })
+                .map((friend, index) => {
+                  if (
+                    index === 0 ||
+                    friends[index - 1].name[0] !== friend.name[0]
+                  ) {
+                    isDiff.current = true;
+                  } else isDiff.current = false;
 
-                return (
-                  <ChatItems
-                    key={friend._id}
-                    member={friend}
-                    header={props.header}
-                    address={friend.address}
-                    isDiff={isDiff.current}
-                  />
-                );
-              })
+                  return (
+                    <ChatItems
+                      key={friend._id}
+                      member={friend}
+                      header={props.header}
+                      address={friend.address}
+                      isDiff={isDiff.current}
+                    />
+                  );
+                })
           }
         </ChatsList>
       </ContactsContent>

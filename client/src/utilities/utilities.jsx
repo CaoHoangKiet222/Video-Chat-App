@@ -11,6 +11,16 @@ export const postData = async (url, method, data = {}) => {
   return response.json();
 };
 
+export const formatHour = (date) => {
+  date = new Date(date);
+  const h = "0" + date.getHours();
+  const m = "0" + date.getMinutes();
+  if (parseInt(h.slice(-2)) >= 13) {
+    return `${h.slice(-2)}:${m.slice(-2)} pm`;
+  }
+  return `${h.slice(-2)}:${m.slice(-2)} am`;
+};
+
 export const formatDate = (date) => {
   date = new Date(date);
   const monthNames = [
@@ -27,17 +37,30 @@ export const formatDate = (date) => {
     "Nov",
     "Dec",
   ];
-  const month = date.getUTCMonth() + 1;
+  const month = date.getUTCMonth();
   const day = date.getUTCDate();
   const year = date.getUTCFullYear();
-  const newdate = day + " " + monthNames[month] + " " + year;
-  const h = "0" + date.getHours();
-  const m = "0" + date.getMinutes();
 
-  if (parseInt(h.slice(-2)) >= 13) {
-    return `${newdate}, ${h.slice(-2)}:${m.slice(-2)} pm`;
+  return day + " " + monthNames[month] + " " + year;
+};
+
+export const checkSameDate = (predate, date) => {
+  date = new Date(date);
+  predate = new Date(predate);
+  if (formatDate(date) === formatDate(predate)) {
+    return true;
   }
-  return `${newdate}, ${h.slice(-2)}:${m.slice(-2)} am`;
+  return false;
+};
+
+export const searchUser = (user, searchName) => {
+  if (
+    searchName === "" ||
+    user.name.toLowerCase().indexOf(searchName.toLowerCase()) !== -1
+  ) {
+    return true;
+  }
+  return false;
 };
 
 export const getUserMedia = async () => {

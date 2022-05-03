@@ -25,7 +25,7 @@ function App() {
         path="/signup"
         element={
           <Login
-            title="Sign Up"
+            title="Sign Up "
             formType="signup"
             isSignUp={true}
             formCheck="I agree to the terms of service"

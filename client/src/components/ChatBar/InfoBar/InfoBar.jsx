@@ -7,17 +7,17 @@ import ChatHeader from "../ChatHeader/ChatHeader";
 import { useSelector } from "react-redux";
 
 const InfoBar = (props) => {
+  console.log("InfoBar running");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState(props.messages);
+  const [messages, setMessages] = useState(null);
   const chatSocket = useSelector((state) => state.socket.chatSocket);
 
   useEffect(() => {
-    chatSocket.emit("joinRoom", props.room, (error, messages) => {
+    chatSocket.emit("joinRoom", props.room, (error) => {
       if (error) {
         return setError(error);
       }
-      return setMessages(messages);
     });
 
     return () => {
@@ -26,11 +26,17 @@ const InfoBar = (props) => {
   }, [props.member, props.room, chatSocket]);
 
   useEffect(() => {
+    // Not done yet
+    console.log(props.messages);
+    setMessages(props.messages);
+  }, [props.messages]);
+
+  useEffect(() => {
     chatSocket.on("receiveMessage", (message) => {
       console.log(message);
       setMessages((preMessages) => [...preMessages, message]);
     });
-  }, []);
+  }, [chatSocket]);
 
   const sendMessage = (e) => {
     try {

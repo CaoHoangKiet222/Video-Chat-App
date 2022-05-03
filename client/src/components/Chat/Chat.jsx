@@ -9,6 +9,7 @@ import Friends from "../Friends/Friends";
 import { fetchConversation } from "../../store/conversations-creator";
 import { fetchFriends } from "../../store/friends-creator";
 import Meeting from "../Friends/Meeting";
+import { v4 as uuidv4 } from "uuid";
 
 const Chat = () => {
   const { conversation } = useSelector((state) => state.conversation);
@@ -42,7 +43,7 @@ const Chat = () => {
             return (
               <Route
                 path={`/Chats/${encodeURIComponent(member.name)}`}
-                key={id}
+                key={uuidv4()}
                 element={
                   <InfoBar
                     room={id}

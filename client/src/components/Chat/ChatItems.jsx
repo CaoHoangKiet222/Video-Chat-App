@@ -10,21 +10,11 @@ import {
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { videoActions } from "../../store/video-slice";
-
-const formatDate = (date) => {
-  date = new Date(date);
-  const h = "0" + date.getHours();
-  const m = "0" + date.getMinutes();
-  if (parseInt(h.slice(-2)) >= 13) {
-    return `${h.slice(-2)}:${m.slice(-2)} pm`;
-  }
-  return `${h.slice(-2)}:${m.slice(-2)} am`;
-};
+import { formatHour } from "../../utilities/utilities";
 
 const ChatItems = (props) => {
   const member = props.member;
   const user = useSelector((state) => state.user.user);
-  const { stream } = useSelector((state) => state.video);
   const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -77,7 +67,7 @@ const ChatItems = (props) => {
             <ChatInfo>
               <h6>{member.name}</h6>
               {props.header === "Chats" && (
-                <div>{formatDate(props.messageDate)}</div>
+                <div>{formatHour(props.messageDate)}</div>
               )}
             </ChatInfo>
             <ChatText type={props.header}>

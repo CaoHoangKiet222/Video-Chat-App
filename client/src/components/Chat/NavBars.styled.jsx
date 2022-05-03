@@ -51,9 +51,9 @@ export const MainNav = styled.ul`
     font-size: 26px;
     padding-bottom: 1.5rem;
     padding-top: 1.5rem;
-    color: #d5d5e3;
+    color: #6c757d;
     &.active > svg {
-      color: white;
+      color: #d5d5e3;
     }
 
     &:hover {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { BiUserCircle } from "react-icons/bi";
 import { BsMessenger, BsTelephone } from "react-icons/bs";
 import { HiOutlineUsers } from "react-icons/hi";
@@ -7,18 +7,31 @@ import { Link } from "react-router-dom";
 import { MainNav, NavBar } from "./NavBars.styled";
 
 const NavBars = () => {
-  const clickHandle = (e) => {
-    e.target.classList.toggle("active");
-  };
+  const navItems = useRef(null);
+
+  const removeActive = useCallback(() => {
+    navItems.current.querySelectorAll("li a").forEach((item) => {
+      item.classList.remove("active");
+    });
+  }, []);
+
+  useEffect(() => {
+    navItems.current.querySelectorAll("li a").forEach((item) => {
+      item.addEventListener("click", () => {
+        removeActive();
+        item.classList.add("active");
+      });
+    });
+  }, [removeActive]);
 
   return (
     <NavBar>
       <a href="#">
         <BsMessenger />
       </a>
-      <MainNav>
+      <MainNav ref={navItems}>
         <li>
-          <Link to="/video-chat/Chats" onClick={clickHandle}>
+          <Link to="/video-chat/Chats" className="active">
             <TiMessages />
           </Link>
         </li>
