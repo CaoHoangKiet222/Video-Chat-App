@@ -14,6 +14,7 @@ import { BiDotsVerticalRounded } from "react-icons/bi";
 import { searchUser } from "../../utilities/utilities";
 
 const SideBars = (props) => {
+  console.log("SideBars running");
   const conversation = useSelector((state) => state.conversation.conversation);
   const friends = useSelector((state) => state.friends.friends);
   const isDiff = useRef(false);
@@ -29,17 +30,14 @@ const SideBars = (props) => {
           chatItems.style.background = "none";
         });
       };
-      console.log(chatsList.current.querySelectorAll("li > a"));
       chatsList.current.querySelectorAll("li > a").forEach((chatItems) => {
-        console.log(chatItems);
         chatItems.addEventListener("click", () => {
-          console.log(chatItems);
           removeAllBackground();
           chatItems.style.background = "#665dfe";
         });
       });
     }
-  }, [conversation]);
+  }, [conversation, chatsList]);
 
   const startSearch = (e) => {
     setSearchName(e.target.value);

@@ -6,11 +6,11 @@ exports = module.exports = (socket, type, io = null) => {
     case "joinRoom":
       socket.on("joinRoom", async (room, callback) => {
         try {
-          // const conv = await Conversation.findOne({ _id: room }).populate({
-          //   path: "members.userId",
-          // });
+          const conv = await Conversation.findOne({ _id: room }).populate({
+            path: "members.userId",
+          });
           //
-          // callback(null, conv.messages);
+          callback(conv.messages);
 
           socket.join(room);
 
@@ -18,7 +18,7 @@ exports = module.exports = (socket, type, io = null) => {
           console.log(io.adapter.rooms);
         } catch (err) {
           console.error(err);
-          // callback(err.message, null);
+          callback(null, err.message);
         }
       });
       break;
@@ -34,7 +34,6 @@ exports = module.exports = (socket, type, io = null) => {
           conversation.messages.push(message);
           await conversation.save();
           const newMesage = conversation.messages.splice(-1)[0];
-
           io.to(room).emit("receiveMessage", newMesage);
 
           callback();

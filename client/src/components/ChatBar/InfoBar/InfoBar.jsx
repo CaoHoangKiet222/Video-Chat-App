@@ -5,35 +5,38 @@ import Main from "../Main/Main";
 import ChatFooter from "../ChatFooter/ChatFooter";
 import ChatHeader from "../ChatHeader/ChatHeader";
 import { useSelector } from "react-redux";
+import InfoBarLoading from "./InfoBarLoading";
+let timer;
 
 const InfoBar = (props) => {
-  console.log("InfoBar running");
+  // console.log("InfoBar running");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [isFetch, setIsFetch] = useState(false);
   const chatSocket = useSelector((state) => state.socket.chatSocket);
 
   useEffect(() => {
-    chatSocket.emit("joinRoom", props.room, (error) => {
+    chatSocket.emit("joinRoom", props.room, (messages, error = null) => {
       if (error) {
         return setError(error);
       }
+      setMessages(messages);
+
+      timer = setTimeout(() => {
+        setIsFetch(true);
+      }, 1000);
     });
 
     return () => {
       chatSocket.emit("leaveRoom", props.room);
+      setIsFetch(false);
+      clearTimeout(timer);
     };
   }, [props.member, props.room, chatSocket]);
 
   useEffect(() => {
-    // Not done yet
-    console.log(props.messages);
-    setMessages(props.messages);
-  }, [props.messages]);
-
-  useEffect(() => {
     chatSocket.on("receiveMessage", (message) => {
-      console.log(message);
       setMessages((preMessages) => [...preMessages, message]);
     });
   }, [chatSocket]);
@@ -63,9 +66,13 @@ const InfoBar = (props) => {
     <Card>
       <Msger>
         <ChatHeader member={props.member} room={props.room} />
-        <Body>
-          <Main messages={messages} />
-        </Body>
+        {!isFetch ? (
+          <InfoBarLoading />
+        ) : (
+          <Body>
+            <Main messages={messages} />
+          </Body>
+        )}
         <ChatFooter onSendMessage={sendMessage} onSetMessage={setMessage} />
       </Msger>
     </Card>

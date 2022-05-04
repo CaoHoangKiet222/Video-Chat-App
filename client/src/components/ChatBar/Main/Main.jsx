@@ -6,7 +6,7 @@ import Messages from "./Messages";
 import { v4 as uuidv4 } from "uuid";
 
 const Main = (props) => {
-  console.log("Main running");
+  // console.log("Main running");
   const { conversation } = useSelector((state) => state.conversation);
   const preTime = useRef(null);
   const timeChange = useRef(true);

@@ -15,7 +15,8 @@ import {
   SocialList,
   List,
   ExtraLogin,
-} from "./LoginStyle";
+  Circle,
+} from "./Login.styled";
 import { useDispatch, useSelector } from "react-redux";
 import { LoadingSpinner } from "../UI/Loading";
 import { FiFacebook, FiTwitter } from "react-icons/fi";
@@ -34,8 +35,9 @@ const Login = (props) => {
 
   useEffect(() => {
     setTimeout(() => {
+      // userState.error === null important statement
       if (userState.error === null && userState.user) {
-        !props.isSignUp ? navigate("/video-chat") : navigate("/login");
+        !props.isSignUp ? navigate("/video-chat/Chats") : navigate("/login");
       }
     }, 1000);
   }, [userState, navigate, props.isSignUp]);
@@ -56,6 +58,8 @@ const Login = (props) => {
       <Content>
         <FormContainer>
           <FormSection>
+            <Circle />
+            <Circle />
             <Logo>
               <a href="#">
                 <img src="/images/logo-login.png" alt="" />

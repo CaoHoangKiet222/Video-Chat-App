@@ -33,16 +33,50 @@ export const FormContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+`;
+
+export const Circle = styled.div`
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(#b0e633, #53ef7d);
+  border-radius: 50%;
+  position: absolute;
+  animation: move-up 1s ease-in infinite alternate-reverse;
+
+  &:nth-child(1) {
+    top: -20px;
+    left: -25px;
+  }
+  &:nth-child(2) {
+    bottom: -25px;
+    right: -25px;
+    animation-nane: move-down;
+  }
+
+  @keyframes move-up {
+    to {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes move-down {
+    to {
+      transform: translateY(10px);
+    }
+  }
 `;
 
 export const FormSection = styled.div`
   max-width: 550px;
   margin: 0 auto;
   padding: 70px 50px;
-  background: #fff;
+  /* background: rgba(255, 255, 255, 0.05); */
+  background: #ffffff;
   border-radius: 5px;
   box-shadow: 0px 10px 13px -7px #000000, 0px 2px 36px 5px #000000;
-  z-index: 999;
+  z-index: 1;
+  position: relative;
 
   p {
     margin: 0;
@@ -160,6 +194,10 @@ export const LoginButton = styled.div`
   right: 0;
   z-index: 99;
 
+  & > div {
+    position: relative;
+  }
+
   button {
     position: relative;
     width: 100%;
@@ -173,7 +211,7 @@ export const LoginButton = styled.div`
     cursor: pointer;
     transition: all 0.7s ease;
     font-size: 17px;
-    z-index: 1;
+    z-index: 2;
   }
 
   &:before,
