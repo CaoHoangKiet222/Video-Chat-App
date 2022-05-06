@@ -8,15 +8,7 @@ import socketReducer from "./socket-slice";
 const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: ["video/setStream"],
-        ignoredActionPaths: ["payload.currentStream"],
-        ignoredPaths: [
-          "video.stream",
-          "socket.chatSocket",
-          "socket.meetingSocket",
-        ],
-      },
+      serializableCheck: false,
     }),
   reducer: {
     user: userReducer,

@@ -1,19 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   CommonControl,
   Container,
-  Img,
   MeetingBottomControls,
   MeetingMain,
   MeetingTopControls,
-  Name,
   PanelControl,
-  PeerInfo,
   Peers,
-  RemotePeer,
-  Status,
   Streams,
-  VideoContainer,
   Videos,
 } from "./MeetingRoom.styled.jsx";
 import {
@@ -32,12 +26,30 @@ import { MdGridView } from "react-icons/md";
 import { VscSplitHorizontal } from "react-icons/vsc";
 import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
 import CommonPeer from "./CommonPeer.jsx";
+import { useSelector } from "react-redux";
 
 const MeetingRoom = () => {
   const [showTop, setShowTop] = useState(false);
+  const {
+    callEnded,
+    userStream,
+    stream,
+    // call: { caller, callee },
+  } = useSelector((state) => state.video);
+  const myVideo = useRef(null),
+    userVideo = useRef(null);
+
+  useEffect(() => {
+    if (stream) {
+      myVideo.current.srcObject = stream;
+    }
+
+    if (userStream) {
+      userVideo.current.srcObject = userStream;
+    }
+  }, [stream, userStream]);
 
   const showTopControls = () => {
-    console.log("hello");
     if (showTop) {
       return setShowTop(false);
     }
@@ -66,7 +78,12 @@ const MeetingRoom = () => {
             </>
           )}
           <Videos isShowTop={showTop}>
-            <video src=""></video>
+            <video
+              ref={myVideo}
+              muted={true}
+              playsInline={true}
+              autoPlay={true}
+            />
           </Videos>
           {showTop && (
             <PanelControl>
@@ -75,13 +92,22 @@ const MeetingRoom = () => {
           )}
         </MeetingTopControls>
         <Streams>
-          <CommonPeer
-            font-size="18px"
-            padding="5px 0"
-            height="120px"
-            width="120px"
-            type="video-container"
-          />
+          {callEnded ? (
+            <CommonPeer
+              font-size="18px"
+              padding="5px 0"
+              height="120px"
+              width="120px"
+              type="video-container"
+            />
+          ) : (
+            <video
+              ref={userVideo}
+              muted={true}
+              playsInline={true}
+              autoPlay={true}
+            />
+          )}
           <MeetingBottomControls>
             <CommonControl>
               <FiVideo />

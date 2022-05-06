@@ -73,6 +73,12 @@ export const Streams = styled.div`
   background-color: #000;
   display: flex;
   flex-direction: column;
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 `;
 
 export const MeetingBottomControls = styled.div`

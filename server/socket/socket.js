@@ -93,6 +93,11 @@ exports = module.exports = (socket, type, io = null) => {
         console.log("answerCall done");
       });
       break;
+    case "joinMeetingRoom":
+      socket.on("joinMeetingRoom", ({ callId }) => {
+        io.to(callId).emit("joinMeetingRoom", callId);
+      });
+      break;
     case "notAnswerCall":
       socket.on("notAnswerCall", ({ callId }) => {
         io.to(callId).emit("notAnswerCall");

@@ -23,13 +23,8 @@ const Meeting = () => {
   const { isReceiving, callee, caller } = useSelector(
     (state) => state.video.call
   );
-  const { callAccepted, callEnded, stream } = useSelector(
-    (state) => state.video
-  );
+  const { callAccepted, stream } = useSelector((state) => state.video);
   const { meetingSocket } = useSelector((state) => state.socket);
-  const myVideo = useRef(),
-    userVideo = useRef(),
-    connectionRef = useRef();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -45,16 +40,20 @@ const Meeting = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (callAccepted && stream) {
-      myVideo.current.srcObject = stream;
+    if (callAccepted) {
+      meetingSocket.emit("joinMeetingRoom", { callId: params.meetingId });
     }
-  }, [callAccepted, stream]);
+  }, [callAccepted, stream, meetingSocket, params]);
 
   useEffect(() => {
     meetingSocket.on("callToUser", ({ signal }) => {
       dispatch(videoActions.setCallSignal({ signal }));
     });
-  }, [dispatch, meetingSocket]);
+
+    meetingSocket.on("joinMeetingRoom", (callId) => {
+      navigate(`/meeting/${callId}`);
+    });
+  }, [dispatch, meetingSocket, navigate]);
 
   useEffect(() => {
     // Off stream when close video
@@ -75,7 +74,7 @@ const Meeting = () => {
 
   useEffect(() => {
     if (stream && !isReceiving) {
-      dispatch(callToUser(userVideo, connectionRef));
+      dispatch(callToUser());
     }
   }, [stream, dispatch, isReceiving]);
 
@@ -87,10 +86,10 @@ const Meeting = () => {
   };
 
   const acceptVideo = () => {
-    dispatch(answerCall(userVideo, connectionRef));
+    dispatch(answerCall());
   };
 
-  return !callAccepted ? (
+  return (
     <Container>
       <Content>
         <Join>
@@ -134,32 +133,6 @@ const Meeting = () => {
         </Join>
       </Content>
     </Container>
-  ) : (
-    <>
-      {stream && (
-        <>
-          <h1>Hello myVideo</h1>
-          <video
-            ref={myVideo}
-            muted={true}
-            playsInline={true}
-            autoPlay={true}
-          />
-        </>
-      )}
-
-      {!callEnded && (
-        <>
-          <h1>Hello userVideo</h1>
-          <video
-            ref={userVideo}
-            muted={true}
-            playsInline={true}
-            autoPlay={true}
-          />
-        </>
-      )}
-    </>
   );
 };
 

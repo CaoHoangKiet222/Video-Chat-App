@@ -40,7 +40,7 @@ export const videoStart = (callee, caller, room, navigate) => {
   };
 };
 
-export const answerCall = (userVideo, connectionRef) => {
+export const answerCall = () => {
   return async (dispatch, getState) => {
     try {
       const {
@@ -68,21 +68,21 @@ export const answerCall = (userVideo, connectionRef) => {
 
       peer.on("stream", (currentStream) => {
         console.log("peer stream answerCall running");
-        userVideo.current.srcObject = currentStream;
+        dispatch(videoActions.setUserStream({ userStream: currentStream }));
       });
 
       // video.call.signal is signal of caller
       peer.signal(video.call.signal);
       console.log("peer signal answerCall done");
 
-      connectionRef.current = peer;
+      dispatch(videoActions.setPeer({ peer }));
     } catch (err) {
       console.error(err);
     }
   };
 };
 
-export const callToUser = (userVideo, connectionRef) => {
+export const callToUser = () => {
   return async (dispatch, getState) => {
     try {
       console.log("current state callToUser", getState());
@@ -109,7 +109,7 @@ export const callToUser = (userVideo, connectionRef) => {
 
       peer.on("stream", (currentStream) => {
         console.log("peer stream callToUser running");
-        userVideo.current.srcObject = currentStream;
+        dispatch(videoActions.setUserStream({ userStream: currentStream }));
       });
 
       // Wait for user accept
@@ -121,7 +121,7 @@ export const callToUser = (userVideo, connectionRef) => {
         console.log("peer signal callToUser done");
       });
 
-      connectionRef.current = peer;
+      dispatch(videoActions.setPeer({ peer }));
     } catch (err) {
       console.error(err);
     }

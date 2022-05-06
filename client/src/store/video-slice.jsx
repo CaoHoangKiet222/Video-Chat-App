@@ -6,6 +6,8 @@ export const videoSlice = createSlice({
     stream: null,
     callId: null,
     call: null,
+    userStream: null,
+    peer: null,
     callAccepted: false,
     callEnded: false,
   },
@@ -15,6 +17,12 @@ export const videoSlice = createSlice({
     },
     setCallId(state, action) {
       state.callId = action.payload.callId;
+    },
+    setUserStream(state, action) {
+      state.userStream = action.payload.userStream;
+    },
+    setPeer(state, action) {
+      state.peer = action.payload.peer;
     },
     setCall(state, action) {
       state.call = action.payload.call;

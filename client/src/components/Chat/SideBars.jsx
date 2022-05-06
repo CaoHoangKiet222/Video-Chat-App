@@ -22,9 +22,7 @@ const SideBars = (props) => {
   const chatsList = useRef(null);
 
   useEffect(() => {
-    console.log("hello");
     if (conversation && chatsList.current !== null) {
-      console.log("hello");
       const removeAllBackground = () => {
         chatsList.current.querySelectorAll("li > a").forEach((chatItems) => {
           chatItems.style.background = "none";
