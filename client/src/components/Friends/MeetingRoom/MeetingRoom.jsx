@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   CommonControl,
   Container,
@@ -31,66 +31,57 @@ import { RiFullscreenExitFill, RiFullscreenFill } from "react-icons/ri";
 import { MdGridView } from "react-icons/md";
 import { VscSplitHorizontal } from "react-icons/vsc";
 import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
+import CommonPeer from "./CommonPeer.jsx";
 
 const MeetingRoom = () => {
-  const showTopControls = () => {};
+  const [showTop, setShowTop] = useState(false);
+
+  const showTopControls = () => {
+    console.log("hello");
+    if (showTop) {
+      return setShowTop(false);
+    }
+    setShowTop(true);
+  };
+
   return (
     <Container>
       <MeetingMain>
-        <MeetingTopControls>
-          <PanelControl>
-            <FiMenu />
-            <FaChevronLeft />
-          </PanelControl>
-          <Peers>
-            <PeerInfo className="main-peer">
-              <RemotePeer>
-                <Name font-size="11px" padding="1px 0">
-                  Cao Hoang Kiet
-                </Name>
-                <Img height="40px" width="40px">
-                  <img src="http://localhost:3000/images/user.jpg" alt="" />
-                </Img>
-                <Status font-size="11px" padding="1px 0">
-                  spectator
-                </Status>
-              </RemotePeer>
-            </PeerInfo>
-            <PeerInfo className="main-peer">
-              <RemotePeer>
-                <Name font-size="11px" padding="1px 0">
-                  Cao Hoang Kiet
-                </Name>
-                <Img height="40px" width="40px">
-                  <img src="http://localhost:3000/images/user.jpg" alt="" />
-                </Img>
-                <Status font-size="11px" padding="1px 0">
-                  spectator
-                </Status>
-              </RemotePeer>
-            </PeerInfo>
-          </Peers>
-          <Videos>
+        <MeetingTopControls className={`${!showTop ? "transparent" : ""}`}>
+          {showTop && (
+            <>
+              <PanelControl>
+                <FiMenu />
+                <FaChevronLeft />
+              </PanelControl>
+              <Peers>
+                <CommonPeer
+                  font-size="11px"
+                  padding="1px 0"
+                  height="40px"
+                  width="40px"
+                  type="peer-info"
+                />
+              </Peers>
+            </>
+          )}
+          <Videos isShowTop={showTop}>
             <video src=""></video>
           </Videos>
-          <PanelControl>
-            <FaChevronDown />
-          </PanelControl>
+          {showTop && (
+            <PanelControl>
+              <FaChevronDown />
+            </PanelControl>
+          )}
         </MeetingTopControls>
         <Streams>
-          <VideoContainer>
-            <RemotePeer>
-              <Name font-size="18px" padding="5px 0">
-                Cao Hoang Kiet
-              </Name>
-              <Img height="120px" width="120px">
-                <img src="http://localhost:3000/images/user.jpg" alt="" />
-              </Img>
-              <Status font-size="18px" padding="5px 0">
-                spectator
-              </Status>
-            </RemotePeer>
-          </VideoContainer>
+          <CommonPeer
+            font-size="18px"
+            padding="5px 0"
+            height="120px"
+            width="120px"
+            type="video-container"
+          />
           <MeetingBottomControls>
             <CommonControl>
               <FiVideo />
@@ -112,8 +103,7 @@ const MeetingRoom = () => {
               <RiFullscreenFill />
             </CommonControl>
             <CommonControl onClick={showTopControls}>
-              <MdGridView />
-              <VscSplitHorizontal />
+              {!showTop ? <MdGridView /> : <VscSplitHorizontal />}
             </CommonControl>
           </MeetingBottomControls>
         </Streams>

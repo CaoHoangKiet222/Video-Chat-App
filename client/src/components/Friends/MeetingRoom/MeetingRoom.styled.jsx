@@ -15,7 +15,7 @@ export const MeetingMain = styled.div`
 
 export const MeetingTopControls = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   z-index: 100;
   background: #363e47;
   height: 95px;
@@ -48,32 +48,20 @@ export const Peers = styled.div`
   width: 100%;
   height: 95px;
   z-index: 1;
-`;
-
-export const PeerInfo = styled.div`
-  min-width: 135px;
-  /* width: 135px; */
-  height: 95px;
-  cursor: pointer;
-  margin: 0 1px;
-  z-index: 1;
-
-  &.main-peer {
-    border: 3px solid #da7d02;
-  }
+  overflow: hidden;
 `;
 
 export const Videos = styled.div`
-  min-width: 137px;
+  min-width: 141px;
   position: relative;
 
-  video {
+  & > video {
     object-fit: cover;
     background-color: black;
     z-index: 100;
     width: 140px;
     min-width: 140px;
-    height: 95px;
+    height: ${(props) => (!props.isShowTop ? "105px" : "95px")};
     cursor: pointer;
     margin: 0 1px;
   }
@@ -85,47 +73,6 @@ export const Streams = styled.div`
   background-color: #000;
   display: flex;
   flex-direction: column;
-`;
-
-export const VideoContainer = styled.div`
-  width: 100%;
-  height: 100%;
-`;
-
-export const RemotePeer = styled.div`
-  display: flex;
-  flex-direction: column;
-  background-color: #f7f7f7;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-`;
-
-export const Name = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  height: 30px;
-  font-weight: 700;
-  color: #666;
-  font-size: ${(props) => props["font-size"]};
-  padding: ${(props) => props.padding};
-`;
-
-export const Img = styled.div`
-  height: ${(props) => props.height};
-  width: ${(props) => props.width};
-
-  img {
-    border-radius: 50%;
-    height: inherit;
-    width: inherit;
-  }
-`;
-
-export const Status = styled(Name)`
-  align-items: flex-start;
 `;
 
 export const MeetingBottomControls = styled.div`
