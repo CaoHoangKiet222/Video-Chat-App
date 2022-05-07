@@ -26,18 +26,23 @@ import { MdGridView } from "react-icons/md";
 import { VscSplitHorizontal } from "react-icons/vsc";
 import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
 import CommonPeer from "./CommonPeer.jsx";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { videoActions } from "../../../store/video-slice.jsx";
+import { leaveCall } from "../../../store/video-creator.jsx";
 
 const MeetingRoom = () => {
   const [showTop, setShowTop] = useState(false);
-  const {
-    callEnded,
-    userStream,
-    stream,
-    // call: { caller, callee },
-  } = useSelector((state) => state.video);
+  const { callEnded, userStream, stream, call, peer } = useSelector(
+    (state) => state.video
+  );
   const myVideo = useRef(null),
-    userVideo = useRef(null);
+    userVideo = useRef(null),
+    peersRef = useRef();
+  const params = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const meetingSocket = useSelector((state) => state.socket.meetingSocket);
 
   useEffect(() => {
     if (stream) {
@@ -49,11 +54,39 @@ const MeetingRoom = () => {
     }
   }, [stream, userStream]);
 
+  useEffect(() => {
+    if (showTop) {
+      const clearMainPeer = () => {
+        peersRef.current.querySelectorAll(":scope > div").forEach((peer) => {
+          peer.classList.remove("main-peer");
+        });
+      };
+
+      peersRef.current.querySelectorAll(":scope > div").forEach((peer) => {
+        peer.addEventListener("click", () => {
+          clearMainPeer();
+          peer.classList.add("main-peer");
+          console.log("hello");
+        });
+      });
+    }
+  }, [showTop]);
+
+  useEffect(() => {
+    meetingSocket.on("callEnded", () => {
+      dispatch(leaveCall(navigate, stream));
+    });
+  }, [dispatch, meetingSocket, navigate, stream]);
+
   const showTopControls = () => {
     if (showTop) {
       return setShowTop(false);
     }
     setShowTop(true);
+  };
+
+  const phoneOffHandle = () => {
+    meetingSocket.emit("callEnded", { callId: params.meetingId });
   };
 
   return (
@@ -66,13 +99,23 @@ const MeetingRoom = () => {
                 <FiMenu />
                 <FaChevronLeft />
               </PanelControl>
-              <Peers>
+              <Peers ref={peersRef}>
                 <CommonPeer
                   font-size="11px"
                   padding="1px 0"
                   height="40px"
                   width="40px"
                   type="peer-info"
+                  user={call?.caller}
+                  className="main-peer"
+                />
+                <CommonPeer
+                  font-size="11px"
+                  padding="1px 0"
+                  height="40px"
+                  width="40px"
+                  type="peer-info"
+                  user={call?.callee}
                 />
               </Peers>
             </>
@@ -99,6 +142,7 @@ const MeetingRoom = () => {
               height="120px"
               width="120px"
               type="video-container"
+              user={call?.caller}
             />
           ) : (
             <video
@@ -118,7 +162,7 @@ const MeetingRoom = () => {
             <CommonControl>
               <CgScreen />
             </CommonControl>
-            <CommonControl className="close">
+            <CommonControl className="close" onClick={phoneOffHandle}>
               <FiPhoneOff />
             </CommonControl>
             <CommonControl>

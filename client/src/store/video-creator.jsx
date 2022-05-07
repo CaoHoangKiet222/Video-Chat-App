@@ -128,15 +128,16 @@ export const callToUser = () => {
   };
 };
 
-export const leaveCall = (connectionRef) => {
+export const leaveCall = (navigate, stream) => {
   return (dispatch) => {
-    connectionRef.current.destroy();
-    connectionRef.current.on("error", (err) => {
-      console.log(err);
+    stream?.getTracks().forEach(function (track) {
+      track.stop();
     });
 
-    dispatch(videoActions.setCallEnded({ callEnded: true }));
+    navigate("/video-chat/Chats");
 
-    // window.location.reload();
+    dispatch(videoActions.setStateAgain());
+
+    window.location.reload();
   };
 };

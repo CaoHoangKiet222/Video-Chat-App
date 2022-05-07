@@ -22,12 +22,13 @@ const SideBars = (props) => {
   const chatsList = useRef(null);
 
   useEffect(() => {
-    if (conversation && chatsList.current !== null) {
+    if (conversation && chatsList.current) {
       const removeAllBackground = () => {
         chatsList.current.querySelectorAll("li > a").forEach((chatItems) => {
           chatItems.style.background = "none";
         });
       };
+
       chatsList.current.querySelectorAll("li > a").forEach((chatItems) => {
         chatItems.addEventListener("click", () => {
           removeAllBackground();
@@ -35,7 +36,7 @@ const SideBars = (props) => {
         });
       });
     }
-  }, [conversation, chatsList]);
+  }, [conversation]);
 
   const startSearch = (e) => {
     setSearchName(e.target.value);

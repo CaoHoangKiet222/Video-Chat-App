@@ -4,7 +4,7 @@ exports = module.exports = (socket, type, io = null) => {
   switch (type) {
     // Use for chat
     case "joinRoom":
-      socket.on("joinRoom", async (room, callback) => {
+      socket.on(type, async (room, callback) => {
         try {
           const conv = await Conversation.findOne({ _id: room }).populate({
             path: "members.userId",
@@ -23,12 +23,12 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "leaveRoom":
-      socket.on("leaveRoom", (room) => {
+      socket.on(type, (room) => {
         socket.leave(room);
       });
       break;
     case "sendMessage":
-      socket.on("sendMessage", async (message, room, callback) => {
+      socket.on(type, async (message, room, callback) => {
         try {
           const conversation = await Conversation.findOne({ _id: room });
           conversation.messages.push(message);
@@ -44,13 +44,13 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "disconnect":
-      socket.on("disconnect", () => {
+      socket.on(type, () => {
         console.log("A user disconnected");
       });
       break;
     // Use for video
     case "joinVideo":
-      socket.on("joinVideo", async ({ user, friend }) => {
+      socket.on(type, async ({ user, friend }) => {
         try {
           console.log("A user joins meeting-rooms");
 
@@ -61,7 +61,6 @@ exports = module.exports = (socket, type, io = null) => {
             ],
           }).select({ _id: 1 });
 
-          // console.log("joinVideo", conversation._id.toString());
           socket.join(conversation._id.toString());
 
           console.log(io.adapter.rooms);
@@ -71,7 +70,7 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "meetingConnection":
-      socket.on("meetingConnection", ({ room, callee, caller }, callback) => {
+      socket.on(type, ({ room, callee, caller }, callback) => {
         socket.broadcast.to(room).emit("meetingConnection", {
           callId: room,
           caller,
@@ -82,25 +81,30 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "callToUser":
-      socket.on("callToUser", ({ callId, signalData }) => {
-        console.log("callId", callId);
+      socket.on(type, ({ callId, signalData }) => {
         socket.broadcast.to(callId).emit("callToUser", { signal: signalData });
       });
       break;
     case "answerCall":
-      socket.on("answerCall", ({ signal, callId }) => {
+      socket.on(type, ({ signal, callId }) => {
         io.to(callId).emit("callAccepted", signal);
         console.log("answerCall done");
       });
       break;
     case "joinMeetingRoom":
-      socket.on("joinMeetingRoom", ({ callId }) => {
+      socket.on(type, ({ callId }) => {
         io.to(callId).emit("joinMeetingRoom", callId);
       });
       break;
     case "notAnswerCall":
-      socket.on("notAnswerCall", ({ callId }) => {
+      socket.on(type, ({ callId }) => {
         io.to(callId).emit("notAnswerCall");
+      });
+      break;
+    case "callEnded":
+      socket.on(type, ({ callId }) => {
+        io.to(callId).emit("callEnded");
+        console.log("callEnded done");
       });
       break;
   }

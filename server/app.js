@@ -73,9 +73,11 @@ io_meeting.on("connection", (socket) => {
 
   socketListen(socket, "answerCall", io_meeting);
 
+  socketListen(socket, "notAnswerCall", io_meeting);
+
   socketListen(socket, "joinMeetingRoom", io_meeting);
 
-  socketListen(socket, "notAnswerCall", io_meeting);
+  socketListen(socket, "callEnded", io_meeting);
 });
 
 (async () => {
