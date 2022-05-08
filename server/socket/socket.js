@@ -107,5 +107,11 @@ exports = module.exports = (socket, type, io = null) => {
         console.log("callEnded done");
       });
       break;
+    case "showMyVideo":
+      socket.on(type, ({ callId }, callback) => {
+        callback();
+        socket.broadcast.to(callId).emit("showUserVideo");
+      });
+      break;
   }
 };

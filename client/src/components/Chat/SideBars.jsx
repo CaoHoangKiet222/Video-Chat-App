@@ -22,7 +22,7 @@ const SideBars = (props) => {
   const chatsList = useRef(null);
 
   useEffect(() => {
-    if (conversation && chatsList.current) {
+    if (conversation || searchName) {
       const removeAllBackground = () => {
         chatsList.current.querySelectorAll("li > a").forEach((chatItems) => {
           chatItems.style.background = "none";
@@ -36,7 +36,7 @@ const SideBars = (props) => {
         });
       });
     }
-  }, [conversation]);
+  }, [conversation, searchName]);
 
   const startSearch = (e) => {
     setSearchName(e.target.value);

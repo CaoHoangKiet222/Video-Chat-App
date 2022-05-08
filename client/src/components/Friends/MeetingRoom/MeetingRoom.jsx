@@ -33,6 +33,8 @@ import { leaveCall } from "../../../store/video-creator.jsx";
 
 const MeetingRoom = () => {
   const [showTop, setShowTop] = useState(false);
+  const [showVideo, setShowVideo] = useState(true);
+  const [showUserVideo, setShowUserVideo] = useState(true);
   const { callEnded, userStream, stream, call, peer } = useSelector(
     (state) => state.video
   );
@@ -43,16 +45,6 @@ const MeetingRoom = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
-
-  useEffect(() => {
-    if (stream) {
-      myVideo.current.srcObject = stream;
-    }
-
-    if (userStream) {
-      userVideo.current.srcObject = userStream;
-    }
-  }, [stream, userStream]);
 
   useEffect(() => {
     if (showTop) {
@@ -73,6 +65,42 @@ const MeetingRoom = () => {
   }, [showTop]);
 
   useEffect(() => {
+    // useEffect for first time peer join into room
+    if (stream) {
+      myVideo.current.srcObject = stream;
+    }
+    if (userStream) {
+      userVideo.current.srcObject = userStream;
+    }
+  }, [stream, userStream]);
+
+  useEffect(() => {
+    // useEffect allow videostream on or off
+    if (showVideo) {
+      myVideo.current.srcObject = stream;
+    } else {
+      myVideo.current.srcObject = null;
+    }
+
+    if (showUserVideo) {
+      userVideo.current.srcObject = userStream;
+    } else {
+      userVideo.current.srcObject = null;
+    }
+  }, [showVideo, stream, showUserVideo, userStream]);
+
+  useEffect(() => {
+    meetingSocket.on("showUserVideo", () => {
+      console.log("showUserVideo");
+      setShowUserVideo(!showUserVideo);
+    });
+
+    return () => {
+      meetingSocket.off("showUserVideo");
+    };
+  }, [meetingSocket, showUserVideo]);
+
+  useEffect(() => {
     meetingSocket.on("callEnded", () => {
       dispatch(leaveCall(navigate, stream));
     });
@@ -87,6 +115,12 @@ const MeetingRoom = () => {
 
   const phoneOffHandle = () => {
     meetingSocket.emit("callEnded", { callId: params.meetingId });
+  };
+
+  const videoHandle = () => {
+    meetingSocket.emit("showMyVideo", { callId: params.meetingId }, () => {
+      setShowVideo(!showVideo);
+    });
   };
 
   return (
@@ -153,8 +187,8 @@ const MeetingRoom = () => {
             />
           )}
           <MeetingBottomControls>
-            <CommonControl>
-              <FiVideo />
+            <CommonControl onClick={videoHandle}>
+              {showVideo ? <FiVideo /> : <FiVideoOff />}
             </CommonControl>
             <CommonControl>
               <HiOutlineMicrophone />
