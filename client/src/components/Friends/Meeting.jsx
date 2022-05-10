@@ -58,13 +58,7 @@ const Meeting = () => {
   useEffect(() => {
     // Off stream when close video
     meetingSocket.on("notAnswerCall", () => {
-      stream?.getTracks().forEach(function (track) {
-        track.stop();
-      });
-
-      navigate("/video-chat/Chats");
-
-      dispatch(videoActions.setStateAgain());
+      dispatch(leaveCall(navigate, stream));
     });
 
     return () => {

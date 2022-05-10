@@ -33,9 +33,9 @@ import { leaveCall } from "../../../store/video-creator.jsx";
 
 const MeetingRoom = () => {
   const [showTop, setShowTop] = useState(false);
-  const [showVideo, setShowVideo] = useState(true);
-  const [showUserVideo, setShowUserVideo] = useState(true);
-  const { callEnded, userStream, stream, call, peer } = useSelector(
+  const [showVideo, setShowVideo] = useState(false);
+  const [showUserVideo, setShowUserVideo] = useState(false);
+  const { userStream, stream, call, peer } = useSelector(
     (state) => state.video
   );
   const myVideo = useRef(null),
@@ -65,33 +65,26 @@ const MeetingRoom = () => {
   }, [showTop]);
 
   useEffect(() => {
-    // useEffect for first time peer join into room
-    if (stream) {
-      myVideo.current.srcObject = stream;
+    if (call.isReceiving) {
+      meetingSocket.emit("showMyVideo", { callId: params.meetingId }, () => {
+        setShowVideo(true);
+      });
     }
-    if (userStream) {
-      userVideo.current.srcObject = userStream;
-    }
-  }, [stream, userStream]);
+  }, [call.isReceiving, meetingSocket, params.meetingId]);
 
   useEffect(() => {
     // useEffect allow videostream on or off
-    if (showVideo) {
-      myVideo.current.srcObject = stream;
-    } else {
-      myVideo.current.srcObject = null;
+    if (myVideo.current) {
+      myVideo.current.srcObject = showVideo ? stream : null;
     }
 
-    if (showUserVideo) {
-      userVideo.current.srcObject = userStream;
-    } else {
-      userVideo.current.srcObject = null;
+    if (userVideo.current) {
+      userVideo.current.srcObject = showUserVideo ? userStream : null;
     }
   }, [showVideo, stream, showUserVideo, userStream]);
 
   useEffect(() => {
     meetingSocket.on("showUserVideo", () => {
-      console.log("showUserVideo");
       setShowUserVideo(!showUserVideo);
     });
 
@@ -102,15 +95,12 @@ const MeetingRoom = () => {
 
   useEffect(() => {
     meetingSocket.on("callEnded", () => {
-      dispatch(leaveCall(navigate, stream));
+      dispatch(leaveCall(navigate, stream, true));
     });
   }, [dispatch, meetingSocket, navigate, stream]);
 
   const showTopControls = () => {
-    if (showTop) {
-      return setShowTop(false);
-    }
-    setShowTop(true);
+    setShowTop(!showTop);
   };
 
   const phoneOffHandle = () => {
@@ -140,7 +130,7 @@ const MeetingRoom = () => {
                   height="40px"
                   width="40px"
                   type="peer-info"
-                  user={call?.caller}
+                  user={call.caller}
                   className="main-peer"
                 />
                 <CommonPeer
@@ -149,18 +139,20 @@ const MeetingRoom = () => {
                   height="40px"
                   width="40px"
                   type="peer-info"
-                  user={call?.callee}
+                  user={call.callee}
                 />
               </Peers>
             </>
           )}
           <Videos isShowTop={showTop}>
-            <video
-              ref={myVideo}
-              muted={true}
-              playsInline={true}
-              autoPlay={true}
-            />
+            {showVideo && (
+              <video
+                ref={myVideo}
+                muted={true}
+                playsInline={true}
+                autoPlay={true}
+              />
+            )}
           </Videos>
           {showTop && (
             <PanelControl>
@@ -169,21 +161,21 @@ const MeetingRoom = () => {
           )}
         </MeetingTopControls>
         <Streams>
-          {callEnded ? (
+          {showUserVideo ? (
+            <video
+              ref={userVideo}
+              muted={true}
+              playsInline={true}
+              autoPlay={true}
+            />
+          ) : (
             <CommonPeer
               font-size="18px"
               padding="5px 0"
               height="120px"
               width="120px"
               type="video-container"
-              user={call?.caller}
-            />
-          ) : (
-            <video
-              ref={userVideo}
-              muted={true}
-              playsInline={true}
-              autoPlay={true}
+              user={call.isReceiving ? call.caller : call.callee}
             />
           )}
           <MeetingBottomControls>

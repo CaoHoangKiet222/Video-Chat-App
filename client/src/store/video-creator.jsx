@@ -128,7 +128,7 @@ export const callToUser = () => {
   };
 };
 
-export const leaveCall = (navigate, stream) => {
+export const leaveCall = (navigate, stream, reload = false) => {
   return (dispatch) => {
     stream?.getTracks().forEach(function (track) {
       track.stop();
@@ -138,6 +138,6 @@ export const leaveCall = (navigate, stream) => {
 
     dispatch(videoActions.setStateAgain());
 
-    window.location.reload();
+    reload && window.location.reload();
   };
 };
