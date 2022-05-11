@@ -35,16 +35,19 @@ const MeetingRoom = () => {
   const [showTop, setShowTop] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [showUserVideo, setShowUserVideo] = useState(false);
+  const [changeScale, setChangeScale] = useState(false);
   const { userStream, stream, call, peer } = useSelector(
     (state) => state.video
   );
   const myVideo = useRef(null),
     userVideo = useRef(null),
+    userTopVideo = useRef(),
     peersRef = useRef();
   const params = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
     if (showTop) {
@@ -58,7 +61,6 @@ const MeetingRoom = () => {
         peer.addEventListener("click", () => {
           clearMainPeer();
           peer.classList.add("main-peer");
-          console.log("hello");
         });
       });
     }
@@ -81,7 +83,11 @@ const MeetingRoom = () => {
     if (userVideo.current) {
       userVideo.current.srcObject = showUserVideo ? userStream : null;
     }
-  }, [showVideo, stream, showUserVideo, userStream]);
+
+    if (userTopVideo.current) {
+      userTopVideo.current.srcObject = showUserVideo ? userStream : null;
+    }
+  }, [showVideo, stream, showUserVideo, userStream, showTop]);
 
   useEffect(() => {
     meetingSocket.on("showUserVideo", () => {
@@ -113,6 +119,10 @@ const MeetingRoom = () => {
     });
   };
 
+  const changeScaleHandle = () => {
+    setChangeScale(!changeScale);
+  };
+
   return (
     <Container>
       <MeetingMain>
@@ -124,23 +134,36 @@ const MeetingRoom = () => {
                 <FaChevronLeft />
               </PanelControl>
               <Peers ref={peersRef}>
-                <CommonPeer
-                  font-size="11px"
-                  padding="1px 0"
-                  height="40px"
-                  width="40px"
-                  type="peer-info"
-                  user={call.caller}
-                  className="main-peer"
-                />
-                <CommonPeer
-                  font-size="11px"
-                  padding="1px 0"
-                  height="40px"
-                  width="40px"
-                  type="peer-info"
-                  user={call.callee}
-                />
+                {showUserVideo ? (
+                  <Videos isShowTop={showTop}>
+                    <video
+                      ref={userTopVideo}
+                      muted={true}
+                      playsInline={true}
+                      autoPlay={true}
+                    />
+                  </Videos>
+                ) : call.isReceiving ? (
+                  <CommonPeer
+                    font-size="11px"
+                    padding="1px 0"
+                    height="40px"
+                    width="40px"
+                    type="peer-info"
+                    user={call.caller}
+                    className="main-peer"
+                  />
+                ) : (
+                  <CommonPeer
+                    font-size="11px"
+                    padding="1px 0"
+                    height="40px"
+                    width="40px"
+                    type="peer-info"
+                    user={call.callee}
+                    className="main-peer"
+                  />
+                )}
               </Peers>
             </>
           )}
@@ -160,7 +183,7 @@ const MeetingRoom = () => {
             </PanelControl>
           )}
         </MeetingTopControls>
-        <Streams>
+        <Streams changeScale={changeScale}>
           {showUserVideo ? (
             <video
               ref={userVideo}
@@ -194,9 +217,8 @@ const MeetingRoom = () => {
             <CommonControl>
               <FiUserPlus />
             </CommonControl>
-            <CommonControl>
-              <RiFullscreenExitFill />
-              <RiFullscreenFill />
+            <CommonControl onClick={changeScaleHandle}>
+              {changeScale ? <RiFullscreenExitFill /> : <RiFullscreenFill />}
             </CommonControl>
             <CommonControl onClick={showTopControls}>
               {!showTop ? <MdGridView /> : <VscSplitHorizontal />}

@@ -9,6 +9,7 @@ export const MeetingMain = styled.div`
   background: #f7f7f7;
   display: flex;
   flex-direction: column;
+
   width: 100%;
   height: 100%;
 `;
@@ -19,6 +20,8 @@ export const MeetingTopControls = styled.div`
   z-index: 100;
   background: #363e47;
   height: 95px;
+  position: fixed;
+  width: 100%;
 
   &.transparent {
     width: 100%;
@@ -52,7 +55,7 @@ export const Peers = styled.div`
 `;
 
 export const Videos = styled.div`
-  min-width: 141px;
+  min-width: 140px;
   position: relative;
 
   & > video {
@@ -73,9 +76,12 @@ export const Streams = styled.div`
   background-color: #000;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  position: relative;
 
   video {
-    width: 100%;
+    display: block;
+    width: ${({ changeScale }) => (changeScale ? "90%" : "100%")};
     height: 100%;
     object-fit: cover;
   }
@@ -86,8 +92,9 @@ export const MeetingBottomControls = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  padding: 0 0 18px;
-  background-color: #f7f7f7;
+  padding: 18px 0 18px 0;
+  position: fixed;
+  bottom: 0;
 `;
 
 export const CommonControl = styled.div`
