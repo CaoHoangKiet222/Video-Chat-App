@@ -80,6 +80,8 @@ io_meeting.on("connection", (socket) => {
   socketListen(socket, "callEnded", io_meeting);
 
   socketListen(socket, "showMyVideo");
+
+  socketListen(socket, "muteSound");
 });
 
 (async () => {

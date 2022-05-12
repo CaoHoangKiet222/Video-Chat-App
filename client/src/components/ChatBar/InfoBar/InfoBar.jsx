@@ -12,7 +12,7 @@ const InfoBar = (props) => {
   // console.log("InfoBar running");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(props.messages);
   const [isFetch, setIsFetch] = useState(false);
   const chatSocket = useSelector((state) => state.socket.chatSocket);
 

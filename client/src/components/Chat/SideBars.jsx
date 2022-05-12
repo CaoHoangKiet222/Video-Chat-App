@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import {
   ChatsHeader,
@@ -21,14 +21,14 @@ const SideBars = (props) => {
   const [searchName, setSearchName] = useState("");
   const chatsList = useRef(null);
 
-  useEffect(() => {
-    if (conversation || searchName) {
-      const removeAllBackground = () => {
-        chatsList.current.querySelectorAll("li > a").forEach((chatItems) => {
-          chatItems.style.background = "none";
-        });
-      };
+  const removeAllBackground = useCallback(() => {
+    chatsList.current.querySelectorAll("li > a").forEach((chatItems) => {
+      chatItems.style.background = "none";
+    });
+  }, []);
 
+  useEffect(() => {
+    if (conversation || searchName || props.header) {
       chatsList.current.querySelectorAll("li > a").forEach((chatItems) => {
         chatItems.addEventListener("click", () => {
           removeAllBackground();
@@ -36,7 +36,7 @@ const SideBars = (props) => {
         });
       });
     }
-  }, [conversation, searchName]);
+  }, [conversation, searchName, props.header, removeAllBackground]);
 
   const startSearch = (e) => {
     setSearchName(e.target.value);
@@ -94,7 +94,7 @@ const SideBars = (props) => {
                   const { userId: member } = members.find(
                     (member) => member.userId._id !== conversation.user._id
                   );
-                  const lastMessage = messages?.slice(-1)[0];
+                  // const lastMessage = messages?.slice(-1)[0];
                   return (
                     <ChatItems
                       key={_id}
@@ -102,8 +102,8 @@ const SideBars = (props) => {
                       messages={messages}
                       user={conversation.user}
                       header={props.header}
-                      messageDate={lastMessage?.messageDate}
-                      content={lastMessage?.content}
+                      // messageDate={lastMessage?.messageDate}
+                      // content={lastMessage?.content}
                       room={_id}
                     />
                   );

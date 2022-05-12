@@ -27,7 +27,7 @@ import { FiLinkedin, FiFacebook, FiTwitter, FiInstagram } from "react-icons/fi";
 import { MdAccessTime } from "react-icons/md";
 import { formatDate, postData } from "../../utilities/utilities";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { conversationActions } from "../../store/conversations-slice";
 
 const Friends = (props) => {
@@ -47,10 +47,13 @@ const Friends = (props) => {
   // }
 
   const messageHandle = async () => {
-    const data = await postData(`${ENDPOINT_SERVER}/add-friend`, "post", {
-      friendId: props.friend._id,
-    });
-    dispatch(conversationActions.setConversation({ conversation: data }));
+    dispatch(
+      conversationActions.setConversation({
+        conversation: await postData(`${ENDPOINT_SERVER}/add-friend`, "post", {
+          friendId: props.friend._id,
+        }),
+      })
+    );
     navigate(`/video-chat/Chats/${encodeURIComponent(name)}`);
   };
 

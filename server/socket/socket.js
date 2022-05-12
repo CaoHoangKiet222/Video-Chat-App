@@ -113,5 +113,10 @@ exports = module.exports = (socket, type, io = null) => {
         socket.broadcast.to(callId).emit("showUserVideo");
       });
       break;
+    case "muteSound":
+      socket.on(type, ({ callId }) => {
+        socket.broadcast.to(callId).emit("muteSound");
+      });
+      break;
   }
 };

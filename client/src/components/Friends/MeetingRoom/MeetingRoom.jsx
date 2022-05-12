@@ -103,6 +103,7 @@ const MeetingRoom = () => {
     meetingSocket.on("callEnded", () => {
       dispatch(leaveCall(navigate, stream, true));
     });
+    meetingSocket.on();
   }, [dispatch, meetingSocket, navigate, stream]);
 
   const showTopControls = () => {
@@ -121,6 +122,12 @@ const MeetingRoom = () => {
 
   const changeScaleHandle = () => {
     setChangeScale(!changeScale);
+  };
+
+  const muteSound = () => {
+    console.log("hello");
+    console.log(userVideo.current.muted);
+    showVideo && meetingSocket.emit("muteSound", { callId: params.meetingId });
   };
 
   return (
@@ -187,7 +194,7 @@ const MeetingRoom = () => {
           {showUserVideo ? (
             <video
               ref={userVideo}
-              muted={true}
+              muted={false}
               playsInline={true}
               autoPlay={true}
             />
@@ -205,7 +212,7 @@ const MeetingRoom = () => {
             <CommonControl onClick={videoHandle}>
               {showVideo ? <FiVideo /> : <FiVideoOff />}
             </CommonControl>
-            <CommonControl>
+            <CommonControl onClick={muteSound}>
               <HiOutlineMicrophone />
             </CommonControl>
             <CommonControl>
