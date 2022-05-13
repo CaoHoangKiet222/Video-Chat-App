@@ -94,7 +94,7 @@ const SideBars = (props) => {
                   const { userId: member } = members.find(
                     (member) => member.userId._id !== conversation.user._id
                   );
-                  // const lastMessage = messages?.slice(-1)[0];
+                  const lastMessage = messages?.slice(-1)[0];
                   return (
                     <ChatItems
                       key={_id}
@@ -102,8 +102,8 @@ const SideBars = (props) => {
                       messages={messages}
                       user={conversation.user}
                       header={props.header}
-                      // messageDate={lastMessage?.messageDate}
-                      // content={lastMessage?.content}
+                      messageDate={lastMessage?.messageDate}
+                      content={lastMessage?.content}
                       room={_id}
                     />
                   );

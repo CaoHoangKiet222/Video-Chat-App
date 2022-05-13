@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import CommonPeer from "./CommonPeer.jsx";
 
 export const Container = styled.div`
   height: 100vh;
@@ -82,7 +83,7 @@ export const Streams = styled.div`
   video {
     display: block;
     width: ${({ changeScale }) => (changeScale ? "90%" : "100%")};
-    height: 100%;
+    height: ${({ showUserVideo }) => (showUserVideo ? "100%" : "0%")};
     object-fit: cover;
   }
 `;

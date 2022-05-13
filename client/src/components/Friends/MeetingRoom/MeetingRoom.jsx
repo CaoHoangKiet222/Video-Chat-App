@@ -14,11 +14,10 @@ import {
   FiMenu,
   FiVideo,
   FiVideoOff,
-  FiPhone,
   FiPhoneOff,
   FiUserPlus,
 } from "react-icons/fi";
-import { BiMicrophone, BiMicrophoneOff } from "react-icons/bi";
+import { BiMicrophoneOff } from "react-icons/bi";
 import { CgScreen } from "react-icons/cg";
 import { HiOutlineMicrophone } from "react-icons/hi";
 import { RiFullscreenExitFill, RiFullscreenFill } from "react-icons/ri";
@@ -28,7 +27,6 @@ import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
 import CommonPeer from "./CommonPeer.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { videoActions } from "../../../store/video-slice.jsx";
 import { leaveCall } from "../../../store/video-creator.jsx";
 
 const MeetingRoom = () => {
@@ -36,9 +34,8 @@ const MeetingRoom = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [showUserVideo, setShowUserVideo] = useState(false);
   const [changeScale, setChangeScale] = useState(false);
-  const { userStream, stream, call, peer } = useSelector(
-    (state) => state.video
-  );
+  const [muteSound, setMuteSound] = useState(false);
+  const { userStream, stream, call } = useSelector((state) => state.video);
   const myVideo = useRef(null),
     userVideo = useRef(null),
     userTopVideo = useRef(),
@@ -47,7 +44,6 @@ const MeetingRoom = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
-  const user = useSelector((state) => state.user);
 
   useEffect(() => {
     if (showTop) {
@@ -81,13 +77,14 @@ const MeetingRoom = () => {
     }
 
     if (userVideo.current) {
-      userVideo.current.srcObject = showUserVideo ? userStream : null;
+      userVideo.current.srcObject =
+        showUserVideo || muteSound ? userStream : null;
     }
 
     if (userTopVideo.current) {
       userTopVideo.current.srcObject = showUserVideo ? userStream : null;
     }
-  }, [showVideo, stream, showUserVideo, userStream, showTop]);
+  }, [showVideo, stream, showUserVideo, userStream, showTop, muteSound]);
 
   useEffect(() => {
     meetingSocket.on("showUserVideo", () => {
@@ -100,10 +97,21 @@ const MeetingRoom = () => {
   }, [meetingSocket, showUserVideo]);
 
   useEffect(() => {
+    meetingSocket.on("toggleSound", () => {
+      console.log(userVideo.current.srcObject);
+      setMuteSound(!muteSound);
+      console.log(userVideo.current.muted);
+    });
+
+    return () => {
+      meetingSocket.off("toggleSound");
+    };
+  }, [meetingSocket, muteSound]);
+
+  useEffect(() => {
     meetingSocket.on("callEnded", () => {
       dispatch(leaveCall(navigate, stream, true));
     });
-    meetingSocket.on();
   }, [dispatch, meetingSocket, navigate, stream]);
 
   const showTopControls = () => {
@@ -124,10 +132,9 @@ const MeetingRoom = () => {
     setChangeScale(!changeScale);
   };
 
-  const muteSound = () => {
-    console.log("hello");
-    console.log(userVideo.current.muted);
-    showVideo && meetingSocket.emit("muteSound", { callId: params.meetingId });
+  const toggleSound = () => {
+    setMuteSound(!muteSound);
+    meetingSocket.emit("toggleSound", { callId: params.meetingId });
   };
 
   return (
@@ -190,30 +197,33 @@ const MeetingRoom = () => {
             </PanelControl>
           )}
         </MeetingTopControls>
-        <Streams changeScale={changeScale}>
+        <Streams changeScale={changeScale} showUserVideo={showUserVideo}>
           {showUserVideo ? (
             <video
               ref={userVideo}
-              muted={false}
+              muted={muteSound}
               playsInline={true}
               autoPlay={true}
             />
           ) : (
-            <CommonPeer
-              font-size="18px"
-              padding="5px 0"
-              height="120px"
-              width="120px"
-              type="video-container"
-              user={call.isReceiving ? call.caller : call.callee}
-            />
+            <>
+              <CommonPeer
+                font-size="18px"
+                padding="5px 0"
+                height="120px"
+                width="120px"
+                type="video-container"
+                user={call.isReceiving ? call.caller : call.callee}
+              />
+              <video ref={userVideo} muted={muteSound} autoPlay={false} />
+            </>
           )}
           <MeetingBottomControls>
             <CommonControl onClick={videoHandle}>
               {showVideo ? <FiVideo /> : <FiVideoOff />}
             </CommonControl>
-            <CommonControl onClick={muteSound}>
-              <HiOutlineMicrophone />
+            <CommonControl onClick={toggleSound}>
+              {!muteSound ? <HiOutlineMicrophone /> : <BiMicrophoneOff />}
             </CommonControl>
             <CommonControl>
               <CgScreen />

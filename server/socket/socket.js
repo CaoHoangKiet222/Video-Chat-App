@@ -104,7 +104,6 @@ exports = module.exports = (socket, type, io = null) => {
     case "callEnded":
       socket.on(type, ({ callId }) => {
         io.to(callId).emit("callEnded");
-        console.log("callEnded done");
       });
       break;
     case "showMyVideo":
@@ -113,9 +112,9 @@ exports = module.exports = (socket, type, io = null) => {
         socket.broadcast.to(callId).emit("showUserVideo");
       });
       break;
-    case "muteSound":
+    case "toggleSound":
       socket.on(type, ({ callId }) => {
-        socket.broadcast.to(callId).emit("muteSound");
+        socket.broadcast.to(callId).emit("toggleSound");
       });
       break;
   }

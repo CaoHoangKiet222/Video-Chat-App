@@ -20,8 +20,6 @@ const ChatItems = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
-  const { content, messageDate } = props.messages.slice(-1)[0];
-  // console.log(props);
 
   let pathname;
   if (props.header === "Friends") {
@@ -69,10 +67,12 @@ const ChatItems = (props) => {
           <ChatContent>
             <ChatInfo>
               <h6>{member.name}</h6>
-              {props.header === "Chats" && <div>{formatHour(messageDate)}</div>}
+              {props.header === "Chats" && (
+                <div>{formatHour(props.messageDate)}</div>
+              )}
             </ChatInfo>
             <ChatText type={props.header}>
-              {props.header === "Chats" && <p>{content}</p>}
+              {props.header === "Chats" && <p>{props.content}</p>}
               {props.header === "Friends" && (
                 <>
                   <FaMapMarkerAlt />
