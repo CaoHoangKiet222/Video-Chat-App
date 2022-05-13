@@ -35,6 +35,7 @@ const MeetingRoom = () => {
   const [showUserVideo, setShowUserVideo] = useState(false);
   const [changeScale, setChangeScale] = useState(false);
   const [muteSound, setMuteSound] = useState(false);
+  const [toggleIconSound, setToggleIconSound] = useState(false);
   const { userStream, stream, call } = useSelector((state) => state.video);
   const myVideo = useRef(null),
     userVideo = useRef(null),
@@ -78,7 +79,7 @@ const MeetingRoom = () => {
 
     if (userVideo.current) {
       userVideo.current.srcObject =
-        showUserVideo || muteSound ? userStream : null;
+        showUserVideo || !muteSound ? userStream : null;
     }
 
     if (userTopVideo.current) {
@@ -98,9 +99,7 @@ const MeetingRoom = () => {
 
   useEffect(() => {
     meetingSocket.on("toggleSound", () => {
-      console.log(userVideo.current.srcObject);
       setMuteSound(!muteSound);
-      console.log(userVideo.current.muted);
     });
 
     return () => {
@@ -133,15 +132,38 @@ const MeetingRoom = () => {
   };
 
   const toggleSound = () => {
-    setMuteSound(!muteSound);
+    setToggleIconSound(!toggleIconSound);
     meetingSocket.emit("toggleSound", { callId: params.meetingId });
   };
+
+  // const returnPeer = (call) => {
+  //   return showUserVideo ? (
+  //     <video
+  //       ref={userVideo}
+  //       muted={muteSound}
+  //       playsInline={true}
+  //       autoPlay={true}
+  //     />
+  //   ) : (
+  //     <>
+  //       <CommonPeer
+  //         font-size="18px"
+  //         padding="5px 0"
+  //         height="120px"
+  //         width="120px"
+  //         type="video-container"
+  //         user={call.isReceiving ? call.caller : call.callee}
+  //       />
+  //       <video ref={userVideo} muted={muteSound} autoPlay={true} />
+  //     </>
+  //   );
+  // };
 
   return (
     <Container>
       <MeetingMain>
         <MeetingTopControls className={`${!showTop ? "transparent" : ""}`}>
-          {showTop && (
+          {showTop ? (
             <>
               <PanelControl>
                 <FiMenu />
@@ -157,16 +179,6 @@ const MeetingRoom = () => {
                       autoPlay={true}
                     />
                   </Videos>
-                ) : call.isReceiving ? (
-                  <CommonPeer
-                    font-size="11px"
-                    padding="1px 0"
-                    height="40px"
-                    width="40px"
-                    type="peer-info"
-                    user={call.caller}
-                    className="main-peer"
-                  />
                 ) : (
                   <CommonPeer
                     font-size="11px"
@@ -174,12 +186,14 @@ const MeetingRoom = () => {
                     height="40px"
                     width="40px"
                     type="peer-info"
-                    user={call.callee}
+                    user={call.isReceiving ? call.caller : call.callee}
                     className="main-peer"
                   />
                 )}
               </Peers>
             </>
+          ) : (
+            <></>
           )}
           <Videos isShowTop={showTop}>
             {showVideo && (
@@ -215,7 +229,7 @@ const MeetingRoom = () => {
                 type="video-container"
                 user={call.isReceiving ? call.caller : call.callee}
               />
-              <video ref={userVideo} muted={muteSound} autoPlay={false} />
+              <video ref={userVideo} muted={muteSound} autoPlay={true} />
             </>
           )}
           <MeetingBottomControls>
@@ -223,7 +237,7 @@ const MeetingRoom = () => {
               {showVideo ? <FiVideo /> : <FiVideoOff />}
             </CommonControl>
             <CommonControl onClick={toggleSound}>
-              {!muteSound ? <HiOutlineMicrophone /> : <BiMicrophoneOff />}
+              {!toggleIconSound ? <HiOutlineMicrophone /> : <BiMicrophoneOff />}
             </CommonControl>
             <CommonControl>
               <CgScreen />
