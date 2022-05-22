@@ -22,6 +22,7 @@ import { LoadingSpinner } from "../UI/Loading";
 import { FiFacebook, FiTwitter } from "react-icons/fi";
 import { IoLogoGoogle } from "react-icons/io5";
 import { fetchLogin } from "../../store/user-creator";
+import { Fade, Flip } from "react-awesome-reveal";
 
 const Login = (props) => {
   console.log("Login running");
@@ -60,16 +61,20 @@ const Login = (props) => {
           <FormSection>
             <Circle />
             <Circle />
-            <Logo>
-              <a href="#">
-                <img src="/images/logo-login.png" alt="" />
-              </a>
-            </Logo>
+            <Flip>
+              <Logo>
+                <a href="#">
+                  <img src="/images/logo-login.png" alt="" />
+                </a>
+              </Logo>
+            </Flip>
             <MainTitle>
-              <h3>
-                <span>{props.title}</span>
-                <span>Your Account</span>
-              </h3>
+              <Fade direction="down" delay={100}>
+                <h3>
+                  <span>{props.title}</span>
+                  <span>Your Account</span>
+                </h3>
+              </Fade>
               {userState.error && <span>{userState.error}</span>}
             </MainTitle>
             <Form

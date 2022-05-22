@@ -83,7 +83,8 @@ export const Streams = styled.div`
   video {
     display: block;
     width: ${({ changeScale }) => (changeScale ? "90%" : "100%")};
-    height: ${({ showUserVideo }) => (showUserVideo ? "100%" : "0%")};
+    height: ${({ showUserVideo, showTop }) =>
+      showUserVideo && !showTop ? "100%" : "0%"};
     object-fit: cover;
   }
 `;

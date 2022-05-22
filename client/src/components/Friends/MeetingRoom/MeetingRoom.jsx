@@ -136,34 +136,34 @@ const MeetingRoom = () => {
     meetingSocket.emit("toggleSound", { callId: params.meetingId });
   };
 
-  // const returnPeer = (call) => {
-  //   return showUserVideo ? (
-  //     <video
-  //       ref={userVideo}
-  //       muted={muteSound}
-  //       playsInline={true}
-  //       autoPlay={true}
-  //     />
-  //   ) : (
-  //     <>
-  //       <CommonPeer
-  //         font-size="18px"
-  //         padding="5px 0"
-  //         height="120px"
-  //         width="120px"
-  //         type="video-container"
-  //         user={call.isReceiving ? call.caller : call.callee}
-  //       />
-  //       <video ref={userVideo} muted={muteSound} autoPlay={true} />
-  //     </>
-  //   );
-  // };
+  const returnPeer = (call, userVideo, showTop, showUserVideo, muteSound) => {
+    return showUserVideo && !showTop ? (
+      <video
+        ref={userVideo}
+        muted={muteSound}
+        playsInline={true}
+        autoPlay={true}
+      />
+    ) : (
+      <>
+        <CommonPeer
+          font-size="18px"
+          padding="5px 0"
+          height="120px"
+          width="120px"
+          type="video-container"
+          user={call.isReceiving ? call.caller : call.callee}
+        />
+        <video ref={userVideo} muted={muteSound} autoPlay={true} />
+      </>
+    );
+  };
 
   return (
     <Container>
       <MeetingMain>
         <MeetingTopControls className={`${!showTop ? "transparent" : ""}`}>
-          {showTop ? (
+          {showTop && (
             <>
               <PanelControl>
                 <FiMenu />
@@ -192,8 +192,6 @@ const MeetingRoom = () => {
                 )}
               </Peers>
             </>
-          ) : (
-            <></>
           )}
           <Videos isShowTop={showTop}>
             {showVideo && (
@@ -211,27 +209,13 @@ const MeetingRoom = () => {
             </PanelControl>
           )}
         </MeetingTopControls>
-        <Streams changeScale={changeScale} showUserVideo={showUserVideo}>
-          {showUserVideo ? (
-            <video
-              ref={userVideo}
-              muted={muteSound}
-              playsInline={true}
-              autoPlay={true}
-            />
-          ) : (
-            <>
-              <CommonPeer
-                font-size="18px"
-                padding="5px 0"
-                height="120px"
-                width="120px"
-                type="video-container"
-                user={call.isReceiving ? call.caller : call.callee}
-              />
-              <video ref={userVideo} muted={muteSound} autoPlay={true} />
-            </>
-          )}
+        <Streams
+          changeScale={changeScale}
+          showUserVideo={showUserVideo}
+          showTop={showTop}
+        >
+          {returnPeer(call, userVideo, showTop, showUserVideo, muteSound)}
+
           <MeetingBottomControls>
             <CommonControl onClick={videoHandle}>
               {showVideo ? <FiVideo /> : <FiVideoOff />}
