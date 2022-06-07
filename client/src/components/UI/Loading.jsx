@@ -6,6 +6,7 @@ export const LoadingSpinner = styled.div`
   height: 80px;
   padding-left: 20px;
   padding-top: 4px;
+  z-index: 2;
 
   &:after {
     content: " ";

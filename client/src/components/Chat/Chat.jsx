@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import InfoBar from "../ChatBar/InfoBar/InfoBar";
-import { Container, MainLayout } from "./Chat.styled";
+import { Container, DefaultUser, MainLayout } from "./Chat.styled";
 import { useDispatch, useSelector } from "react-redux";
 import SideBars from "./SideBars";
 import NavBars from "./NavBars";
@@ -14,7 +14,9 @@ import { v4 as uuidv4 } from "uuid";
 const Chat = () => {
   const { conversation } = useSelector((state) => state.conversation);
   const { friends } = useSelector((state) => state.friends);
+  const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const CLIENT_ENDPOINT = process.env.REACT_APP_ENDPOINT_CLIENT;
 
   useEffect(() => {
     dispatch(fetchConversation());
@@ -68,6 +70,18 @@ const Chat = () => {
           })}
           <Route path={`Chats/meeting/:meetingId`} element={<Meeting />} />
         </Routes>
+        <DefaultUser>
+          <div className="user">
+            <div className="container">
+              <div className="avatar">
+                <img src={`${CLIENT_ENDPOINT}/${user?.avata}`} alt="" />
+              </div>
+              <h5>Welcome, {user?.name}!</h5>
+              <p>Please select a chat to start messaging.</p>
+              <button>Start a conversation</button>
+            </div>
+          </div>
+        </DefaultUser>
       </MainLayout>
     </Container>
   );

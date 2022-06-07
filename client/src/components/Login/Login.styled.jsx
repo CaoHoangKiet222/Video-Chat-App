@@ -194,10 +194,6 @@ export const LoginButton = styled.div`
   right: 0;
   z-index: 99;
 
-  & > div {
-    position: relative;
-  }
-
   button {
     position: relative;
     width: 100%;
@@ -249,13 +245,16 @@ export const LoginButton = styled.div`
     color: #01c5ff;
   }
 
+  & > div {
+    position: relative;
+  }
+
   &:hover {
     ${LoadingSpinner} {
       &:after {
         border: 5px solid #01c5ff;
         border-color: #01c5ff transparent #01c5ff transparent;
       }
-      z-index: 2;
     }
   }
 

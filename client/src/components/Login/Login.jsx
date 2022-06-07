@@ -23,6 +23,9 @@ import { FiFacebook, FiTwitter } from "react-icons/fi";
 import { IoLogoGoogle } from "react-icons/io5";
 import { fetchLogin } from "../../store/user-creator";
 import { Fade, Flip } from "react-awesome-reveal";
+import Error from "../UI/Error";
+import SkeletonComponent from "../UI/Skeleton";
+import Skeleton from "react-loading-skeleton";
 
 const Login = (props) => {
   console.log("Login running");
@@ -32,6 +35,7 @@ const Login = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
+  const [clearErr, setClearErr] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,7 +51,14 @@ const Login = (props) => {
     setEmail("");
     setPassword("");
     setConfirmPass("");
+    setClearErr(false);
   }, [props.isSignUp]);
+
+  useEffect(() => {
+    if (!userState.error) {
+      setClearErr(false);
+    }
+  }, [userState.error]);
 
   const submitHandle = async (e) => {
     e.preventDefault();
@@ -75,7 +86,9 @@ const Login = (props) => {
                   <span>Your Account</span>
                 </h3>
               </Fade>
-              {userState.error && <span>{userState.error}</span>}
+              {/* {userState.error && <span>{userState.error}</span>} */}
+              {/* <Error error={userState.error} onClearErr={setClearErr} /> */}
+              {!clearErr && userState.error && <Skeleton height={180} />}
             </MainTitle>
             <Form
               method="POST"
