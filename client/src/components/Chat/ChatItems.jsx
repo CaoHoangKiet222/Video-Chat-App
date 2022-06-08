@@ -11,7 +11,6 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { videoActions } from "../../store/video-slice";
 import { formatHour } from "../../utilities/utilities";
-import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 
 const ChatItems = (props) => {
   console.log("ChatItems running");

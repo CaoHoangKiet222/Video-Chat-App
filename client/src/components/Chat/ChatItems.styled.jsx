@@ -38,6 +38,9 @@ export const Avatar = styled.div`
   }
 
   &:before {
+    ${(props) =>
+      !props.isSkeleton &&
+      `
     background: #44a675;
     content: "";
     display: block;
@@ -48,6 +51,7 @@ export const Avatar = styled.div`
     top: 1px;
     right: 1px;
     // border: 3px solid #fff;
+    `}
   }
 `;
 export const ChatContent = styled.div`

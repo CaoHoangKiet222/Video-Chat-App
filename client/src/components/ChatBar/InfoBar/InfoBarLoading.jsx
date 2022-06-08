@@ -2,9 +2,9 @@ import React from "react";
 import { TikTokSpinner } from "../../UI/TikTokLoading";
 import { Container } from "./InfoBarLoading.styled";
 
-const InfoBarLoading = () => {
+const InfoBarLoading = ({ background }) => {
   return (
-    <Container>
+    <Container background={background}>
       <TikTokSpinner />
     </Container>
   );
