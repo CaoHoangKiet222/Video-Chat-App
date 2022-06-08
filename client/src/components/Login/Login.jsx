@@ -25,7 +25,6 @@ import { fetchLogin } from "../../store/user-creator";
 import { Fade, Flip } from "react-awesome-reveal";
 import Error from "../UI/Error";
 import SkeletonComponent from "../UI/Skeleton";
-import Skeleton from "react-loading-skeleton";
 
 const Login = (props) => {
   console.log("Login running");
@@ -87,8 +86,6 @@ const Login = (props) => {
                 </h3>
               </Fade>
               {/* {userState.error && <span>{userState.error}</span>} */}
-              {/* <Error error={userState.error} onClearErr={setClearErr} /> */}
-              {!clearErr && userState.error && <Skeleton height={180} />}
               {!clearErr && userState.error && (
                 <Error error={userState.error} onClearErr={setClearErr} />
               )}
