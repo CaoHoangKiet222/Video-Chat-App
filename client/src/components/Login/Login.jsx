@@ -89,6 +89,9 @@ const Login = (props) => {
               {/* {userState.error && <span>{userState.error}</span>} */}
               {/* <Error error={userState.error} onClearErr={setClearErr} /> */}
               {!clearErr && userState.error && <Skeleton height={180} />}
+              {!clearErr && userState.error && (
+                <Error error={userState.error} onClearErr={setClearErr} />
+              )}
             </MainTitle>
             <Form
               method="POST"
