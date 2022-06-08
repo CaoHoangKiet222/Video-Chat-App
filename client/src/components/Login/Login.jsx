@@ -24,7 +24,6 @@ import { IoLogoGoogle } from "react-icons/io5";
 import { fetchLogin } from "../../store/user-creator";
 import { Fade, Flip } from "react-awesome-reveal";
 import Error from "../UI/Error";
-import SkeletonComponent from "../UI/Skeleton";
 
 const Login = (props) => {
   console.log("Login running");
@@ -85,7 +84,6 @@ const Login = (props) => {
                   <span>Your Account</span>
                 </h3>
               </Fade>
-              {/* {userState.error && <span>{userState.error}</span>} */}
               {!clearErr && userState.error && (
                 <Error error={userState.error} onClearErr={setClearErr} />
               )}
