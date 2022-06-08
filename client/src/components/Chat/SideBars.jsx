@@ -12,6 +12,7 @@ import ChatItems from "./ChatItems";
 import { BsBell, BsSearch } from "react-icons/bs";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { searchUser } from "../../utilities/utilities";
+import SkeletonComponent from "../UI/Skeleton";
 
 const SideBars = (props) => {
   console.log("SideBars running");
@@ -82,7 +83,10 @@ const SideBars = (props) => {
         <ChatsList ref={chatsList}>
           {
             // Chats
-            props.header === "Chats" &&
+            props.isLoading ? (
+              <SkeletonComponent />
+            ) : (
+              props.header === "Chats" &&
               conversation?.conv
                 .filter(({ members }) => {
                   const { userId: member } = members.find(
@@ -108,10 +112,14 @@ const SideBars = (props) => {
                     />
                   );
                 })
+            )
           }
           {
             // Friends
-            props.header === "Friends" &&
+            props.isLoading ? (
+              <SkeletonComponent />
+            ) : (
+              props.header === "Friends" &&
               friends
                 ?.filter((friend) => {
                   return searchUser(friend, searchName);
@@ -134,6 +142,7 @@ const SideBars = (props) => {
                     />
                   );
                 })
+            )
           }
         </ChatsList>
       </ContactsContent>
