@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Msger } from "./InforBar.styled";
+import { Card, Msger } from "./InfoBar.styled";
 import { Body } from "../ChatHeader/ChatHeader.styled";
 import Main from "../Main/Main";
 import ChatFooter from "../ChatFooter/ChatFooter";
