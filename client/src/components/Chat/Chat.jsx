@@ -11,6 +11,7 @@ import { fetchFriends } from "../../store/friends-creator";
 import Meeting from "../Friends/Meeting";
 import { v4 as uuidv4 } from "uuid";
 import InfoBarLoading from "../ChatBar/InfoBar/InfoBarLoading";
+import { fetchCalls } from "../../store/calls-creator";
 
 const Chat = () => {
   const { conversation } = useSelector((state) => state.conversation);
@@ -25,6 +26,7 @@ const Chat = () => {
   useEffect(() => {
     dispatch(fetchConversation());
     dispatch(fetchFriends());
+    dispatch(fetchCalls());
   }, [dispatch]);
 
   useEffect(() => {
@@ -56,8 +58,14 @@ const Chat = () => {
               <SideBars header="Friends" display="none" isLoading={isLoading} />
             }
           />
-          <Route path="/Calls/*" element={<SideBars header="Calls" />} />
-          <Route path="/Account/*" element={<SideBars header="Account" />} />
+          <Route
+            path="/Calls/*"
+            element={<SideBars header="Calls" isLoading={isLoading} />}
+          />
+          <Route
+            path="/Account/*"
+            element={<SideBars header="Account" isLoading={isLoading} />}
+          />
         </Routes>
         <Routes>
           {conversation?.conv.map(({ members, messages, _id: id }) => {

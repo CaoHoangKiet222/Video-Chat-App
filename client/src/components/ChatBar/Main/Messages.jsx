@@ -47,6 +47,7 @@ const Messages = (props) => {
       );
       return prepMess;
     });
+
     postData(`${ENDPOINT_SERVER}/delete-message`, "delete", {
       message: props.message,
       conversationId: props.conversationId,

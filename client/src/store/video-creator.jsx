@@ -1,4 +1,5 @@
 import Peer from "simple-peer";
+import { postData } from "../utilities/utilities";
 import { videoActions } from "./video-slice";
 
 const waitCallDone = (callee, caller, room, dispatch) => {
@@ -24,6 +25,7 @@ export const videoStart = (callee, caller, room, navigate) => {
       const {
         socket: { meetingSocket },
       } = getState();
+      const ENDPOINT_SERVER = process.env.REACT_APP_ENDPOINT_SERVER;
 
       meetingSocket.emit(
         "meetingConnection",
@@ -34,6 +36,12 @@ export const videoStart = (callee, caller, room, navigate) => {
           navigate(`/video-chat/Chats/meeting/${encodeURIComponent(room)}`);
         }
       );
+
+      postData(`${ENDPOINT_SERVER}/save-calls`, "post", {
+        calleeId: callee._id,
+        callerId: caller._id,
+        startCall: new Date(Date.now()),
+      });
     } catch (err) {
       console.error(err);
     }

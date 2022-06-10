@@ -18,6 +18,7 @@ const SideBars = (props) => {
   console.log("SideBars running");
   const conversation = useSelector((state) => state.conversation.conversation);
   const friends = useSelector((state) => state.friends.friends);
+  const calls = useSelector((state) => state.calls.calls);
   const isDiff = useRef(false);
   const [searchName, setSearchName] = useState("");
   const chatsList = useRef(null);
@@ -112,6 +113,27 @@ const SideBars = (props) => {
                     />
                   );
                 })
+            )
+          }
+          {
+            // Phone Calls
+            props.isLoading ? (
+              <SkeletonComponent />
+            ) : (
+              props.header === "Calls" &&
+              calls?.map((call) => {
+                console.log(call);
+                return (
+                  <></>
+                  // <ChatItems
+                  //   key={call._id}
+                  //   member={}
+                  //   header={props.header}
+                  // address={friend.address}
+                  // isDiff={isDiff.current}
+                  // />
+                );
+              })
             )
           }
           {

@@ -20,7 +20,7 @@ const ChatHeader = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const callHandle = () => {
+  const callHandle = async () => {
     dispatch(videoStart(member, user, props.room, navigate));
   };
 

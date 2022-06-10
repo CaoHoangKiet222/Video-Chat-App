@@ -8,7 +8,13 @@ export const postData = async (url, method, data = {}) => {
     credentials: "include",
     body: JSON.stringify(data),
   });
-  return response.json();
+
+  switch (method) {
+    case "delete":
+      return;
+    default:
+      return response.json();
+  }
 };
 
 export const formatHour = (date) => {
