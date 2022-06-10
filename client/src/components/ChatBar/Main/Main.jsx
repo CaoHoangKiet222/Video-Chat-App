@@ -27,19 +27,23 @@ const Main = (props) => {
           return (
             <Messages
               key={uuidv4()}
-              message={message.content}
+              message={message}
               time={message.messageDate}
               timeChange={timeChange.current}
               isRight={true}
+              setMessages={props.setMessages}
+              conversationId={props.room}
             />
           );
         }
         return (
           <Messages
             key={uuidv4()}
-            message={message.content}
+            message={message}
             time={message.messageDate}
             preTime={preTime.current}
+            setMessages={props.setMessages}
+            conversationId={props.room}
           />
         );
       }

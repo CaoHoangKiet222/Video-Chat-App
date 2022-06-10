@@ -10,7 +10,7 @@ import {
 } from "./Main.styled";
 import { Avatar } from "../../Chat/ChatItems.styled";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
-import { formatDate, formatHour } from "../../../utilities/utilities";
+import { formatDate, formatHour, postData } from "../../../utilities/utilities";
 import {
   IoCopyOutline,
   IoReturnUpForward,
@@ -21,6 +21,8 @@ import { RiDeleteBinLine } from "react-icons/ri";
 
 const Messages = (props) => {
   const [showMenu, setShowMenu] = useState(false);
+  const ENDPOINT_SERVER = process.env.REACT_APP_ENDPOINT_SERVER;
+
   useEffect(() => {
     const checkClickOutSide = () => {
       if (showMenu) {
@@ -37,6 +39,20 @@ const Messages = (props) => {
     setShowMenu(true);
   };
 
+  const deleteHandler = () => {
+    props.setMessages((prepMess) => {
+      prepMess.splice(
+        prepMess.findIndex((mess) => mess === props.message),
+        1
+      );
+      return prepMess;
+    });
+    postData(`${ENDPOINT_SERVER}/delete-message`, "delete", {
+      message: props.message,
+      conversationId: props.conversationId,
+    });
+  };
+
   return (
     <Message isRight={props.isRight}>
       {props.timeChange && (
@@ -44,7 +60,7 @@ const Messages = (props) => {
       )}
       <MessageWrap>
         <Content isRight={props.isRight}>
-          <span>{props.message}</span>
+          <span>{props.message.content}</span>
         </Content>
       </MessageWrap>
       <MessageOptions>
@@ -73,7 +89,7 @@ const Messages = (props) => {
                 <AiOutlineStar></AiOutlineStar>
                 <span>Favourite</span>
               </a>
-              <a href="#" className="text-danger">
+              <a href="#" className="text-danger" onClick={deleteHandler}>
                 <RiDeleteBinLine></RiDeleteBinLine>
                 <span>Delete</span>
               </a>

@@ -70,7 +70,11 @@ const InfoBar = (props) => {
           <InfoBarLoading />
         ) : (
           <Body>
-            <Main messages={messages} />
+            <Main
+              messages={messages}
+              setMessages={setMessages}
+              room={props.room}
+            />
           </Body>
         )}
         <ChatFooter onSendMessage={sendMessage} onSetMessage={setMessage} />
