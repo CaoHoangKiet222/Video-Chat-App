@@ -48,6 +48,7 @@ app.get("/", (_req, res) => {
 
 app.use(require("./routes/user"));
 app.use(require("./routes/messages"));
+app.use(require("./routes/meetings"));
 
 const io_chat = io.of("/chat-rooms");
 io_chat.on("connection", (socket) => {
