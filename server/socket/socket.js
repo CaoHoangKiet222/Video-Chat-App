@@ -1,4 +1,5 @@
 const Conversation = module.require("../models/conversation");
+const Meetings = module.require("../models/meetings");
 
 exports = module.exports = (socket, type, io = null) => {
   switch (type) {
@@ -86,8 +87,16 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "answerCall":
-      socket.on(type, ({ signal, callId }) => {
-        io.to(callId).emit("callAccepted", signal);
+      socket.on(type, async ({ signal, callId, call }) => {
+        const { callerId, calleeId, startCall, callAccepted } = call;
+        await new Meetings({
+          callerId,
+          calleeId,
+          startCall,
+          callAccepted,
+        }).save();
+
+        io.to(callId).emit("callAccepted", signal, Date.now());
         console.log("answerCall done");
       });
       break;
@@ -97,8 +106,20 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "notAnswerCall":
-      socket.on(type, ({ callId }) => {
-        io.to(callId).emit("notAnswerCall");
+      socket.on(type, async ({ callId, call }) => {
+        try {
+          const { callerId, calleeId, startCall, callAccepted } = call;
+          await new Meetings({
+            callerId,
+            calleeId,
+            startCall,
+            callAccepted,
+          }).save();
+
+          io.to(callId).emit("notAnswerCall");
+        } catch (error) {
+          console.log(error);
+        }
       });
       break;
     case "callEnded":

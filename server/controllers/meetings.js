@@ -1,14 +1,5 @@
 const Meetings = require("../models/meetings");
-const { pushCalls, getUserCalls } = require("../utilities/utilities");
-
-exports.saveCalls = async (req, res, _next) => {
-  try {
-    const { callerId, calleeId, startCall } = req.body;
-    await new Meetings({ callerId, calleeId, startCall }).save();
-  } catch (error) {
-    console.log(error);
-  }
-};
+const { getUserCalls } = require("../utilities/utilities");
 
 exports.getCalls = async (req, res, _next) => {
   try {
@@ -24,16 +15,12 @@ exports.getCalls = async (req, res, _next) => {
       .populate([{ path: "callerId" }])
       .select("callerId startCall callTime callAccepted");
 
-    console.log("userIsCaller", userIsCaller);
-    // console.log("userIsCallee", userIsCallee);
-    // const array = getUserCalls("userIsCaller", userIsCaller);
-    // const array2 = getUserCalls("userIsCallee", userIsCallee);
-    // console.log("array", array);
-    // console.log("array", array2);
-
     res.json({
-      userIsCaller: getUserCalls("userIsCaller", userIsCaller),
-      userIsCallee: getUserCalls("userIsCallee", userIsCallee),
+      calls: getUserCalls(
+        "userIsCallee",
+        userIsCallee,
+        getUserCalls("userIsCaller", userIsCaller)
+      ),
     });
   } catch (error) {
     console.log(error);

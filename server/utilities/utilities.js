@@ -10,10 +10,11 @@ const pushCalls = (type = "", array = [], object = {}) => {
   switch (type) {
     case "userIsCaller":
       return array.push({
-        callee: object.calleeId,
+        contactMem: object.calleeId,
         calls: [
           {
             _id: object._id,
+            isReceived: false,
             startCall: object.startCall,
             callTime: object.callTime,
             callAccepted: object.callAccepted,
@@ -22,10 +23,11 @@ const pushCalls = (type = "", array = [], object = {}) => {
       });
     default: // "userIsCallee"
       return array.push({
-        caller: object.callerId,
+        contactMem: object.callerId,
         calls: [
           {
             _id: object._id,
+            isReceived: true,
             startCall: object.startCall,
             callTime: object.callTime,
             callAccepted: object.callAccepted,
@@ -37,7 +39,7 @@ const pushCalls = (type = "", array = [], object = {}) => {
 
 exports.getUserCalls = (type = "", userCall = [], array = []) => {
   for (let i = 0; i < userCall.length; i++) {
-    if (i === 0) {
+    if (array.length === 0) {
       pushCalls(type, array, userCall[0]);
     } else {
       const preLength = array.length;
@@ -47,18 +49,28 @@ exports.getUserCalls = (type = "", userCall = [], array = []) => {
         switch (type) {
           case "userIsCaller":
             compare =
-              array[j].callee._id.toString() ===
+              array[j].contactMem._id.toString() ===
               userCall[i].calleeId._id.toString();
             break;
           default: // "userIsCallee"
             compare =
-              array[j].caller._id.toString() ===
+              array[j].contactMem._id.toString() ===
               userCall[i].callerId._id.toString();
             break;
         }
-        if (compare) {
+        if (compare && type === "userIsCaller") {
           array[j].calls.push({
             _id: userCall[i]._id,
+            isReceived: false,
+            startCall: userCall[i].startCall,
+            callTime: userCall[i].callTime,
+            callAccepted: userCall[i].callAccepted,
+          });
+          found = true;
+        } else if (compare && type === "userIsCallee") {
+          array[j].calls.push({
+            _id: userCall[i]._id,
+            isReceived: true,
             startCall: userCall[i].startCall,
             callTime: userCall[i].callTime,
             callAccepted: userCall[i].callAccepted,
@@ -72,4 +84,12 @@ exports.getUserCalls = (type = "", userCall = [], array = []) => {
     }
   }
   return array;
+};
+
+exports.getListContacts = (contact1 = [], contact2 = []) => {
+  // const newContact = new Array();
+  // contact1.forEach(contact => {
+  //   newContact.push(contact.calleeId)
+  // });
+  //
 };
