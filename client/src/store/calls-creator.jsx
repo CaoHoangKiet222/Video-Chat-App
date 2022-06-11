@@ -8,12 +8,13 @@ export const fetchCalls = () => {
         { credentials: "include" }
       );
       const data = await response.json();
+      console.log(data);
 
       if (data.error) {
         throw new Error(data.error);
       }
 
-      dispatch(callsActions.setCalls({ calls: data, error: null }));
+      dispatch(callsActions.setCalls({ calls: data.calls, error: null }));
     } catch (err) {
       dispatch(callsActions.setCalls({ calls: null, error: err.message }));
     }

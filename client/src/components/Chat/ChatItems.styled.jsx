@@ -40,6 +40,7 @@ export const Avatar = styled.div`
   &:before {
     ${(props) =>
       !props.isSkeleton &&
+      props.type === "Chats" &&
       `
     background: #44a675;
     content: "";
@@ -92,11 +93,37 @@ export const ChatText = styled.div`
     white-space: nowrap;
     margin: 0;
     ${(props) =>
-      props.type === "Friends" &&
-      `
+      props.type === "Friends"
+        ? `
          width: 100%;
          margin-left: 7px;
          line-height: 1.4;
-      `}
+      `
+        : props.type === "Calls" &&
+          `
+         width: 100%;
+         margin-left: 7px;
+         line-height: 1.2;
+    `}
+  }
+`;
+
+export const ContactActions = styled.div`
+  width: 46px;
+  height: 48px;
+
+  button {
+    cursor: pointer;
+    background-color: transparent;
+    color: #ffffff;
+    width: calc(1.5rem + 2px);
+    line-height: 2.5rem;
+    border: 0;
+    outline: none;
+    svg {
+      font-size: 0.875rem;
+      height: 2.95rem;
+      width: 1.8rem;
+    }
   }
 `;

@@ -6,11 +6,14 @@ import {
   ChatInfo,
   ChatItem,
   ChatText,
+  ContactActions,
 } from "./ChatItems.styled";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { videoActions } from "../../store/video-slice";
 import { formatHour } from "../../utilities/utilities";
+import { HiPhoneIncoming, HiPhoneOutgoing } from "react-icons/hi";
+import { RiPhoneLine } from "react-icons/ri";
 
 const ChatItems = (props) => {
   console.log("ChatItems running");
@@ -20,10 +23,15 @@ const ChatItems = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
+  console.log(props.call);
 
   let pathname;
   if (props.header === "Friends") {
     pathname = `/video-chat/${props.header}/list-friends/${encodeURIComponent(
+      member.name
+    )}`;
+  } else if (props.header === "Calls") {
+    pathname = `/video-chat/${props.header}/details/${encodeURIComponent(
       member.name
     )}`;
   } else
@@ -61,7 +69,7 @@ const ChatItems = (props) => {
       )}
       <ChatItem>
         <Link to={pathname}>
-          <Avatar>
+          <Avatar type={props.header}>
             <img src={`${ENDPOINT_CLIENT}/${member.avata}`} alt="" />
           </Avatar>
           <ChatContent>
@@ -73,6 +81,16 @@ const ChatItems = (props) => {
             </ChatInfo>
             <ChatText type={props.header}>
               {props.header === "Chats" && <p>{props.content}</p>}
+              {props.header === "Calls" && (
+                <>
+                  {props.call.isReceived ? (
+                    <HiPhoneIncoming />
+                  ) : (
+                    <HiPhoneOutgoing />
+                  )}
+                  <p>{props.firstStartCall}</p>
+                </>
+              )}
               {props.header === "Friends" && (
                 <>
                   <FaMapMarkerAlt />
@@ -81,6 +99,13 @@ const ChatItems = (props) => {
               )}
             </ChatText>
           </ChatContent>
+          {props.header === "Calls" && (
+            <ContactActions>
+              <button>
+                <RiPhoneLine />
+              </button>
+            </ContactActions>
+          )}
         </Link>
       </ChatItem>
     </>

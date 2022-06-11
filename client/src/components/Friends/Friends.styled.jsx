@@ -1,7 +1,13 @@
 import styled from "styled-components";
 import { Card } from "../ChatBar/InfoBar/InfoBar.styled";
 
-export const CardFriends = styled(Card)``;
+export const CardFriends = styled(Card)`
+  max-height: 100vh;
+  overflow: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
 export const Container = styled.div`
   width: 100%;
@@ -77,6 +83,16 @@ export const Icons = styled.div`
   margin-top: 0.75rem;
   display: flex;
 
+  p {
+    background-color: #665dfe;
+    color: #f8f9fa;
+    border-radius: 0.25rem;
+    width: 10rem;
+    text-align: center;
+    margin: 0;
+    line-height: 1.8rem;
+  }
+
   div {
     height: 3rem;
     width: 3rem;
@@ -126,6 +142,7 @@ export const RowInfo = styled.div`
   // margin-left: -15px;
   width: 100%;
 `;
+
 export const ListGroup = styled.ul`
   display: flex;
   flex-direction: column;
@@ -146,6 +163,7 @@ export const ListGroup = styled.ul`
     border-top-right-radius: calc(0.25rem - 1px);
   }
 `;
+
 export const ListItem = styled.li`
   background: #383f44;
   position: relative;
@@ -156,6 +174,7 @@ export const ListItem = styled.li`
   height: 79px;
   display: flex;
   justify-content: space-between;
+  margin-bottom: ${(props) => (props.type === "Calls" ? "1rem" : "0")};
 
   &:first-child {
     border-top-left-radius: inherit;

@@ -75,12 +75,25 @@ const Meeting = () => {
   const closeVideo = () => {
     meetingSocket.emit("notAnswerCall", {
       callId: params.meetingId,
+      call: {
+        calleeId: callee._id,
+        callerId: caller._id,
+        startCall: new Date(Date.now()),
+        callAccepted: false,
+      },
     });
     // dispatch(leaveCall(connectionRef));
   };
 
   const acceptVideo = () => {
-    dispatch(answerCall());
+    dispatch(
+      answerCall({
+        calleeId: callee._id,
+        callerId: caller._id,
+        startCall: new Date(Date.now()),
+        callAccepted: true,
+      })
+    );
   };
 
   return (

@@ -12,10 +12,12 @@ import Meeting from "../Friends/Meeting";
 import { v4 as uuidv4 } from "uuid";
 import InfoBarLoading from "../ChatBar/InfoBar/InfoBarLoading";
 import { fetchCalls } from "../../store/calls-creator";
+import CallDetails from "../Calls/CallDetails";
 
 const Chat = () => {
   const { conversation } = useSelector((state) => state.conversation);
   const { friends } = useSelector((state) => state.friends);
+  const { calls } = useSelector((state) => state.calls);
   const { user } = useSelector((state) => state.user);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
@@ -87,6 +89,7 @@ const Chat = () => {
               />
             );
           })}
+
           {friends?.map((friend) => {
             return (
               <Route
@@ -98,6 +101,17 @@ const Chat = () => {
               />
             );
           })}
+
+          {calls?.map(({ contactMem, calls }) => {
+            return (
+              <Route
+                path={`/Calls/details/${encodeURIComponent(contactMem.name)}`}
+                key={contactMem._id}
+                element={<CallDetails contactMem={contactMem} calls={calls} />}
+              />
+            );
+          })}
+
           <Route path={`Chats/meeting/:meetingId`} element={<Meeting />} />
         </Routes>
         {!isChosen && (

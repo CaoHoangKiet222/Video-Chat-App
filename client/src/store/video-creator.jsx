@@ -1,5 +1,6 @@
 import Peer from "simple-peer";
 import { postData } from "../utilities/utilities";
+import { timeCallActions } from "./timecall-slice";
 import { videoActions } from "./video-slice";
 
 const waitCallDone = (callee, caller, room, dispatch) => {
@@ -25,7 +26,6 @@ export const videoStart = (callee, caller, room, navigate) => {
       const {
         socket: { meetingSocket },
       } = getState();
-      const ENDPOINT_SERVER = process.env.REACT_APP_ENDPOINT_SERVER;
 
       meetingSocket.emit(
         "meetingConnection",
@@ -36,19 +36,13 @@ export const videoStart = (callee, caller, room, navigate) => {
           navigate(`/video-chat/Chats/meeting/${encodeURIComponent(room)}`);
         }
       );
-
-      postData(`${ENDPOINT_SERVER}/save-calls`, "post", {
-        calleeId: callee._id,
-        callerId: caller._id,
-        startCall: new Date(Date.now()),
-      });
     } catch (err) {
       console.error(err);
     }
   };
 };
 
-export const answerCall = () => {
+export const answerCall = (call) => {
   return async (dispatch, getState) => {
     try {
       const {
@@ -71,6 +65,7 @@ export const answerCall = () => {
         meetingSocket.emit("answerCall", {
           signal: data,
           callId: video.callId,
+          call,
         });
       });
 
@@ -121,9 +116,11 @@ export const callToUser = () => {
       });
 
       // Wait for user accept
-      meetingSocket.on("callAccepted", (signal) => {
+      meetingSocket.on("callAccepted", (signal, timeStart) => {
         dispatch(videoActions.setCallAccepted({ callAccepted: true }));
 
+        console.log(timeStart);
+        dispatch(timeCallActions.setTimeCall({ timeCall: timeStart }));
         // signal of callee answering to caller
         peer.signal(signal);
         console.log("peer signal callToUser done");

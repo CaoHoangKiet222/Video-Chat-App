@@ -11,7 +11,11 @@ import {
 import ChatItems from "./ChatItems";
 import { BsBell, BsSearch } from "react-icons/bs";
 import { BiDotsVerticalRounded } from "react-icons/bi";
-import { searchUser } from "../../utilities/utilities";
+import {
+  arrangePhoneTime,
+  getPhoneTime,
+  searchUser,
+} from "../../utilities/utilities";
 import SkeletonComponent from "../UI/Skeleton";
 
 const SideBars = (props) => {
@@ -19,6 +23,7 @@ const SideBars = (props) => {
   const conversation = useSelector((state) => state.conversation.conversation);
   const friends = useSelector((state) => state.friends.friends);
   const calls = useSelector((state) => state.calls.calls);
+  console.log(calls);
   const isDiff = useRef(false);
   const [searchName, setSearchName] = useState("");
   const chatsList = useRef(null);
@@ -104,12 +109,9 @@ const SideBars = (props) => {
                     <ChatItems
                       key={_id}
                       member={member}
-                      messages={messages}
-                      user={conversation.user}
                       header={props.header}
                       messageDate={lastMessage?.messageDate}
                       content={lastMessage?.content}
-                      room={_id}
                     />
                   );
                 })
@@ -121,17 +123,18 @@ const SideBars = (props) => {
               <SkeletonComponent />
             ) : (
               props.header === "Calls" &&
-              calls?.map((call) => {
-                console.log(call);
+              calls?.map(({ contactMem, calls }) => {
+                const sortCalls = arrangePhoneTime(calls);
+                const firstCall = getPhoneTime(sortCalls[0]);
+
                 return (
-                  <></>
-                  // <ChatItems
-                  //   key={call._id}
-                  //   member={}
-                  //   header={props.header}
-                  // address={friend.address}
-                  // isDiff={isDiff.current}
-                  // />
+                  <ChatItems
+                    key={contactMem._id}
+                    member={contactMem}
+                    header={props.header}
+                    firstStartCall={firstCall.startCall}
+                    call={sortCalls.slice(-1)[0]}
+                  />
                 );
               })
             )
