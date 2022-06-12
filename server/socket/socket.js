@@ -8,7 +8,7 @@ exports = module.exports = (socket, type, io = null) => {
       socket.on(type, async (room, callback) => {
         try {
           const conv = await Conversation.findOne({ _id: room }).populate({
-            path: "members.userId",
+            path: "members.userId messages.senderId",
           });
           //
           callback(conv.messages);
@@ -31,11 +31,18 @@ exports = module.exports = (socket, type, io = null) => {
     case "sendMessage":
       socket.on(type, async (message, room, callback) => {
         try {
-          const conversation = await Conversation.findOne({ _id: room });
+          const conversation = await Conversation.findOne({
+            _id: room,
+          });
+          console.log(conversation.messages);
           conversation.messages.push(message);
           await conversation.save();
-          const newMesage = conversation.messages.splice(-1)[0];
-          io.to(room).emit("receiveMessage", newMesage);
+
+          const lastMes = await Conversation.findOne({ _id: room }).populate(
+            "messages.senderId"
+          );
+
+          io.to(room).emit("receiveMessage", lastMes.messages.splice(-1)[0]);
 
           callback();
         } catch (err) {

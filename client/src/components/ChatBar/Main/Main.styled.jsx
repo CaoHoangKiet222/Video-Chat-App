@@ -84,6 +84,7 @@ export const Message = styled.div`
   flex-direction: column;
   align-items: ${(props) => (props.isRight ? "flex-end" : "flex-start")};
   overflow-wrap: break-word;
+  position: relative;
 
   ${MessageOptions} {
     flex-direction: ${(props) => (props.isRight ? "row-reverse" : "row")};
@@ -180,6 +181,48 @@ export const DropDownContent = styled.div`
 
     &.text-danger {
       color: #ff337c !important;
+    }
+  }
+`;
+
+export const ReplyHeader = styled.h4`
+  margin: 0;
+
+  .role {
+    padding: 0 42px 0 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #adb5bd;
+    font-weight: 400;
+
+    svg {
+      margin-right: 12px;
+    }
+  }
+`;
+
+export const ReplyContent = styled.div`
+  .content {
+    padding: 0 42px 0 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    span {
+      position: relative;
+      height: auto;
+      background-color: #4e4f5030;
+      color: #adb5bd;
+      margin-left: 2.25rem;
+      margin-right: 2.25rem;
+      padding: 1rem 2.25rem;
+      border-radius: 1.25rem;
+      text-align: left;
+      display: inline-block;
+      max-width: 25rem;
+      left: 42px;
+      bottom: -8px;
     }
   }
 `;

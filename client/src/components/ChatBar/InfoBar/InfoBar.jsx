@@ -41,15 +41,18 @@ const InfoBar = (props) => {
     });
   }, [chatSocket]);
 
-  const sendMessage = (e) => {
+  const sendMessage = (e, replyContent = "") => {
     try {
       e.preventDefault();
+      console.log(replyContent);
       if (message) {
         const newMesage = {
           content: message,
           senderId: props.user._id,
           messageDate: new Date(Date.now()),
+          reply: replyContent,
         };
+
         chatSocket.emit("sendMessage", newMesage, props.room, (error) => {
           if (error) {
             return setError(error);
@@ -77,7 +80,11 @@ const InfoBar = (props) => {
             />
           </Body>
         )}
-        <ChatFooter onSendMessage={sendMessage} onSetMessage={setMessage} />
+        <ChatFooter
+          member={props.member}
+          onSendMessage={sendMessage}
+          onSetMessage={setMessage}
+        />
       </Msger>
     </Card>
   );

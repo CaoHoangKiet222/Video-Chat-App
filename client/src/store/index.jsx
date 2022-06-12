@@ -6,6 +6,7 @@ import friendsReducer from "./friends-slice";
 import videoReducer from "./video-slice";
 import socketReducer from "./socket-slice";
 import timeCallReducer from "./timecall-slice";
+import replyReducer from "./reply-slice";
 
 const store = configureStore({
   middleware: (getDefaultMiddleware) =>
@@ -20,6 +21,7 @@ const store = configureStore({
     friends: friendsReducer,
     video: videoReducer,
     timeCall: timeCallReducer,
+    reply: replyReducer,
   },
 });
 

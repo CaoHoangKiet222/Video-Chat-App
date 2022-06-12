@@ -23,6 +23,10 @@ const conversationSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User",
       },
+      reply: {
+        type: Schema.Types.Mixed,
+        default: {},
+      },
     },
   ],
 });
