@@ -62,11 +62,17 @@ export const answerCall = (call) => {
 
       peer.on("signal", (data) => {
         console.log("peer on signal answerCall running");
-        meetingSocket.emit("answerCall", {
-          signal: data,
-          callId: video.callId,
-          call,
-        });
+        meetingSocket.emit(
+          "answerCall",
+          {
+            signal: data,
+            callId: video.callId,
+            call,
+          },
+          () => {
+            dispatch(timeCallActions.setTimeCall({ timeCall: call.startCall }));
+          }
+        );
       });
 
       peer.on("stream", (currentStream) => {
@@ -119,7 +125,6 @@ export const callToUser = () => {
       meetingSocket.on("callAccepted", (signal, timeStart) => {
         dispatch(videoActions.setCallAccepted({ callAccepted: true }));
 
-        console.log(timeStart);
         dispatch(timeCallActions.setTimeCall({ timeCall: timeStart }));
         // signal of callee answering to caller
         peer.signal(signal);

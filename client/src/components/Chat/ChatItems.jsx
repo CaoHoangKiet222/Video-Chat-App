@@ -79,7 +79,7 @@ const ChatItems = (props) => {
                 <div>{formatHour(props.messageDate)}</div>
               )}
             </ChatInfo>
-            <ChatText type={props.header}>
+            <ChatText accepted={props.call?.accepted} type={props.header}>
               {props.header === "Chats" && <p>{props.content}</p>}
               {props.header === "Calls" && (
                 <>

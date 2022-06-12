@@ -31,8 +31,12 @@ const CallItem = ({ call }) => {
           </h6>
           <div>
             <p>{getPhoneTime(call, "Calls").startCall}</p>
-            <span>•</span>
-            <p> 12m 25s</p>
+            {call.callAccepted && (
+              <>
+                <span>•</span>
+                <p>{call.callTime}</p>
+              </>
+            )}
           </div>
         </div>
         <div className="media-options">

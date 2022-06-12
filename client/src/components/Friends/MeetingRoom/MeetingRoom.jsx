@@ -28,6 +28,7 @@ import CommonPeer from "./CommonPeer.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { leaveCall } from "../../../store/video-creator.jsx";
+import { formatCallTime } from "../../../utilities/utilities.jsx";
 
 const MeetingRoom = () => {
   const [showTop, setShowTop] = useState(false);
@@ -45,6 +46,8 @@ const MeetingRoom = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
+  const timeCall = useSelector((state) => state.timeCall.timeCall);
+  console.log(formatCallTime(timeCall));
 
   useEffect(() => {
     if (showTop) {
@@ -118,7 +121,13 @@ const MeetingRoom = () => {
   };
 
   const phoneOffHandle = () => {
-    meetingSocket.emit("callEnded", { callId: params.meetingId });
+    meetingSocket.emit("callEnded", {
+      callId: params.meetingId,
+      callTime: formatCallTime(timeCall),
+      callerId: call.caller._id,
+      calleeId: call.callee._id,
+      startCall: timeCall,
+    });
   };
 
   const videoHandle = () => {

@@ -32,7 +32,6 @@ export const Media = styled.div`
       margin-bottom: 4px;
       font-size: 0.875rem;
       font-weight: 500;
-      /* line-height: 1.2; */
     }
     div {
       display: flex;
@@ -54,15 +53,15 @@ export const Media = styled.div`
     button {
       cursor: pointer;
       background-color: transparent;
-      color: #ffffff;
+      color: #adb5bd !important;
       width: calc(1.5rem + 2px);
-      line-height: 2.5rem;
+      line-height: 1.5rem;
       border: 0;
       outline: none;
       svg {
         font-size: 0.875rem;
         height: 2.95rem;
-        width: 1.8rem;
+        width: 1.6rem;
       }
     }
   }

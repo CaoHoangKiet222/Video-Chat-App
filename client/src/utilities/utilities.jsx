@@ -55,6 +55,26 @@ export const formatDate = (date, seperator) => {
   }
 };
 
+export const formatCallTime = (date) => {
+  date = new Date(date);
+  const dateNow = new Date(Date.now());
+  const h = date.getHours();
+  const m = date.getMinutes();
+  const s = date.getSeconds();
+  const hNow = dateNow.getHours();
+  const mNow = dateNow.getMinutes();
+  const sNow = dateNow.getSeconds();
+
+  return Math.abs(hNow - h) === 0
+    ? Math.abs(mNow - m) + "m " + Math.abs(sNow - s) + "s"
+    : Math.abs(hNow - h) +
+        "h " +
+        Math.abs(mNow - m) +
+        "m " +
+        Math.abs(sNow - s) +
+        "s";
+};
+
 export const checkSameHour = (predate, date) => {
   date = new Date(date);
   predate = new Date(predate);
@@ -78,7 +98,6 @@ export const getFloatTime = (date) => {
   const m = new Date(date).getMinutes();
   const hNow = new Date(Date.now()).getHours();
   const mNow = new Date(Date.now()).getMinutes();
-  console.log(hNow);
 
   return Math.abs(hNow - h) === 0
     ? Math.abs(mNow - m) === 0
@@ -88,7 +107,9 @@ export const getFloatTime = (date) => {
       : { startCall: Math.abs(mNow - m) + " mins ago" }
     : Math.abs(hNow - h) === 1
     ? { startCall: "1 hour ago" }
-    : { startCall: Math.abs(hNow - h) + " hours ago" };
+    : {
+        startCall: Math.abs(hNow - h) + " hours ago",
+      };
 };
 
 export const getPhoneTime = (call, type = "") => {
@@ -114,7 +135,7 @@ export const getPhoneTime = (call, type = "") => {
 const comparePhoneTimeIsDone = (x, y, array, i, j) => {
   if (x === y) {
     return false;
-  } else if (x > y) {
+  } else if (x < y) {
     let temp = array[i];
     array[i] = array[j];
     array[j] = temp;

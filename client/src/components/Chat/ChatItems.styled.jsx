@@ -86,6 +86,9 @@ export const ChatInfo = styled.div`
 export const ChatText = styled.div`
   display: flex;
 
+  svg {
+    ${(props) => props.type === "Calls" && !props.accepted && `color: #FF337C`}
+  }
   p {
     color: #f8f9fa;
     overflow: hidden;
