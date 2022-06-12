@@ -44,6 +44,12 @@ exports = module.exports = (socket, type, io = null) => {
         }
       });
       break;
+    case "deleteMessage":
+      socket.on(type, ({ message, conversationId }) => {
+        console.log(message, conversationId);
+        socket.broadcast.to(conversationId).emit("deleteMessage", message);
+      });
+      break;
     case "disconnect":
       socket.on(type, () => {
         console.log("A user disconnected");
@@ -87,7 +93,7 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "answerCall":
-      socket.on(type, async ({ signal, callId, call }) => {
+      socket.on(type, async ({ signal, callId, call }, cb) => {
         const { callerId, calleeId, startCall, callAccepted } = call;
         await new Meetings({
           callerId,
@@ -96,7 +102,9 @@ exports = module.exports = (socket, type, io = null) => {
           callAccepted,
         }).save();
 
-        io.to(callId).emit("callAccepted", signal, Date.now());
+        io.to(callId).emit("callAccepted", signal, startCall);
+        cb();
+
         console.log("answerCall done");
       });
       break;
@@ -123,9 +131,18 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "callEnded":
-      socket.on(type, ({ callId }) => {
-        io.to(callId).emit("callEnded");
-      });
+      socket.on(
+        type,
+        async ({ callId, callTime, callerId, calleeId, startCall }) => {
+          console.log("asdfasdfasdfasdf", callTime);
+          const updateMeeting = await Meetings.findOneAndUpdate(
+            { callerId, calleeId, startCall },
+            { callTime }
+          );
+          console.log(updateMeeting);
+          io.to(callId).emit("callEnded");
+        }
+      );
       break;
     case "showMyVideo":
       socket.on(type, ({ callId }, callback) => {

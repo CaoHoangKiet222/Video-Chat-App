@@ -60,6 +60,8 @@ io_chat.on("connection", (socket) => {
 
   socketListen(socket, "sendMessage", io_chat);
 
+  socketListen(socket, "deleteMessage", io_chat);
+
   socketListen(socket, "disconnect");
 });
 

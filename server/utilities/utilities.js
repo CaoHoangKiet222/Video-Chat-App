@@ -85,11 +85,3 @@ exports.getUserCalls = (type = "", userCall = [], array = []) => {
   }
   return array;
 };
-
-exports.getListContacts = (contact1 = [], contact2 = []) => {
-  // const newContact = new Array();
-  // contact1.forEach(contact => {
-  //   newContact.push(contact.calleeId)
-  // });
-  //
-};
