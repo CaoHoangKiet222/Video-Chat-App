@@ -18,9 +18,12 @@ import {
 } from "react-icons/io5";
 import { AiOutlineStar } from "react-icons/ai";
 import { RiDeleteBinLine } from "react-icons/ri";
+import { useSelector } from "react-redux";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 const Messages = (props) => {
   const [showMenu, setShowMenu] = useState(false);
+  const chatSocket = useSelector((state) => state.socket.chatSocket);
   const ENDPOINT_SERVER = process.env.REACT_APP_ENDPOINT_SERVER;
 
   useEffect(() => {
@@ -35,17 +38,36 @@ const Messages = (props) => {
     };
   }, [showMenu]);
 
+  useEffect(() => {
+    chatSocket.on("deleteMessage", (message) => {
+      props.setMessages((prepMess) => {
+        const index = prepMess.findIndex((mess) => mess._id === message._id);
+        index !== -1 && prepMess.splice(index, 1);
+        return [...prepMess];
+      });
+    });
+
+    return () => {
+      chatSocket.off("deleteMessage");
+    };
+  }, [chatSocket, props]);
+
   const dropDownHandle = () => {
     setShowMenu(true);
   };
 
   const deleteHandler = () => {
+    chatSocket.emit("deleteMessage", {
+      message: props.message,
+      conversationId: props.conversationId,
+    });
+
     props.setMessages((prepMess) => {
       prepMess.splice(
-        prepMess.findIndex((mess) => mess === props.message),
+        prepMess.findIndex((mess) => mess._id === props.message._id),
         1
       );
-      return prepMess;
+      return [...prepMess];
     });
 
     postData(`${ENDPOINT_SERVER}/delete-message`, "delete", {
@@ -74,10 +96,12 @@ const Messages = (props) => {
           <BiDotsHorizontalRounded />
           {showMenu && (
             <DropDownContent>
-              <a href="#">
-                <IoCopyOutline></IoCopyOutline>
-                <span>Copy</span>
-              </a>
+              <CopyToClipboard text={props.message.content}>
+                <a href="#">
+                  <IoCopyOutline></IoCopyOutline>
+                  <span>Copy</span>
+                </a>
+              </CopyToClipboard>
               <a href="#">
                 <IoReturnUpBack></IoReturnUpBack>
                 <span>Reply</span>

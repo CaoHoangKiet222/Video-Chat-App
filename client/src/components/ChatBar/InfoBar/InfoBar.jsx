@@ -9,10 +9,10 @@ import InfoBarLoading from "./InfoBarLoading";
 let timer;
 
 const InfoBar = (props) => {
-  // console.log("InfoBar running");
+  console.log("InfoBar running");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState(props.messages);
+  const [messages, setMessages] = useState([]);
   const [isFetch, setIsFetch] = useState(false);
   const chatSocket = useSelector((state) => state.socket.chatSocket);
 

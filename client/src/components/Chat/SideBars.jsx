@@ -23,7 +23,6 @@ const SideBars = (props) => {
   const conversation = useSelector((state) => state.conversation.conversation);
   const friends = useSelector((state) => state.friends.friends);
   const calls = useSelector((state) => state.calls.calls);
-  console.log(calls);
   const isDiff = useRef(false);
   const [searchName, setSearchName] = useState("");
   const chatsList = useRef(null);

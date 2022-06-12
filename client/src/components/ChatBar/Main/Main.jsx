@@ -41,7 +41,7 @@ const Main = (props) => {
             key={uuidv4()}
             message={message}
             time={message.messageDate}
-            preTime={preTime.current}
+            timeChange={timeChange.current}
             setMessages={props.setMessages}
             conversationId={props.room}
           />
