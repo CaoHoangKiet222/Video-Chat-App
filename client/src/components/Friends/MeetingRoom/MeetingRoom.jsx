@@ -47,7 +47,7 @@ const MeetingRoom = () => {
   const navigate = useNavigate();
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
   const timeCall = useSelector((state) => state.timeCall.timeCall);
-  console.log(formatCallTime(timeCall));
+  // console.log(formatCallTime(timeCall));
 
   useEffect(() => {
     if (showTop) {

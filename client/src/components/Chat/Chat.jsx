@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from "uuid";
 import InfoBarLoading from "../ChatBar/InfoBar/InfoBarLoading";
 import { fetchCalls } from "../../store/calls-creator";
 import CallDetails from "../Calls/CallDetails";
+import ModalDialog from "../ModalDialog/ModalDialog";
 
 const Chat = () => {
   const { conversation } = useSelector((state) => state.conversation);
@@ -23,6 +24,7 @@ const Chat = () => {
   const dispatch = useDispatch();
   const params = useParams();
   const [isChosen, setIsChosen] = useState(false);
+  const [showModalDialog, setShowModalDialog] = useState(false);
   const CLIENT_ENDPOINT = process.env.REACT_APP_ENDPOINT_CLIENT;
 
   useEffect(() => {
@@ -45,9 +47,19 @@ const Chat = () => {
     }
   }, [params]);
 
+  const startConversation = () => {
+    setShowModalDialog(true);
+  };
+
   return (
     <Container>
       <MainLayout>
+        {showModalDialog && (
+          <ModalDialog
+            friends={friends}
+            setShowModalDialog={setShowModalDialog}
+          />
+        )}
         <NavBars />
         <Routes>
           <Route
@@ -127,7 +139,9 @@ const Chat = () => {
                     </div>
                     <h5>Welcome, {user.name}!</h5>
                     <p>Please select a chat to start messaging.</p>
-                    <button>Start a conversation</button>
+                    <button onClick={startConversation}>
+                      Start a conversation
+                    </button>
                   </>
                 )}
               </div>

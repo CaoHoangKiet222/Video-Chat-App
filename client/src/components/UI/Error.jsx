@@ -32,6 +32,8 @@ const Wrapper = styled.div`
   background-color: #ffffff70;
   display: grid;
   width: 100vw;
+  min-height: 100vh;
+  min-width: 100vw;
   height: 100vh;
   position: fixed;
   place-items: center;
@@ -39,7 +41,6 @@ const Wrapper = styled.div`
   top: 0;
   left: 0;
   z-index: 100;
-  transition: ease-in-out 0.2s;
 `;
 
 const Card = styled.div`
