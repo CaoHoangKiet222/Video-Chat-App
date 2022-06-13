@@ -10,7 +10,7 @@ exports = module.exports = (socket, type, io = null) => {
           const conv = await Conversation.findOne({ _id: room }).populate({
             path: "members.userId messages.senderId",
           });
-          //
+
           callback(conv.messages);
 
           socket.join(room);
@@ -31,18 +31,23 @@ exports = module.exports = (socket, type, io = null) => {
     case "sendMessage":
       socket.on(type, async (message, room, callback) => {
         try {
-          const conversation = await Conversation.findOne({
-            _id: room,
-          });
-          console.log(conversation.messages);
-          conversation.messages.push(message);
-          await conversation.save();
+          Conversation.findOneAndUpdate(
+            { _id: room },
+            {
+              $push: {
+                messages: message,
+              },
+            },
+            { new: true },
+            (_error, conversation) => {
+              console.log(conversation);
 
-          const lastMes = await Conversation.findOne({ _id: room }).populate(
-            "messages.senderId"
-          );
-
-          io.to(room).emit("receiveMessage", lastMes.messages.splice(-1)[0]);
+              io.to(room).emit(
+                "receiveMessage",
+                conversation.messages.splice(-1)[0]
+              );
+            }
+          ).populate("messages.senderId");
 
           callback();
         } catch (err) {
@@ -102,15 +107,16 @@ exports = module.exports = (socket, type, io = null) => {
     case "answerCall":
       socket.on(type, async ({ signal, callId, call }, cb) => {
         const { callerId, calleeId, startCall, callAccepted } = call;
+
+        cb();
+        io.to(callId).emit("callAccepted", signal, startCall);
+
         await new Meetings({
           callerId,
           calleeId,
           startCall,
           callAccepted,
         }).save();
-
-        io.to(callId).emit("callAccepted", signal, startCall);
-        cb();
 
         console.log("answerCall done");
       });
@@ -123,6 +129,8 @@ exports = module.exports = (socket, type, io = null) => {
     case "notAnswerCall":
       socket.on(type, async ({ callId, call }) => {
         try {
+          io.to(callId).emit("notAnswerCall");
+
           const { callerId, calleeId, startCall, callAccepted } = call;
           await new Meetings({
             callerId,
@@ -130,8 +138,6 @@ exports = module.exports = (socket, type, io = null) => {
             startCall,
             callAccepted,
           }).save();
-
-          io.to(callId).emit("notAnswerCall");
         } catch (error) {
           console.log(error);
         }
@@ -141,13 +147,12 @@ exports = module.exports = (socket, type, io = null) => {
       socket.on(
         type,
         async ({ callId, callTime, callerId, calleeId, startCall }) => {
-          console.log("asdfasdfasdfasdf", callTime);
-          const updateMeeting = await Meetings.findOneAndUpdate(
+          io.to(callId).emit("callEnded");
+
+          await Meetings.findOneAndUpdate(
             { callerId, calleeId, startCall },
             { callTime }
           );
-          console.log(updateMeeting);
-          io.to(callId).emit("callEnded");
         }
       );
       break;
