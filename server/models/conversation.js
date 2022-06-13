@@ -27,6 +27,10 @@ const conversationSchema = new Schema({
         type: Schema.Types.Mixed,
         default: {},
       },
+      isForward: {
+        type: Boolean,
+        default: false,
+      },
     },
   ],
 });

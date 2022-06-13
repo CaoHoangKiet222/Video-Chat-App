@@ -7,7 +7,8 @@ const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
-const socketListen = require("./socket/socket");
+const socketMessageListen = require("./socket/socket-message");
+const socketMeetingListen = require("./socket/socket-meeting");
 
 const PORT = process.env.YOUR_PORT || process.env.PORT || 5000;
 const MONGODB_URI =
@@ -54,38 +55,40 @@ const io_chat = io.of("/chat-rooms");
 io_chat.on("connection", (socket) => {
   console.log("A user connected to channel chat-rooms");
 
-  socketListen(socket, "joinRoom", io_chat);
+  socketMessageListen(socket, "joinRoom", io_chat);
 
-  socketListen(socket, "leaveRoom");
+  socketMessageListen(socket, "leaveRoom");
 
-  socketListen(socket, "sendMessage", io_chat);
+  socketMessageListen(socket, "sendMessage", io_chat);
 
-  socketListen(socket, "deleteMessage", io_chat);
+  socketMessageListen(socket, "forwardMessage", io_chat);
 
-  socketListen(socket, "disconnect");
+  socketMessageListen(socket, "deleteMessage", io_chat);
+
+  socketMessageListen(socket, "disconnect");
 });
 
 const io_meeting = io.of("/meeting-rooms");
 io_meeting.on("connection", (socket) => {
   console.log("A user connected to channel meeting-rooms");
 
-  socketListen(socket, "joinVideo", io_meeting);
+  socketMeetingListen(socket, "joinVideo", io_meeting);
 
-  socketListen(socket, "meetingConnection", io_meeting);
+  socketMeetingListen(socket, "meetingConnection", io_meeting);
 
-  socketListen(socket, "callToUser");
+  socketMeetingListen(socket, "callToUser");
 
-  socketListen(socket, "answerCall", io_meeting);
+  socketMeetingListen(socket, "answerCall", io_meeting);
 
-  socketListen(socket, "notAnswerCall", io_meeting);
+  socketMeetingListen(socket, "notAnswerCall", io_meeting);
 
-  socketListen(socket, "joinMeetingRoom", io_meeting);
+  socketMeetingListen(socket, "joinMeetingRoom", io_meeting);
 
-  socketListen(socket, "callEnded", io_meeting);
+  socketMeetingListen(socket, "callEnded", io_meeting);
 
-  socketListen(socket, "showMyVideo");
+  socketMeetingListen(socket, "showMyVideo");
 
-  socketListen(socket, "toggleSound");
+  socketMeetingListen(socket, "toggleSound");
 });
 
 (async () => {
