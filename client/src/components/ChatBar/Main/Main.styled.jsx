@@ -202,6 +202,10 @@ export const ReplyHeader = styled.h4`
   }
 `;
 
+export const ForwardHeader = styled(ReplyHeader)`
+  margin-bottom: 10px;
+`;
+
 export const ReplyContent = styled.div`
   .content {
     padding: 0 42px 0 22px;
@@ -221,7 +225,7 @@ export const ReplyContent = styled.div`
       text-align: left;
       display: inline-block;
       max-width: 25rem;
-      left: 42px;
+      left: ${(props) => (props.isRight ? "42px" : "-23px")};
       bottom: -8px;
     }
   }

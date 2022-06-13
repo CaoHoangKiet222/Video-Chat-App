@@ -16,6 +16,7 @@ const ChatFooter = (props) => {
   useEffect(() => {
     if (reply?.isClick) {
       setCloseRepForm(false);
+      inputValue.current.focus();
     }
   }, [reply]);
 

@@ -32,7 +32,7 @@ const ModalDialog = (props) => {
           <ModalContent>
             <ModalHeader>
               <ModalTitle>
-                <h5>New Chat</h5>
+                <h5>{props.isForward ? "Forward" : "New Chat"}</h5>
               </ModalTitle>
               <button className="btn" onClick={closeModalDialog}>
                 <span>×</span>
@@ -59,6 +59,7 @@ const ModalDialog = (props) => {
                   searchName={searchName}
                   setSearchName={setSearchName}
                   setShowModalDialog={props.setShowModalDialog}
+                  isForward={props.isForward}
                 />
               </Row>
             </ModalBody>

@@ -14,12 +14,14 @@ import InfoBarLoading from "../ChatBar/InfoBar/InfoBarLoading";
 import { fetchCalls } from "../../store/calls-creator";
 import CallDetails from "../Calls/CallDetails";
 import ModalDialog from "../ModalDialog/ModalDialog";
+import { forwardActions } from "../../store/forward-slice";
 
 const Chat = () => {
   const { conversation } = useSelector((state) => state.conversation);
   const { friends } = useSelector((state) => state.friends);
   const { calls } = useSelector((state) => state.calls);
   const { user } = useSelector((state) => state.user);
+  const { forward } = useSelector((state) => state.forward);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
   const params = useParams();
@@ -32,6 +34,12 @@ const Chat = () => {
     dispatch(fetchFriends());
     dispatch(fetchCalls());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (forward?.isClick) {
+      setShowModalDialog(true);
+    }
+  }, [forward]);
 
   useEffect(() => {
     if (user?.name || user?.avata) {
@@ -49,6 +57,9 @@ const Chat = () => {
 
   const startConversation = () => {
     setShowModalDialog(true);
+    dispatch(
+      forwardActions.setForward({ forward: { isClick: false, message: null } })
+    );
   };
 
   return (
@@ -56,6 +67,7 @@ const Chat = () => {
       <MainLayout>
         {showModalDialog && (
           <ModalDialog
+            isForward={forward?.isClick}
             friends={friends}
             setShowModalDialog={setShowModalDialog}
           />

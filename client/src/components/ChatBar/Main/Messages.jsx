@@ -4,6 +4,7 @@ import {
   Divider,
   DropDown,
   DropDownContent,
+  ForwardHeader,
   Message,
   MessageOptions,
   MessageWrap,
@@ -19,16 +20,17 @@ import {
   IoReturnUpBack,
 } from "react-icons/io5";
 import { AiOutlineStar } from "react-icons/ai";
-import { RiDeleteBinLine } from "react-icons/ri";
+import { RiDeleteBinLine, RiShareForwardFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { replyActions } from "../../../store/reply-slice";
 import { BsReplyAllFill } from "react-icons/bs";
+import { forwardActions } from "../../../store/forward-slice";
 
 const Messages = (props) => {
   const [showMenu, setShowMenu] = useState(false);
   const chatSocket = useSelector((state) => state.socket.chatSocket);
-  const user = useSelector((state) => state.user.user);
+  const { user } = useSelector((state) => state.user);
   const ENDPOINT_SERVER = process.env.REACT_APP_ENDPOINT_SERVER;
   const dispatch = useDispatch();
 
@@ -83,45 +85,66 @@ const Messages = (props) => {
   };
 
   const replyHandler = () => {
-    console.log(props);
     dispatch(
       replyActions.setReply({
         reply: {
           isClick: true,
-          isUser: props.isRight,
           message: props.message,
         },
       })
     );
   };
 
+  const forwardHandler = () => {
+    // console.log(props);
+    dispatch(
+      forwardActions.setForward({
+        forward: {
+          message: props.message,
+          isClick: true,
+        },
+      })
+    );
+  };
+  console.log(props);
+
   return (
     <Message isRight={props.isRight}>
       {props.timeChange && (
         <Divider data-label={formatDate(props.time)}></Divider>
       )}
-      {props.message.reply !== null && (
+      {props.message?.reply !== null && (
         <>
           <ReplyHeader>
             <div className="role">
               <BsReplyAllFill />
               <span>
-                {props.message.reply?.isUser
-                  ? user.name
+                {props.message.reply.message.senderId._id ===
+                props.message.senderId._id
+                  ? props.isRight
+                    ? "You replied to yourself"
+                    : props.message.senderId.name + " replied to themself"
                   : props.isRight
-                  ? "You replyed to " + props.message.senderId.name
-                  : user.name + " replyed to you"}
+                  ? "You replyed to " +
+                    props.message.reply.message.senderId.name
+                  : props.message.senderId.name + " replyed to you"}
               </span>
             </div>
           </ReplyHeader>
-          <ReplyContent>
+          <ReplyContent isRight={props.isRight}>
             <div className="content">
-              <span>
-                ammmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
-              </span>
+              <span>{props.message.reply.message.content}</span>
             </div>
           </ReplyContent>
         </>
+      )}
+      {props.message.isForward && props.message.senderId._id !== user._id && (
+        <ForwardHeader>
+          <div className="role">
+            <RiShareForwardFill />
+            <span>{props.message.senderId.name + " forwarded a message"}</span>
+          </div>
+        </ForwardHeader>
       )}
       <MessageWrap>
         <Content isRight={props.isRight}>
@@ -148,7 +171,7 @@ const Messages = (props) => {
                 <IoReturnUpBack></IoReturnUpBack>
                 <span>Reply</span>
               </a>
-              <a href="#">
+              <a href="#" onClick={forwardHandler}>
                 <IoReturnUpForward></IoReturnUpForward>
                 <span>Forward</span>
               </a>

@@ -23,7 +23,6 @@ const ChatItems = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
-  console.log(props.call);
 
   let pathname;
   if (props.header === "Friends") {

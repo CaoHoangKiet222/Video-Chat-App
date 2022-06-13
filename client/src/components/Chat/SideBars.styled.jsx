@@ -113,6 +113,7 @@ export const ChatsSubHeader = styled.div`
     display: flex;
     width: ${(props) => (props.display === "none" ? "100%" : "311px")};
     height: 40px;
+
     input {
       width: 90%;
       background-color: #2a2a2a;

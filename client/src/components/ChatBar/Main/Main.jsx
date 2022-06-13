@@ -23,7 +23,7 @@ const Main = (props) => {
         } else {
           timeChange.current = false;
         }
-        // console.log(message);
+        console.log(message);
         if (message.senderId._id === conversation.user._id) {
           return (
             <Messages

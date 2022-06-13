@@ -17,7 +17,7 @@ import CallItem from "./CallItem";
 const CallDetails = (props) => {
   const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
   const { avata, name, phone } = props.contactMem;
-  console.log(arrangePhoneTime(props.calls));
+  // console.log(arrangePhoneTime(props.calls));
 
   return (
     <Main>
