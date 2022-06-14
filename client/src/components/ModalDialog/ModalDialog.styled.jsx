@@ -27,7 +27,7 @@ export const Container = styled.div`
 
 export const Document = styled.div`
   transition: transform 0.3s ease-out, -webkit-transform 0.3s ease-out;
-  max-width: 500px;
+  max-width: ${(props) => (props.isForward ? "600px" : "500px")};
   margin: 1.75rem auto;
   height: 100%;
   position: relative;

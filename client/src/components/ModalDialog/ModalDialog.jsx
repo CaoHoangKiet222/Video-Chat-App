@@ -28,7 +28,7 @@ const ModalDialog = (props) => {
     <>
       <ModalFade />
       <Container>
-        <Document>
+        <Document isForward={props.isForward}>
           <ModalContent>
             <ModalHeader>
               <ModalTitle>
@@ -44,7 +44,7 @@ const ModalDialog = (props) => {
                   <div>
                     <input
                       type="text"
-                      placeholder="Search ..."
+                      placeholder="Search for user..."
                       onChange={startSearch}
                     ></input>
                     <div>

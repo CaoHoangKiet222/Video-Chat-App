@@ -26,6 +26,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import { replyActions } from "../../../store/reply-slice";
 import { BsReplyAllFill } from "react-icons/bs";
 import { forwardActions } from "../../../store/forward-slice";
+import { fetchConversation } from "../../../store/conversations-creator";
 
 const Messages = (props) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -53,30 +54,37 @@ const Messages = (props) => {
         index !== -1 && prepMess.splice(index, 1);
         return [...prepMess];
       });
+      dispatch(fetchConversation());
     });
 
     return () => {
       chatSocket.off("deleteMessage");
     };
-  }, [chatSocket, props]);
+  }, [chatSocket, props, dispatch]);
 
   const dropDownHandle = () => {
     setShowMenu(true);
   };
 
   const deleteHandler = async () => {
-    chatSocket.emit("deleteMessage", {
-      message: props.message,
-      conversationId: props.conversationId,
-    });
+    chatSocket.emit(
+      "deleteMessage",
+      {
+        message: props.message,
+        conversationId: props.conversationId,
+      },
+      () => {
+        props.setMessages((prepMess) => {
+          prepMess.splice(
+            prepMess.findIndex((mess) => mess._id === props.message._id),
+            1
+          );
+          return [...prepMess];
+        });
 
-    props.setMessages((prepMess) => {
-      prepMess.splice(
-        prepMess.findIndex((mess) => mess._id === props.message._id),
-        1
-      );
-      return [...prepMess];
-    });
+        dispatch(fetchConversation());
+      }
+    );
 
     await postData(`${ENDPOINT_SERVER}/delete-message`, "delete", {
       message: props.message,
@@ -106,7 +114,6 @@ const Messages = (props) => {
       })
     );
   };
-  console.log(props);
 
   return (
     <Message isRight={props.isRight}>

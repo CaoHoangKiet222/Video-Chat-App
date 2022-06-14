@@ -4,9 +4,12 @@ import { userActions } from "./user-slice";
 export const fetchConversation = () => {
   return async (dispatch) => {
     try {
-      const response = await fetch("http://localhost:5000/Chats/conversation", {
+      const ENDPOINT_SERVER = process.env.REACT_APP_ENDPOINT_SERVER;
+
+      const response = await fetch(`${ENDPOINT_SERVER}/Chats/conversation`, {
         credentials: "include",
       });
+
       const data = await response.json();
 
       if (data.error) {
@@ -29,3 +32,5 @@ export const fetchConversation = () => {
     }
   };
 };
+
+export const addFriend = () => {};

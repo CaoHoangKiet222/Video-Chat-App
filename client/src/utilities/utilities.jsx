@@ -225,6 +225,18 @@ export const searchUser = (user, searchName) => {
   return false;
 };
 
+export const checkIsFriend = (user, friend, conversation) => {
+  for (const [_index, conv] of conversation.entries()) {
+    const member = conv.members.find((mem) => {
+      return user._id !== mem.userId._id;
+    });
+    if (member.userId._id === friend._id) {
+      return true;
+    }
+  }
+  return false;
+};
+
 export const getUserMedia = async () => {
   return await navigator.mediaDevices.getUserMedia({
     video: true,

@@ -57,7 +57,7 @@ io_chat.on("connection", (socket) => {
 
   socketMessageListen(socket, "joinRoom", io_chat);
 
-  socketMessageListen(socket, "leaveRoom");
+  socketMessageListen(socket, "leaveRoom", io_chat);
 
   socketMessageListen(socket, "sendMessage", io_chat);
 

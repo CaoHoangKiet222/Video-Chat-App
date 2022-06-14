@@ -4,16 +4,19 @@ import { Body } from "../ChatHeader/ChatHeader.styled";
 import Main from "../Main/Main";
 import ChatFooter from "../ChatFooter/ChatFooter";
 import ChatHeader from "../ChatHeader/ChatHeader";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import InfoBarLoading from "./InfoBarLoading";
+import { fetchConversation } from "../../../store/conversations-creator";
 let timer;
 
 const InfoBar = (props) => {
   console.log("InfoBar running");
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(props.messages);
   const [messages, setMessages] = useState([]);
+  const [isSendMess, setIsSendMess] = useState(false);
   const [isFetch, setIsFetch] = useState(false);
+  const dispatch = useDispatch();
   const chatSocket = useSelector((state) => state.socket.chatSocket);
 
   useEffect(() => {
@@ -33,32 +36,46 @@ const InfoBar = (props) => {
       setIsFetch(false);
       clearTimeout(timer);
     };
-  }, [props.member, props.room, chatSocket]);
+  }, [props.room, chatSocket]);
+
+  useEffect(() => {
+    chatSocket.on("leaveRoom", () => {
+      setIsSendMess(false);
+    });
+  }, [chatSocket]);
 
   useEffect(() => {
     chatSocket.on("receiveMessage", (message) => {
+      dispatch(fetchConversation());
+      setIsSendMess(true);
       setMessages((preMessages) => [...preMessages, message]);
     });
-  }, [chatSocket]);
+  }, [chatSocket, dispatch]);
 
   const sendMessage = (e, replyContent = "") => {
     try {
       e.preventDefault();
-      console.log(replyContent);
       if (message) {
         const newMesage = {
           content: message,
-          senderId: props.user._id,
+          sender: props.user,
           messageDate: new Date(Date.now()),
           reply: replyContent,
         };
 
-        chatSocket.emit("sendMessage", newMesage, props.room, (error) => {
-          if (error) {
-            return setError(error);
+        chatSocket.emit(
+          "sendMessage",
+          newMesage,
+          props.room,
+          (error, message) => {
+            if (error) {
+              return setError(error);
+            }
+            setMessages((preMess) => [...preMess, message]);
+            dispatch(fetchConversation());
+            return setMessage("");
           }
-          return setMessage("");
-        });
+        );
       }
     } catch (err) {
       console.error(err);
@@ -69,7 +86,7 @@ const InfoBar = (props) => {
     <Card>
       <Msger>
         <ChatHeader member={props.member} room={props.room} />
-        {!isFetch ? (
+        {!isFetch && !isSendMess ? (
           <InfoBarLoading />
         ) : (
           <Body>

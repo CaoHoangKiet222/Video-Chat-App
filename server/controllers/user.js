@@ -4,7 +4,7 @@ const bcryptjs = require("bcryptjs");
 const { validationResult } = require("express-validator");
 const { sortName } = require("../utilities/utilities");
 
-exports.getCall = async (req, res, next) => {
+exports.getCall = async (req, res, _next) => {
   try {
     console.log(req.session.user);
     const { members } = await Conversation.findOne({
@@ -20,7 +20,7 @@ exports.getCall = async (req, res, next) => {
   }
 };
 
-exports.getListFriends = async (req, res, next) => {
+exports.getListFriends = async (req, res, _next) => {
   try {
     const friends = await User.find();
     const listFriends = friends.filter(
@@ -33,27 +33,28 @@ exports.getListFriends = async (req, res, next) => {
   }
 };
 
-exports.getConversation = async (req, res, next) => {
+exports.getConversation = (req, res, _next) => {
   try {
-    const conv = await Conversation.find({
-      "members.userId": req.session.user,
-    }).populate({ path: "members.userId" });
-
-    return res.status(200).json({
-      conv,
-      user: req.session.user,
-    });
+    Conversation.find(
+      {
+        "members.userId": req.session.user,
+      },
+      (_err, convTest) => {
+        return res.status(200).json({
+          conv: convTest,
+          user: req.session.user,
+        });
+      }
+    ).populate({ path: "members.userId" });
   } catch (err) {
     console.error(err);
     res.send({ error: err.message });
   }
 };
 
-exports.postAddFriend = async (req, res, next) => {
+exports.postAddFriend = async (req, res, _next) => {
   try {
-    let conversation = await Conversation.find({
-      "members.userId": req.session.user,
-    }).populate({ path: "members.userId" });
+    console.log("sdfasdfasdf");
     const convExist = await Conversation.findOne({
       $and: [
         { "members.userId": req.body.friendId },
@@ -62,15 +63,15 @@ exports.postAddFriend = async (req, res, next) => {
     });
 
     if (!convExist) {
-      const newConversation = new Conversation({
+      await new Conversation({
         members: [{ userId: req.session.user }, { userId: req.body.friendId }],
         messages: [],
-      });
-      await newConversation.save();
-      conversation = await Conversation.find({
-        "members.userId": req.session.user,
-      }).populate({ path: "members.userId" });
+      }).save();
     }
+
+    const conversation = await Conversation.find({
+      "members.userId": req.session.user,
+    }).populate({ path: "members.userId" });
 
     res.send({
       conv: conversation,
@@ -81,7 +82,7 @@ exports.postAddFriend = async (req, res, next) => {
   }
 };
 
-exports.postUserLogin = async (req, res, next) => {
+exports.postUserLogin = async (req, res, _next) => {
   try {
     const errors = validationResult(req);
     console.log(errors);
@@ -104,7 +105,7 @@ exports.postUserLogin = async (req, res, next) => {
   }
 };
 
-exports.postUserSignUp = async (req, res, next) => {
+exports.postUserSignUp = async (req, res, _next) => {
   try {
     const errors = validationResult(req);
     console.log(errors);
@@ -119,7 +120,7 @@ exports.postUserSignUp = async (req, res, next) => {
       email: req.body.email,
       password: hashedPassword,
       avata: "images/user.jpg",
-      lastOnline: Date.now(),
+      lastOnline: new Date(Date.now()),
     });
     await user.save();
 
