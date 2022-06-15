@@ -25,15 +25,14 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { HiOutlineGlobe } from "react-icons/hi";
 import { FiLinkedin, FiFacebook, FiTwitter, FiInstagram } from "react-icons/fi";
 import { MdAccessTime } from "react-icons/md";
-import { formatDate, postData } from "../../utilities/utilities";
+import { formatDate } from "../../utilities/utilities";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { conversationActions } from "../../store/conversations-slice";
+import { postAddFriend } from "../../store/friends-creator";
 
 const Friends = (props) => {
   const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
-  const ENDPOINT_SERVER = process.env.REACT_APP_ENDPOINT_SERVER;
-  const { avata, name } = props.friend;
+  const { avata, name, _id } = props.friend;
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -47,14 +46,7 @@ const Friends = (props) => {
   // }
 
   const messageHandle = async () => {
-    dispatch(
-      conversationActions.setConversation({
-        conversation: await postData(`${ENDPOINT_SERVER}/add-friend`, "post", {
-          friendId: props.friend._id,
-        }),
-      })
-    );
-    navigate(`/video-chat/Chats/${encodeURIComponent(name)}`);
+    dispatch(postAddFriend(_id, name, navigate));
   };
 
   return (

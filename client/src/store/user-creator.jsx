@@ -11,6 +11,7 @@ export const fetchLogin = (url, user) => {
         email: user.email,
         password: user.password,
         confirmPassword: user.confirmPass,
+        rememberToLogin: user.rememberToLogin,
       });
 
       if (data.error) {
@@ -29,6 +30,7 @@ export const fetchLogin = (url, user) => {
               email: data.email,
               password: data.password,
               confirmPassword: data.confirmPassword,
+              isRemember: user.isRemember,
             },
             isFetch: false,
             error: null,

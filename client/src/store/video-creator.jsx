@@ -1,5 +1,5 @@
 import Peer from "simple-peer";
-import { postData } from "../utilities/utilities";
+import { getUserMedia } from "../utilities/utilities";
 import { timeCallActions } from "./timecall-slice";
 import { videoActions } from "./video-slice";
 
@@ -18,6 +18,62 @@ const waitCallDone = (callee, caller, room, dispatch) => {
     );
     resolve();
   });
+};
+
+export const beforeStartVideo = (
+  type,
+  member,
+  user,
+  room,
+  navigate,
+  error,
+  isReceiving
+) => {
+  return async (dispatch) => {
+    switch (type) {
+      case "Caller": {
+        await getUserMedia({ video: true, audio: true })
+          .then((currentStream) => {
+            console.log(currentStream);
+            dispatch(videoActions.setStream({ currentStream }));
+          })
+          .catch((err) => {
+            console.log(err);
+            error.current = err;
+          });
+
+        if (!error.current) {
+          return dispatch(videoStart(member, user, room, navigate));
+        }
+
+        error.current = null;
+        break;
+      }
+      default: {
+        getUserMedia({ video: true, audio: true })
+          .then((currentStream) => {
+            console.log(currentStream);
+            dispatch(videoActions.setStream({ currentStream }));
+          })
+          .catch((err) => {
+            console.log(err);
+            dispatch(videoActions.setError({ error: err }));
+          });
+        dispatch(videoActions.setCallId({ callId: room }));
+        dispatch(
+          videoActions.setCall({
+            call: {
+              callee: member,
+              caller: user,
+              isReceiving,
+            },
+          })
+        );
+        navigate(`/video-chat/Chats/meeting/${encodeURIComponent(room)}`);
+        break;
+      }
+    }
+  };
 };
 
 export const videoStart = (callee, caller, room, navigate) => {
@@ -42,7 +98,7 @@ export const videoStart = (callee, caller, room, navigate) => {
   };
 };
 
-export const answerCall = (call) => {
+export const answerCall = (call, type) => {
   return async (dispatch, getState) => {
     try {
       const {
@@ -52,6 +108,8 @@ export const answerCall = (call) => {
       console.log("answerCall video", video);
 
       dispatch(videoActions.setCallAccepted({ callAccepted: true }));
+
+      dispatch(videoActions.setType({ type }));
 
       const peer = new Peer({
         // initiator:false not initiating call just answering caller
@@ -77,6 +135,7 @@ export const answerCall = (call) => {
 
       peer.on("stream", (currentStream) => {
         console.log("peer stream answerCall running");
+
         dispatch(videoActions.setUserStream({ userStream: currentStream }));
       });
 

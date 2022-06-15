@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { Avatar } from "../Chat/ChatItems.styled";
 import {
   Buttons,
@@ -13,7 +13,6 @@ import { FiPhoneOff, FiPhone, FiVideo } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { answerCall, callToUser, leaveCall } from "../../store/video-creator";
-import { getUserMedia } from "../../utilities/utilities";
 import { videoActions } from "../../store/video-slice";
 
 const Meeting = () => {
@@ -23,21 +22,10 @@ const Meeting = () => {
   const { isReceiving, callee, caller } = useSelector(
     (state) => state.video.call
   );
-  const { callAccepted, stream } = useSelector((state) => state.video);
+  const { callAccepted, stream, error } = useSelector((state) => state.video);
   const { meetingSocket } = useSelector((state) => state.socket);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    getUserMedia()
-      .then((currentStream) => {
-        console.log(currentStream);
-        dispatch(videoActions.setStream({ currentStream }));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, [dispatch]);
 
   useEffect(() => {
     if (callAccepted) {
@@ -67,6 +55,7 @@ const Meeting = () => {
   }, [dispatch, meetingSocket, navigate, stream]);
 
   useEffect(() => {
+    console.log(isReceiving);
     if (stream && !isReceiving) {
       dispatch(callToUser());
     }
@@ -85,14 +74,32 @@ const Meeting = () => {
     // dispatch(leaveCall(connectionRef));
   };
 
-  const acceptVideo = () => {
+  const acceptPhone = () => {
     dispatch(
-      answerCall({
-        calleeId: callee._id,
-        callerId: caller._id,
-        startCall: new Date(Date.now()),
-        callAccepted: true,
-      })
+      answerCall(
+        {
+          calleeId: callee._id,
+          callerId: caller._id,
+          startCall: new Date(Date.now()),
+          callAccepted: true,
+        },
+        "phone"
+      )
+    );
+  };
+
+  const acceptVideo = () => {
+    console.log(error);
+    dispatch(
+      answerCall(
+        {
+          calleeId: callee._id,
+          callerId: caller._id,
+          startCall: new Date(Date.now()),
+          callAccepted: true,
+        },
+        "video"
+      )
     );
   };
 
@@ -128,7 +135,7 @@ const Meeting = () => {
             </RoundedButton>
             {isReceiving && (
               <>
-                <RoundedButton className="accept">
+                <RoundedButton className="accept" onClick={acceptPhone}>
                   <FiPhone />
                 </RoundedButton>
                 <RoundedButton onClick={acceptVideo}>

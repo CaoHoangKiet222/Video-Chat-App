@@ -10,6 +10,8 @@ export const videoSlice = createSlice({
     peer: null,
     callAccepted: false,
     callEnded: false,
+    error: null,
+    type: null,
   },
   reducers: {
     setStream(state, action) {
@@ -42,6 +44,12 @@ export const videoSlice = createSlice({
       state.call = null;
       state.callAccepted = false;
       state.callEnded = false;
+    },
+    setError(state, action) {
+      state.error = action.payload.error;
+    },
+    setType(state, action) {
+      state.type = action.payload.type;
     },
   },
 });

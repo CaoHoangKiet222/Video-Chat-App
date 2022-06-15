@@ -28,7 +28,8 @@ import CommonPeer from "./CommonPeer.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { leaveCall } from "../../../store/video-creator.jsx";
-import { formatCallTime } from "../../../utilities/utilities.jsx";
+import { formatCallTime, shareScreen } from "../../../utilities/utilities.jsx";
+import { videoActions } from "../../../store/video-slice.jsx";
 
 const MeetingRoom = () => {
   const [showTop, setShowTop] = useState(false);
@@ -37,7 +38,9 @@ const MeetingRoom = () => {
   const [changeScale, setChangeScale] = useState(false);
   const [muteSound, setMuteSound] = useState(false);
   const [toggleIconSound, setToggleIconSound] = useState(false);
-  const { userStream, stream, call } = useSelector((state) => state.video);
+  const { userStream, stream, call, peer, type } = useSelector(
+    (state) => state.video
+  );
   const myVideo = useRef(null),
     userVideo = useRef(null),
     userTopVideo = useRef(),
@@ -47,7 +50,7 @@ const MeetingRoom = () => {
   const navigate = useNavigate();
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
   const timeCall = useSelector((state) => state.timeCall.timeCall);
-  // console.log(formatCallTime(timeCall));
+  const [isClickFirstTime, setIsClickFirstTime] = useState(false);
 
   useEffect(() => {
     if (showTop) {
@@ -68,11 +71,40 @@ const MeetingRoom = () => {
 
   useEffect(() => {
     if (call.isReceiving) {
-      meetingSocket.emit("showMyVideo", { callId: params.meetingId }, () => {
-        setShowVideo(true);
-      });
+      console.log("emit showMyVideo");
+      meetingSocket.emit(
+        "showMyVideo",
+        { callId: params.meetingId, type, isClickFirstTime },
+        () => {
+          setIsClickFirstTime(true);
+          if (type === "video") {
+            return setShowVideo(true);
+          }
+          setShowVideo(false);
+        }
+      );
     }
-  }, [call.isReceiving, meetingSocket, params.meetingId]);
+  }, [
+    call.isReceiving,
+    meetingSocket,
+    params.meetingId,
+    type,
+    isClickFirstTime,
+  ]);
+
+  useEffect(() => {
+    meetingSocket.on("startVideoOrPhone", (type) => {
+      console.log("startVideoOrPhone", type);
+      if (type === "video") {
+        return setShowUserVideo(true);
+      }
+      setShowUserVideo(false);
+    });
+
+    if (isClickFirstTime) {
+      meetingSocket.off("startVideoOrPhone");
+    }
+  }, [meetingSocket, isClickFirstTime]);
 
   useEffect(() => {
     // useEffect allow videostream on or off
@@ -131,9 +163,14 @@ const MeetingRoom = () => {
   };
 
   const videoHandle = () => {
-    meetingSocket.emit("showMyVideo", { callId: params.meetingId }, () => {
-      setShowVideo(!showVideo);
-    });
+    // dispatch(videoActions.setType({ type: "video" }));
+    meetingSocket.emit(
+      "showMyVideo",
+      { callId: params.meetingId, isClickFirstTime },
+      () => {
+        setShowVideo(!showVideo);
+      }
+    );
   };
 
   const changeScaleHandle = () => {
@@ -143,6 +180,10 @@ const MeetingRoom = () => {
   const toggleSound = () => {
     setToggleIconSound(!toggleIconSound);
     meetingSocket.emit("toggleSound", { callId: params.meetingId });
+  };
+
+  const handleShareScreen = () => {
+    shareScreen(stream, peer);
   };
 
   const returnPeer = (call, userVideo, showTop, showUserVideo, muteSound) => {
@@ -227,12 +268,19 @@ const MeetingRoom = () => {
 
           <MeetingBottomControls>
             <CommonControl onClick={videoHandle}>
+              {/* {type === "phone" ? ( */}
+              {/*   <FiVideoOff /> */}
+              {/* ) : showVideo ? ( */}
+              {/*   <FiVideo /> */}
+              {/* ) : ( */}
+              {/*   <FiVideoOff /> */}
+              {/* )} */}
               {showVideo ? <FiVideo /> : <FiVideoOff />}
             </CommonControl>
             <CommonControl onClick={toggleSound}>
               {!toggleIconSound ? <HiOutlineMicrophone /> : <BiMicrophoneOff />}
             </CommonControl>
-            <CommonControl>
+            <CommonControl onClick={handleShareScreen}>
               <CgScreen />
             </CommonControl>
             <CommonControl className="close" onClick={phoneOffHandle}>

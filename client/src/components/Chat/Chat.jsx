@@ -94,7 +94,7 @@ const Chat = () => {
           />
         </Routes>
         <Routes>
-          {conversation?.conv.map(({ members, messages, _id: id }) => {
+          {conversation?.conv?.map(({ members, messages, _id: id }) => {
             const { userId: member } = members.find((member) => {
               return member.userId._id !== conversation.user._id;
             });

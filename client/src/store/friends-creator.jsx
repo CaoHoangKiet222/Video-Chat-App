@@ -1,3 +1,5 @@
+import { postData } from "../utilities/utilities";
+import { conversationActions } from "./conversations-slice";
 import { friendsActions } from "./friends-slice";
 
 export const fetchFriends = () => {
@@ -8,6 +10,7 @@ export const fetchFriends = () => {
         { credentials: "include" }
       );
       const data = await response.json();
+      console.log(data);
 
       if (data.error) {
         throw new Error(data.error);
@@ -19,5 +22,22 @@ export const fetchFriends = () => {
         friendsActions.setFriends({ friends: null, error: err.message })
       );
     }
+  };
+};
+
+export const postAddFriend = (id, name, navigate) => {
+  return async (dispatch) => {
+    dispatch(
+      conversationActions.setConversation({
+        conversation: await postData(
+          `${process.env.REACT_APP_ENDPOINT_SERVER}/add-friend`,
+          "post",
+          {
+            friendId: id,
+          }
+        ),
+      })
+    );
+    navigate(`/video-chat/Chats/${encodeURIComponent(name)}`);
   };
 };

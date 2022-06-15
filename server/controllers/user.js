@@ -54,7 +54,6 @@ exports.getConversation = (req, res, _next) => {
 
 exports.postAddFriend = async (req, res, _next) => {
   try {
-    console.log("sdfasdfasdf");
     const convExist = await Conversation.findOne({
       $and: [
         { "members.userId": req.body.friendId },
@@ -98,6 +97,7 @@ exports.postUserLogin = async (req, res, _next) => {
         console.log(err);
       }
     });
+    console.log(user, req.body.rememberToLogin);
 
     return res.send(user);
   } catch (err) {

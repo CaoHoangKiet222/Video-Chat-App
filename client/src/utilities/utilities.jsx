@@ -237,9 +237,28 @@ export const checkIsFriend = (user, friend, conversation) => {
   return false;
 };
 
-export const getUserMedia = async () => {
-  return await navigator.mediaDevices.getUserMedia({
-    video: true,
-    audio: true,
-  });
+export const getUserMedia = async (type) => {
+  return await navigator.mediaDevices.getUserMedia(type);
+};
+
+export const shareScreen = (stream, peer) => {
+  navigator.mediaDevices
+    .getDisplayMedia({ cursor: true })
+    .then((shareStream) => {
+      const screenTrack = shareStream.getTracks()[0];
+
+      const videoTrack = stream
+        .getTracks()
+        .find((track) => track.kind === "video");
+
+      peer.replaceTrack(videoTrack, screenTrack, stream);
+      console.log(screenTrack);
+
+      screenTrack.onended = () => {
+        peer.replaceTrack(screenTrack, videoTrack, stream);
+      };
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 };

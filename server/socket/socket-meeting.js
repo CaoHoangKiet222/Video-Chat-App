@@ -92,9 +92,12 @@ exports = module.exports = (socket, type, io = null) => {
       );
       break;
     case "showMyVideo":
-      socket.on(type, ({ callId }, callback) => {
+      socket.on(type, ({ callId, type, isClickFirstTime }, callback) => {
         callback();
         socket.broadcast.to(callId).emit("showUserVideo");
+
+        !isClickFirstTime &&
+          socket.broadcast.to(callId).emit("startVideoOrPhone", type);
       });
       break;
     case "toggleSound":

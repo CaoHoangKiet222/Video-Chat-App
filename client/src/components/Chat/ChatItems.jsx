@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Avatar,
@@ -11,9 +11,10 @@ import {
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { videoActions } from "../../store/video-slice";
-import { formatHour } from "../../utilities/utilities";
+import { formatHour, getUserMedia } from "../../utilities/utilities";
 import { HiPhoneIncoming, HiPhoneOutgoing } from "react-icons/hi";
 import { RiPhoneLine } from "react-icons/ri";
+import { beforeStartVideo } from "../../store/video-creator";
 
 const ChatItems = (props) => {
   console.log("ChatItems running");
@@ -46,17 +47,28 @@ const ChatItems = (props) => {
     meetingSocket.on(
       "meetingConnection",
       ({ callId, caller, callee, isReceiving }) => {
-        dispatch(videoActions.setCallId({ callId }));
         dispatch(
-          videoActions.setCall({
-            call: {
-              callee,
-              caller,
-              isReceiving,
-            },
-          })
+          beforeStartVideo(
+            "Callee",
+            callee,
+            caller,
+            callId,
+            navigate,
+            null,
+            isReceiving
+          )
         );
-        navigate(`/video-chat/Chats/meeting/${encodeURIComponent(callId)}`);
+        // dispatch(videoActions.setCallId({ callId }));
+        // dispatch(
+        //   videoActions.setCall({
+        //     call: {
+        //       callee,
+        //       caller,
+        //       isReceiving,
+        //     },
+        //   })
+        // );
+        // navigate(`/video-chat/Chats/meeting/${encodeURIComponent(callId)}`);
       }
     );
   }, [dispatch, navigate, meetingSocket]);

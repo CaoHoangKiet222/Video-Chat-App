@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchConversation } from "../../store/conversations-creator";
 import { forwardActions } from "../../store/forward-slice";
-import { fetchFriends } from "../../store/friends-creator";
+import { fetchFriends, postAddFriend } from "../../store/friends-creator";
 import { checkIsFriend } from "../../utilities/utilities";
 import { Avatar } from "../Chat/ChatItems.styled";
 import {
@@ -84,27 +84,20 @@ const DialogMain = (props) => {
 
   const newChatHandler = (e) => {
     e.preventDefault();
-    console.log(checkIsFriend(user, friend, conversation?.conv));
-    if (checkIsFriend(user, friend, conversation?.conv)) {
-      if (!props.isForward) {
+
+    if (!props.isForward) {
+      if (checkIsFriend(user, friend, conversation?.conv)) {
         navigate(`/video-chat/Chats/${encodeURIComponent(friend.name)}`);
-        return props.setShowModalDialog(false);
+      } else {
+        dispatch(postAddFriend(friend._id, friend.name, navigate));
       }
+      props.setShowModalDialog(false);
     }
-    // Need to be fixed
-    // dispatch(fetchFriends());
   };
 
   return (
     <DialogItem isForward={props.isForward}>
-      <Link
-        to={`${
-          props.isForward
-            ? "#"
-            : `/video-chat/Chats/${encodeURIComponent(friend.name)}`
-        }`}
-        onClick={newChatHandler}
-      >
+      <Link to={"#"} onClick={newChatHandler}>
         <Avatar>
           <img src={`${ENDPOINT_CLIENT}/${friend.avata}`} alt="" />
         </Avatar>
