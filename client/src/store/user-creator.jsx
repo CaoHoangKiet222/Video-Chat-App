@@ -57,7 +57,6 @@ export const fetchSession = (url, navigate) => {
     try {
       const response = await fetch(url, { credentials: "include" });
       const { isRemember } = await response.json();
-      console.log(isRemember);
       if (isRemember) {
         setTimeout(() => {
           navigate("/video-chat/Chats");

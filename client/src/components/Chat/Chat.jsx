@@ -17,6 +17,7 @@ import ModalDialog from "../ModalDialog/ModalDialog";
 import { forwardActions } from "../../store/forward-slice";
 import Notification from "../UI/Notification";
 import { errorActions } from "../../store/error-slice";
+import Settings from "../Profile/Settings";
 
 const Chat = () => {
   const { conversation } = useSelector((state) => state.conversation);
@@ -162,27 +163,31 @@ const Chat = () => {
 
           <Route path={`Chats/meeting/:meetingId`} element={<Meeting />} />
         </Routes>
-        {!isChosen && (
-          <DefaultUser>
-            <div className="user">
-              <div className="container">
-                {isLoading ? (
-                  <InfoBarLoading background="#323333" />
-                ) : (
-                  <>
-                    <div className="avatar">
-                      <img src={`${CLIENT_ENDPOINT}/${user?.avata}`} alt="" />
-                    </div>
-                    <h5>Welcome, {user?.name}!</h5>
-                    <p>Please select a chat to start messaging.</p>
-                    <button onClick={startConversation}>
-                      Start a conversation
-                    </button>
-                  </>
-                )}
+        {params["*"] !== "Profile" ? (
+          !isChosen && (
+            <DefaultUser>
+              <div className="user">
+                <div className="container">
+                  {isLoading ? (
+                    <InfoBarLoading background="#323333" />
+                  ) : (
+                    <>
+                      <div className="avatar">
+                        <img src={`${CLIENT_ENDPOINT}/${user?.avata}`} alt="" />
+                      </div>
+                      <h5>Welcome, {user?.name}!</h5>
+                      <p>Please select a chat to start messaging.</p>
+                      <button onClick={startConversation}>
+                        Start a conversation
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          </DefaultUser>
+            </DefaultUser>
+          )
+        ) : (
+          <Settings />
         )}
       </MainLayout>
     </Container>

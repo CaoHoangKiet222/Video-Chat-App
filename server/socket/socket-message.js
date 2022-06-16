@@ -63,8 +63,6 @@ exports = module.exports = (socket, type, io = null) => {
     case "forwardMessage":
       socket.on(type, ({ message, user, friend }, callback) => {
         try {
-          console.log(message);
-
           Conversation.findOneAndUpdate(
             {
               $and: [
@@ -79,8 +77,6 @@ exports = module.exports = (socket, type, io = null) => {
             },
             { new: true },
             async (_err, conversation) => {
-              console.log("asdfasdfasdfsdfs", conversation);
-
               if (!conversation) {
                 console.log("conversation not exists");
                 await new Conversation({
@@ -104,7 +100,6 @@ exports = module.exports = (socket, type, io = null) => {
       break;
     case "deleteMessage":
       socket.on(type, ({ message, conversationId }, callback) => {
-        console.log(message, conversationId);
         socket.broadcast.to(conversationId).emit("deleteMessage", message);
         callback();
       });

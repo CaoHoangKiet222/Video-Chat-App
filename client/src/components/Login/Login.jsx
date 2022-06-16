@@ -35,7 +35,6 @@ const Login = (props) => {
   const [clearErr, setClearErr] = useState(false);
   const [isRemember, setIsRemember] = useState(false);
   const navigate = useNavigate();
-  console.log(userState);
 
   useEffect(() => {
     dispatch(
