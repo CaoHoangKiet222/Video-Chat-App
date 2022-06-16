@@ -6,7 +6,6 @@ const { sortName } = require("../utilities/utilities");
 
 exports.getCall = async (req, res, _next) => {
   try {
-    console.log(req.session.user);
     const { members } = await Conversation.findOne({
       _id: req.params.conversationId,
     }).populate({ path: "members.userId" });
@@ -47,7 +46,15 @@ exports.getConversation = (req, res, _next) => {
       }
     ).populate({ path: "members.userId" });
   } catch (err) {
-    console.error(err);
+    console.log(err);
+    res.send({ error: err.message });
+  }
+};
+
+exports.getSession = (req, res, _next) => {
+  try {
+    res.send({ isRemember: req.session.isRemember });
+  } catch (error) {
     res.send({ error: err.message });
   }
 };
@@ -85,6 +92,7 @@ exports.postUserLogin = async (req, res, _next) => {
   try {
     const errors = validationResult(req);
     console.log(errors);
+
     if (!errors.isEmpty()) {
       return res.send({ error: errors.array()[0].msg });
     }
@@ -92,6 +100,7 @@ exports.postUserLogin = async (req, res, _next) => {
 
     req.session.user = user;
     req.session.isLoggedin = true;
+    req.session.isRemember = req.body.rememberToLogin;
     req.session.save((err) => {
       if (err) {
         console.log(err);
@@ -101,7 +110,20 @@ exports.postUserLogin = async (req, res, _next) => {
 
     return res.send(user);
   } catch (err) {
-    console.error(err);
+    console.log(err);
+  }
+};
+
+exports.postUserLogout = (req, res, _next) => {
+  try {
+    req.session.destroy((error) => {
+      return console.log(error);
+    });
+
+    res.json({ error: null });
+  } catch (error) {
+    console.log(error);
+    res.json({ error: error.message });
   }
 };
 
@@ -109,6 +131,7 @@ exports.postUserSignUp = async (req, res, _next) => {
   try {
     const errors = validationResult(req);
     console.log(errors);
+
     if (!errors.isEmpty()) {
       return res.send({ error: errors.array()[0].msg });
     }
@@ -126,7 +149,7 @@ exports.postUserSignUp = async (req, res, _next) => {
 
     res.send(user);
   } catch (err) {
-    console.error(err);
+    console.log(err);
     res.send({ error: err.message });
   }
 };

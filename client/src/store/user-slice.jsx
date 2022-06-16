@@ -13,7 +13,14 @@ export const userSlice = createSlice({
       state.isFetch = action.payload.isFetch;
       state.error = action.payload.error;
     },
-    logout(state, action) {},
+    logout(state) {
+      state.user = null;
+      state.isFetch = false;
+      state.error = null;
+    },
+    setIsFetch(state, action) {
+      state.isFetch = action.payload.isFetch;
+    },
   },
 });
 

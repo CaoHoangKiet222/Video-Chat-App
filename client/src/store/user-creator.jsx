@@ -1,4 +1,5 @@
 import { postData } from "../utilities/utilities";
+import { errorActions } from "./error-slice";
 import { userActions } from "./user-slice";
 let timer;
 
@@ -11,7 +12,7 @@ export const fetchLogin = (url, user) => {
         email: user.email,
         password: user.password,
         confirmPassword: user.confirmPass,
-        rememberToLogin: user.rememberToLogin,
+        rememberToLogin: user.isRemember,
       });
 
       if (data.error) {
@@ -30,7 +31,6 @@ export const fetchLogin = (url, user) => {
               email: data.email,
               password: data.password,
               confirmPassword: data.confirmPassword,
-              isRemember: user.isRemember,
             },
             isFetch: false,
             error: null,
@@ -48,6 +48,40 @@ export const fetchLogin = (url, user) => {
           })
         );
       }, 1500);
+    }
+  };
+};
+
+export const fetchSession = (url, navigate) => {
+  return async (dispatch) => {
+    try {
+      const response = await fetch(url, { credentials: "include" });
+      const { isRemember } = await response.json();
+      console.log(isRemember);
+      if (isRemember) {
+        setTimeout(() => {
+          navigate("/video-chat/Chats");
+        }, 1000);
+        dispatch(userActions.setIsFetch({ isFetch: true }));
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+};
+
+export const userLogout = (url, userId, navigate) => {
+  return async (dispatch) => {
+    try {
+      const response = await postData(url, "post", { userId });
+      console.log(response);
+
+      if (!response.error) {
+        navigate("/login");
+        dispatch(userActions.logout());
+      }
+    } catch (error) {
+      dispatch(errorActions.setError({ error: true, message: error.message }));
     }
   };
 };

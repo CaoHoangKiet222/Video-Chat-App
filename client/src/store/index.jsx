@@ -8,6 +8,7 @@ import socketReducer from "./socket-slice";
 import timeCallReducer from "./timecall-slice";
 import replyReducer from "./reply-slice";
 import forwardReducer from "./forward-slice";
+import errorReducer from "./error-slice";
 
 const store = configureStore({
   middleware: (getDefaultMiddleware) =>
@@ -24,6 +25,7 @@ const store = configureStore({
     timeCall: timeCallReducer,
     reply: replyReducer,
     forward: forwardReducer,
+    error: errorReducer,
   },
 });
 

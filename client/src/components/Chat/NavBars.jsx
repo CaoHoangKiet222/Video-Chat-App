@@ -46,7 +46,7 @@ const NavBars = () => {
           </Link>
         </li>
         <li>
-          <Link to="/video-chat/Account">
+          <Link to="/video-chat/Profile">
             <BiUserCircle />
           </Link>
         </li>

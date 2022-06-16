@@ -82,6 +82,7 @@ export const Item = styled.div`
 export const Icons = styled.div`
   margin-top: 0.75rem;
   display: flex;
+  cursor: pointer;
 
   p {
     background-color: #665dfe;

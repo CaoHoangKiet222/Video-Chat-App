@@ -19,6 +19,13 @@ export const ChatsHeader = styled.div`
   background: #383f44;
   border-color: #2b2b2f;
   padding: 0.75rem;
+
+  h5 {
+    margin: 0;
+    color: #ffffff;
+    font-weight: 400;
+    font-size: 0.9rem;
+  }
 `;
 
 export const HeaderContent = styled.div`

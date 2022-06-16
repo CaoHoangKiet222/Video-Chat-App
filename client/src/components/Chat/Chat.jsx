@@ -15,6 +15,8 @@ import { fetchCalls } from "../../store/calls-creator";
 import CallDetails from "../Calls/CallDetails";
 import ModalDialog from "../ModalDialog/ModalDialog";
 import { forwardActions } from "../../store/forward-slice";
+import Notification from "../UI/Notification";
+import { errorActions } from "../../store/error-slice";
 
 const Chat = () => {
   const { conversation } = useSelector((state) => state.conversation);
@@ -22,6 +24,7 @@ const Chat = () => {
   const { calls } = useSelector((state) => state.calls);
   const { user } = useSelector((state) => state.user);
   const { forward } = useSelector((state) => state.forward);
+  const { error, message } = useSelector((state) => state.error);
   const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
   const params = useParams();
@@ -55,6 +58,18 @@ const Chat = () => {
     }
   }, [params]);
 
+  useEffect(() => {
+    let timer = 0;
+    if (error) {
+      timer = setTimeout(() => {
+        dispatch(errorActions.resetError({ error: false }));
+      }, 6000);
+    }
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [error, dispatch]);
+
   const startConversation = () => {
     setShowModalDialog(true);
     dispatch(
@@ -62,9 +77,18 @@ const Chat = () => {
     );
   };
 
+  const notificationHandler = () => {
+    dispatch(errorActions.resetError({ error: false }));
+  };
+
   return (
     <Container>
       <MainLayout>
+        <Notification
+          text={message}
+          active={error ? true : false}
+          onClick={notificationHandler}
+        />
         {showModalDialog && (
           <ModalDialog
             isForward={forward?.isClick}
@@ -89,8 +113,8 @@ const Chat = () => {
             element={<SideBars header="Calls" isLoading={isLoading} />}
           />
           <Route
-            path="/Account/*"
-            element={<SideBars header="Account" isLoading={isLoading} />}
+            path="/Profile/*"
+            element={<SideBars header="Profile" isLoading={isLoading} />}
           />
         </Routes>
         <Routes>
@@ -147,9 +171,9 @@ const Chat = () => {
                 ) : (
                   <>
                     <div className="avatar">
-                      <img src={`${CLIENT_ENDPOINT}/${user.avata}`} alt="" />
+                      <img src={`${CLIENT_ENDPOINT}/${user?.avata}`} alt="" />
                     </div>
-                    <h5>Welcome, {user.name}!</h5>
+                    <h5>Welcome, {user?.name}!</h5>
                     <p>Please select a chat to start messaging.</p>
                     <button onClick={startConversation}>
                       Start a conversation

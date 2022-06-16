@@ -21,22 +21,27 @@ import { useDispatch, useSelector } from "react-redux";
 import { LoadingSpinner } from "../UI/Loading";
 import { FiFacebook, FiTwitter } from "react-icons/fi";
 import { IoLogoGoogle } from "react-icons/io5";
-import { fetchLogin } from "../../store/user-creator";
+import { fetchLogin, fetchSession } from "../../store/user-creator";
 import { Fade, Flip } from "react-awesome-reveal";
 import Error from "../UI/Error";
 
 const Login = (props) => {
   console.log("Login running");
-  const url = `${process.env.REACT_APP_ENDPOINT_SERVER}/${props.formType}`;
   const userState = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
   const [clearErr, setClearErr] = useState(false);
-  const [isRemember, setIsRemember] = useState(userState.isRemember);
-  console.log(userState);
+  const [isRemember, setIsRemember] = useState(false);
   const navigate = useNavigate();
+  console.log(userState);
+
+  useEffect(() => {
+    dispatch(
+      fetchSession(`${process.env.REACT_APP_ENDPOINT_SERVER}/session`, navigate)
+    );
+  }, [dispatch, navigate]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -63,7 +68,7 @@ const Login = (props) => {
   const submitHandle = (e) => {
     e.preventDefault();
     dispatch(
-      fetchLogin(url, {
+      fetchLogin(`${process.env.REACT_APP_ENDPOINT_SERVER}/${props.formType}`, {
         email,
         password,
         confirmPass,
@@ -96,16 +101,8 @@ const Login = (props) => {
                     <span>Your Account</span>
                   </h3>
                 </Fade>
-                {/* {!clearErr && userState.error && ( */}
-                {/*   <Error error={userState.error} onClearErr={setClearErr} /> */}
-                {/* )} */}
               </MainTitle>
-              <Form
-                method="POST"
-                action={url}
-                isSignup={props.isSignUp}
-                onSubmit={submitHandle}
-              >
+              <Form isSignup={props.isSignUp} onSubmit={submitHandle}>
                 <input
                   type="hidden"
                   name="clientHome"

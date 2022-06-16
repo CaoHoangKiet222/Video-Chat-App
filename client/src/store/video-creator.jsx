@@ -1,5 +1,6 @@
 import Peer from "simple-peer";
 import { getUserMedia } from "../utilities/utilities";
+import { errorActions } from "./error-slice";
 import { timeCallActions } from "./timecall-slice";
 import { videoActions } from "./video-slice";
 
@@ -39,7 +40,14 @@ export const beforeStartVideo = (
           })
           .catch((err) => {
             console.log(err);
-            error.current = err;
+            error.current = err.message;
+            dispatch(
+              errorActions.setError({
+                error: true,
+                message: err.message,
+              })
+            );
+            console.log(error);
           });
 
         if (!error.current) {
@@ -57,7 +65,13 @@ export const beforeStartVideo = (
           })
           .catch((err) => {
             console.log(err);
-            dispatch(videoActions.setError({ error: err }));
+            // dispatch(videoActions.setError({ error: err }));
+            dispatch(
+              errorActions.setError({
+                error: true,
+                message: err.message,
+              })
+            );
           });
         dispatch(videoActions.setCallId({ callId: room }));
         dispatch(

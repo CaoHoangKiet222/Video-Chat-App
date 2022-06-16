@@ -17,7 +17,7 @@ exports = module.exports = (socket, type, io = null) => {
 
           socket.join(conversation._id.toString());
 
-          console.log(io.adapter.rooms);
+          // console.log(io.adapter.rooms);
         } catch (err) {
           console.error(err);
         }
@@ -41,19 +41,23 @@ exports = module.exports = (socket, type, io = null) => {
       break;
     case "answerCall":
       socket.on(type, async ({ signal, callId, call }, cb) => {
-        const { callerId, calleeId, startCall, callAccepted } = call;
+        try {
+          const { callerId, calleeId, startCall, callAccepted } = call;
 
-        cb();
-        io.to(callId).emit("callAccepted", signal, startCall);
+          cb();
+          io.to(callId).emit("callAccepted", signal, startCall);
 
-        await new Meetings({
-          callerId,
-          calleeId,
-          startCall,
-          callAccepted,
-        }).save();
+          await new Meetings({
+            callerId,
+            calleeId,
+            startCall,
+            callAccepted,
+          }).save();
 
-        console.log("answerCall done");
+          console.log("answerCall done");
+        } catch (error) {
+          console.log(error);
+        }
       });
       break;
     case "joinMeetingRoom":
@@ -82,12 +86,16 @@ exports = module.exports = (socket, type, io = null) => {
       socket.on(
         type,
         async ({ callId, callTime, callerId, calleeId, startCall }) => {
-          io.to(callId).emit("callEnded");
+          try {
+            io.to(callId).emit("callEnded");
 
-          await Meetings.findOneAndUpdate(
-            { callerId, calleeId, startCall },
-            { callTime }
-          );
+            await Meetings.findOneAndUpdate(
+              { callerId, calleeId, startCall },
+              { callTime }
+            );
+          } catch (error) {
+            console.log(error);
+          }
         }
       );
       break;

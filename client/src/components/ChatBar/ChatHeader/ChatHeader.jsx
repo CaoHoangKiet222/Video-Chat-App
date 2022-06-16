@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { BsSearch, BsTelephone } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
@@ -11,9 +11,7 @@ import {
   MediaNav,
 } from "./ChatHeader.styled";
 import { useDispatch, useSelector } from "react-redux";
-import { beforeStartVideo, videoStart } from "../../../store/video-creator";
-import { getUserMedia } from "../../../utilities/utilities";
-import { videoActions } from "../../../store/video-slice";
+import { beforeStartVideo } from "../../../store/video-creator";
 
 const ChatHeader = (props) => {
   const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
@@ -27,19 +25,6 @@ const ChatHeader = (props) => {
     dispatch(
       beforeStartVideo("Caller", member, user, props.room, navigate, error)
     );
-    // await getUserMedia({ video: true, audio: true })
-    //   .then((currentStream) => {
-    //     console.log(currentStream);
-    //     dispatch(videoActions.setStream({ currentStream }));
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     error.current = err;
-    //   });
-    // if (!error.current) {
-    //   return dispatch(videoStart(member, user, props.room, navigate));
-    // }
-    // error.current = null;
   };
 
   return (
