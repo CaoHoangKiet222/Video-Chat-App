@@ -9,21 +9,16 @@ import {
   ContactActions,
 } from "./ChatItems.styled";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { formatHour } from "../../utilities/utilities";
 import { HiPhoneIncoming, HiPhoneOutgoing } from "react-icons/hi";
 import { RiPhoneLine } from "react-icons/ri";
-import { beforeStartVideo } from "../../store/video-creator";
 
 const ChatItems = (props) => {
   console.log("ChatItems running");
   const member = props.member;
-  const user = useSelector((state) => state.user.user);
   const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
-  console.log("sdfsdfsdf", member.isLoggined);
 
   let pathname;
   if (props.header === "Friends") {
@@ -52,7 +47,7 @@ const ChatItems = (props) => {
       )}
       <ChatItem>
         <Link to={pathname}>
-          <Avatar type={props.header} isLoggined={member.isLoggined}>
+          <Avatar header={props.header} isLoggined={member.isLoggined}>
             <img src={`${ENDPOINT_CLIENT}/${member.avata}`} alt="" />
           </Avatar>
           <ChatContent>

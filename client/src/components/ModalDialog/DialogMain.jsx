@@ -4,8 +4,7 @@ import { FaTelegramPlane, FaUndo } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchConversation } from "../../store/conversations-creator";
-import { forwardActions } from "../../store/forward-slice";
-import { fetchFriends, postAddFriend } from "../../store/friends-creator";
+import { postAddFriend } from "../../store/friends-creator";
 import { checkIsFriend } from "../../utilities/utilities";
 import { Avatar } from "../Chat/ChatItems.styled";
 import {
@@ -98,7 +97,7 @@ const DialogMain = (props) => {
   return (
     <DialogItem isForward={props.isForward}>
       <Link to={"#"} onClick={newChatHandler}>
-        <Avatar>
+        <Avatar isLoggined={friend.isLoggined} header="Chats">
           <img src={`${ENDPOINT_CLIENT}/${friend.avata}`} alt="" />
         </Avatar>
         <DialogContent>
@@ -106,7 +105,7 @@ const DialogMain = (props) => {
             <h6>{friend.name}</h6>
           </DialogInfo>
           <DialogText>
-            <p>Online</p>
+            <p>{friend.isLoggined ? "Online" : "Offline"}</p>
           </DialogText>
         </DialogContent>
         {props.isForward && (

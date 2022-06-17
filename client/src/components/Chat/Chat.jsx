@@ -79,11 +79,13 @@ const Chat = () => {
     meetingSocket.on("notifyingUserIsOnline", () => {
       console.log("notifyingUserIsOnline");
       dispatch(fetchConversation());
+      dispatch(fetchFriends());
     });
 
     meetingSocket.on("notifyingUserIsOffline", () => {
       console.log("notifyingUserIsOffline");
       dispatch(fetchConversation());
+      dispatch(fetchFriends());
     });
 
     meetingSocket.on(

@@ -67,9 +67,11 @@ const MeetingRoom = () => {
       });
     }
   }, [showTop]);
+  console.log(type);
 
   useEffect(() => {
-    if (call.isReceiving) {
+    // Callee startCall
+    if (call.isReceiving && !isClickFirstTime) {
       console.log("emit showMyVideo");
       meetingSocket.emit(
         "showMyVideo",
@@ -91,21 +93,16 @@ const MeetingRoom = () => {
     isClickFirstTime,
   ]);
 
-  console.log(showUserVideo);
   useEffect(() => {
-    meetingSocket.on("startVideoOrPhone", (type) => {
-      console.log("startVideoOrPhone", type);
+    // Caller startCall
+    if (isClickFirstTime) {
+      return meetingSocket.off("startVideoOrPhone");
+    }
+
+    meetingSocket.on("startPhone", () => {
       setIsClickFirstTime(true);
-      if (type === "video") {
-        return setShowUserVideo(true);
-      }
-      console.log("sdfasdfasfsdfasf");
       setShowUserVideo(false);
     });
-
-    if (isClickFirstTime) {
-      meetingSocket.off("startVideoOrPhone");
-    }
   }, [meetingSocket, isClickFirstTime]);
 
   useEffect(() => {
@@ -125,9 +122,11 @@ const MeetingRoom = () => {
   }, [showVideo, stream, showUserVideo, userStream, showTop, muteSound]);
 
   useEffect(() => {
+    // if (isClickFirstTime ) {
     meetingSocket.on("showUserVideo", () => {
       setShowUserVideo(!showUserVideo);
     });
+    // }
 
     return () => {
       meetingSocket.off("showUserVideo");
@@ -170,6 +169,7 @@ const MeetingRoom = () => {
       "showMyVideo",
       { callId: params.meetingId, isClickFirstTime },
       () => {
+        // setIsClickFirstTime(true);
         setShowVideo(!showVideo);
       }
     );

@@ -32,22 +32,23 @@ const ChatHeader = (props) => {
     dispatch(
       errorActions.setError({
         error: true,
-        message: "User is offline",
+        message: "Can't call user because user is offline",
       })
     );
   };
+  console.log(props);
 
   return (
     <HeaderBar>
       <Media>
-        <Avatar>
+        <Avatar header="Chats" isLoggined={member.isLoggined}>
           <img src={`${ENDPOINT_CLIENT}/${member.avata}`} alt="" />
         </Avatar>
         <MediaContent>
           <MediaInfo>
             <h6>{member.name}</h6>
           </MediaInfo>
-          <small>Online</small>
+          <small>{member.isLoggined ? "Online" : "Offline"}</small>
         </MediaContent>
       </Media>
       <MediaNav>

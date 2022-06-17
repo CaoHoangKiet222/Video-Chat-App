@@ -40,7 +40,7 @@ export const Avatar = styled.div`
   &:before {
     ${(props) =>
       !props.isSkeleton &&
-      props.type === "Chats" &&
+      props.header === "Chats" &&
       props.isLoggined &&
       `
     background: #44a675;
