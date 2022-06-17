@@ -12,6 +12,22 @@ export const socketSlice = createSlice({
       transports: ["websocket"],
     }),
   },
+  reducers: {
+    disconnectSocket(state) {
+      state.chatSocket = state.chatSocket.disconnect();
+      state.meetingSocket = state.meetingSocket.disconnect();
+    },
+    setupSocket(state) {
+      state.chatSocket = io(`${ENDPOINT_SERVER}/chat-rooms`, {
+        transports: ["websocket"],
+      });
+      state.meetingSocket = io(`${ENDPOINT_SERVER}/meeting-rooms`, {
+        transports: ["websocket"],
+      });
+    },
+  },
 });
+
+export const socketActions = socketSlice.actions;
 
 export default socketSlice.reducer;

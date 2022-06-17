@@ -65,7 +65,7 @@ io_chat.on("connection", (socket) => {
 
   socketMessageListen(socket, "deleteMessage", io_chat);
 
-  socketMessageListen(socket, "disconnect");
+  socketMessageListen(socket, "disconnect", io_chat);
 });
 
 const io_meeting = io.of("/meeting-rooms");
@@ -89,6 +89,10 @@ io_meeting.on("connection", (socket) => {
   socketMeetingListen(socket, "showMyVideo");
 
   socketMeetingListen(socket, "toggleSound");
+
+  socketMeetingListen(socket, "notifyingUserIsOffline", io_meeting);
+
+  socketMeetingListen(socket, "disconnect", io_meeting);
 });
 
 (async () => {

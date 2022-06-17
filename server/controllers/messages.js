@@ -1,7 +1,6 @@
-const { default: mongoose } = require("mongoose");
 const Conversation = require("../models/conversation");
 
-exports.deleteMessage = async (req, res, _next) => {
+exports.deleteMessage = async (req, _res, _next) => {
   try {
     await Conversation.findByIdAndUpdate(req.body.conversationId, {
       $pull: {

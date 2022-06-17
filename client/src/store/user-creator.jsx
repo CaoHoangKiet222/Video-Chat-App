@@ -1,5 +1,6 @@
 import { postData } from "../utilities/utilities";
 import { errorActions } from "./error-slice";
+import { socketActions } from "./socket-slice";
 import { userActions } from "./user-slice";
 let timer;
 
@@ -53,15 +54,25 @@ export const fetchLogin = (url, user) => {
 };
 
 export const fetchSession = (url, navigate) => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     try {
       const response = await fetch(url, { credentials: "include" });
       const { isRemember } = await response.json();
+      const { chatSocket, meetingSocket } = getState().socket;
       if (isRemember) {
         setTimeout(() => {
           navigate("/video-chat/Chats");
-        }, 1000);
+        }, 1500);
         dispatch(userActions.setIsFetch({ isFetch: true }));
+      } else {
+        if (chatSocket && meetingSocket) {
+          meetingSocket.emit("notifyingUserIsOffline");
+
+          dispatch(socketActions.disconnectSocket());
+          // return dispatch(socketActions.setupSocket());
+        }
+
+        dispatch(socketActions.setupSocket());
       }
     } catch (err) {
       console.log(err);
@@ -70,14 +81,20 @@ export const fetchSession = (url, navigate) => {
 };
 
 export const userLogout = (url, userId, navigate) => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     try {
       const response = await postData(url, "post", { userId });
+      const { meetingSocket } = getState().socket;
       console.log(response);
 
       if (!response.error) {
         navigate("/login");
         dispatch(userActions.logout());
+
+        meetingSocket.emit("notifyingUserIsOffline");
+
+        dispatch(socketActions.disconnectSocket());
+        // dispatch(socketActions.setupSocket());
       }
     } catch (error) {
       dispatch(errorActions.setError({ error: true, message: error.message }));

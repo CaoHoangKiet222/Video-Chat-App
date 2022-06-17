@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import InfoBar from "../ChatBar/InfoBar/InfoBar";
 import { Container, DefaultUser, MainLayout } from "./Chat.styled";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +18,7 @@ import { forwardActions } from "../../store/forward-slice";
 import Notification from "../UI/Notification";
 import { errorActions } from "../../store/error-slice";
 import Settings from "../Profile/Settings";
+import { beforeStartVideo } from "../../store/video-creator";
 
 const Chat = () => {
   const { conversation } = useSelector((state) => state.conversation);
@@ -31,6 +32,8 @@ const Chat = () => {
   const params = useParams();
   const [isChosen, setIsChosen] = useState(false);
   const [showModalDialog, setShowModalDialog] = useState(false);
+  const meetingSocket = useSelector((state) => state.socket.meetingSocket);
+  const navigate = useNavigate();
   const CLIENT_ENDPOINT = process.env.REACT_APP_ENDPOINT_CLIENT;
 
   useEffect(() => {
@@ -71,6 +74,36 @@ const Chat = () => {
     };
   }, [error, dispatch]);
 
+  useEffect(() => {
+    // to be careful to put socket-client in map() because it can run multiple times
+    meetingSocket.on("notifyingUserIsOnline", () => {
+      console.log("notifyingUserIsOnline");
+      dispatch(fetchConversation());
+    });
+
+    meetingSocket.on("notifyingUserIsOffline", () => {
+      console.log("notifyingUserIsOffline");
+      dispatch(fetchConversation());
+    });
+
+    meetingSocket.on(
+      "meetingConnection",
+      ({ callId, caller, callee, isReceiving }) => {
+        dispatch(
+          beforeStartVideo(
+            "Callee",
+            callee,
+            caller,
+            callId,
+            navigate,
+            null,
+            isReceiving
+          )
+        );
+      }
+    );
+  }, [meetingSocket, dispatch, navigate]);
+
   const startConversation = () => {
     setShowModalDialog(true);
     dispatch(
@@ -78,18 +111,10 @@ const Chat = () => {
     );
   };
 
-  const notificationHandler = () => {
-    dispatch(errorActions.resetError({ error: false }));
-  };
-
   return (
     <Container>
       <MainLayout>
-        <Notification
-          text={message}
-          active={error ? true : false}
-          onClick={notificationHandler}
-        />
+        <Notification text={message} active={error ? true : false} />
         {showModalDialog && (
           <ModalDialog
             isForward={forward?.isClick}

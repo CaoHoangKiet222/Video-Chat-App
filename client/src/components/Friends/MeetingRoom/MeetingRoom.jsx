@@ -29,7 +29,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { leaveCall } from "../../../store/video-creator.jsx";
 import { formatCallTime, shareScreen } from "../../../utilities/utilities.jsx";
-import { videoActions } from "../../../store/video-slice.jsx";
 
 const MeetingRoom = () => {
   const [showTop, setShowTop] = useState(false);
@@ -92,12 +91,15 @@ const MeetingRoom = () => {
     isClickFirstTime,
   ]);
 
+  console.log(showUserVideo);
   useEffect(() => {
     meetingSocket.on("startVideoOrPhone", (type) => {
       console.log("startVideoOrPhone", type);
+      setIsClickFirstTime(true);
       if (type === "video") {
         return setShowUserVideo(true);
       }
+      console.log("sdfasdfasfsdfasf");
       setShowUserVideo(false);
     });
 

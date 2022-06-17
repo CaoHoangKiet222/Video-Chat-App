@@ -128,6 +128,7 @@ const SideBars = (props) => {
                         header={props.header}
                         messageDate={lastMessage?.messageDate}
                         content={lastMessage?.content}
+                        room={_id}
                       />
                     );
                   })

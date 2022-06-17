@@ -32,9 +32,9 @@ const userSchema = new Schema({
   avata: {
     type: String,
   },
-  lastOnline: {
-    type: Date,
-    required: true,
+  isLoggined: {
+    type: Boolean,
+    default: false,
   },
 });
 

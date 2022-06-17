@@ -1,9 +1,17 @@
 import React from "react";
 import { AiFillWarning } from "react-icons/ai";
 import { IoClose } from "react-icons/io5";
+import { useDispatch } from "react-redux";
 import styled from "styled-components";
+import { errorActions } from "../../store/error-slice";
 
 const Notification = (props) => {
+  const dispatch = useDispatch();
+
+  const notificationHandler = () => {
+    dispatch(errorActions.resetError({ error: false }));
+  };
+
   return (
     <Container className={`${props.active ? "active" : ""}`}>
       <Content>
@@ -13,7 +21,7 @@ const Notification = (props) => {
             <AiFillWarning />
           </Wrapper>
           <Text>{props.text}</Text>
-          <Button>
+          <Button onClick={notificationHandler}>
             <IoClose />
           </Button>
         </Warning>

@@ -4,20 +4,15 @@ const Meetings = module.require("../models/meetings");
 exports = module.exports = (socket, type, io = null) => {
   switch (type) {
     case "joinVideo":
-      socket.on(type, async ({ user, friend }) => {
+      socket.on(type, async ({ conversationId }) => {
         try {
-          console.log("A user joins meeting-rooms");
+          console.log("A user joins meeting-rooms", conversationId);
 
-          const conversation = await Conversation.findOne({
-            $and: [
-              { "members.userId": user._id },
-              { "members.userId": friend._id },
-            ],
-          }).select({ _id: 1 });
+          socket.join(conversationId);
 
-          socket.join(conversation._id.toString());
+          console.log(io.adapter.rooms);
 
-          // console.log(io.adapter.rooms);
+          socket.broadcast.to(conversationId).emit("notifyingUserIsOnline");
         } catch (err) {
           console.error(err);
         }
@@ -111,6 +106,17 @@ exports = module.exports = (socket, type, io = null) => {
     case "toggleSound":
       socket.on(type, ({ callId }) => {
         socket.broadcast.to(callId).emit("toggleSound");
+      });
+      break;
+    case "disconnect":
+      socket.on(type, () => {
+        console.log("A user disconnected to meeting channel");
+        console.log(io.adapter.rooms);
+      });
+      break;
+    case "notifyingUserIsOffline":
+      socket.on(type, () => {
+        socket.broadcast.emit("notifyingUserIsOffline");
       });
       break;
   }

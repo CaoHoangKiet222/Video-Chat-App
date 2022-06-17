@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Avatar,
@@ -10,8 +10,7 @@ import {
 } from "./ChatItems.styled";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { videoActions } from "../../store/video-slice";
-import { formatHour, getUserMedia } from "../../utilities/utilities";
+import { formatHour } from "../../utilities/utilities";
 import { HiPhoneIncoming, HiPhoneOutgoing } from "react-icons/hi";
 import { RiPhoneLine } from "react-icons/ri";
 import { beforeStartVideo } from "../../store/video-creator";
@@ -24,6 +23,7 @@ const ChatItems = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
+  console.log("sdfsdfsdf", member.isLoggined);
 
   let pathname;
   if (props.header === "Friends") {
@@ -38,40 +38,12 @@ const ChatItems = (props) => {
     pathname = `/video-chat/${props.header}/${encodeURIComponent(member.name)}`;
 
   useEffect(() => {
-    if (member && user) {
-      meetingSocket.emit("joinVideo", { user, friend: member });
+    if (props.room) {
+      meetingSocket.emit("joinVideo", {
+        conversationId: props.room,
+      });
     }
-  }, [member, user, meetingSocket]);
-
-  useEffect(() => {
-    meetingSocket.on(
-      "meetingConnection",
-      ({ callId, caller, callee, isReceiving }) => {
-        dispatch(
-          beforeStartVideo(
-            "Callee",
-            callee,
-            caller,
-            callId,
-            navigate,
-            null,
-            isReceiving
-          )
-        );
-        // dispatch(videoActions.setCallId({ callId }));
-        // dispatch(
-        //   videoActions.setCall({
-        //     call: {
-        //       callee,
-        //       caller,
-        //       isReceiving,
-        //     },
-        //   })
-        // );
-        // navigate(`/video-chat/Chats/meeting/${encodeURIComponent(callId)}`);
-      }
-    );
-  }, [dispatch, navigate, meetingSocket]);
+  }, [meetingSocket, props.room]);
 
   return (
     <>
@@ -80,7 +52,7 @@ const ChatItems = (props) => {
       )}
       <ChatItem>
         <Link to={pathname}>
-          <Avatar type={props.header}>
+          <Avatar type={props.header} isLoggined={member.isLoggined}>
             <img src={`${ENDPOINT_CLIENT}/${member.avata}`} alt="" />
           </Avatar>
           <ChatContent>

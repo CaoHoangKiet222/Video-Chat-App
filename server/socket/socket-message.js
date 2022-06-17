@@ -106,7 +106,8 @@ exports = module.exports = (socket, type, io = null) => {
       break;
     case "disconnect":
       socket.on(type, () => {
-        console.log("A user disconnected");
+        console.log("A user disconnected to message channel");
+        console.log(io.adapter.rooms);
       });
       break;
   }

@@ -53,9 +53,32 @@ exports.getConversation = (req, res, _next) => {
 
 exports.getSession = (req, res, _next) => {
   try {
-    res.send({ isRemember: req.session.isRemember });
+    if (req.session.isRemember) {
+      return res.send({
+        isRemember: req.session.isRemember,
+      });
+    }
+
+    User.findByIdAndUpdate(
+      req.session.user._id,
+      {
+        isLoggined: false,
+      },
+      { new: true },
+      () => {
+        req.session.destroy((error) => console.log(error));
+
+        // res.json({ error: null });
+        res.json({
+          isRemember: false,
+          error: null,
+        });
+      }
+    );
+
+    // req.session.destroy((error) => console.log(error));
   } catch (error) {
-    res.send({ error: err.message });
+    res.send({ error: error.message });
   }
 };
 
@@ -96,19 +119,24 @@ exports.postUserLogin = async (req, res, _next) => {
     if (!errors.isEmpty()) {
       return res.send({ error: errors.array()[0].msg });
     }
-    const user = await User.findOne({ email: req.body.email });
 
-    req.session.user = user;
-    req.session.isLoggedin = true;
-    req.session.isRemember = req.body.rememberToLogin;
-    req.session.save((err) => {
-      if (err) {
-        console.log(err);
+    User.findOneAndUpdate(
+      { email: req.body.email },
+      { isLoggined: true },
+      { new: true },
+      (_error, user) => {
+        req.session.user = user;
+        req.session.isRemember = req.body.rememberToLogin;
+        req.session.save((err) => {
+          if (err) {
+            return console.log(err);
+          }
+        });
+        console.log(user, req.body.rememberToLogin);
+
+        return res.send(user);
       }
-    });
-    console.log(user, req.body.rememberToLogin);
-
-    return res.send(user);
+    );
   } catch (err) {
     console.log(err);
   }
@@ -116,11 +144,18 @@ exports.postUserLogin = async (req, res, _next) => {
 
 exports.postUserLogout = (req, res, _next) => {
   try {
-    req.session.destroy((error) => {
-      return console.log(error);
-    });
+    User.findByIdAndUpdate(
+      req.session.user._id,
+      {
+        isLoggined: false,
+      },
+      { new: true },
+      () => {
+        req.session.destroy((error) => console.log(error));
 
-    res.json({ error: null });
+        res.json({ error: null });
+      }
+    );
   } catch (error) {
     console.log(error);
     res.json({ error: error.message });

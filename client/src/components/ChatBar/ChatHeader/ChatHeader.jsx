@@ -12,6 +12,7 @@ import {
 } from "./ChatHeader.styled";
 import { useDispatch, useSelector } from "react-redux";
 import { beforeStartVideo } from "../../../store/video-creator";
+import { errorActions } from "../../../store/error-slice";
 
 const ChatHeader = (props) => {
   const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
@@ -21,9 +22,18 @@ const ChatHeader = (props) => {
   const navigate = useNavigate();
   const error = useRef(null);
 
-  const callHandle = async () => {
+  const callHandle = () => {
+    if (member.isLoggined) {
+      return dispatch(
+        beforeStartVideo("Caller", member, user, props.room, navigate, error)
+      );
+    }
+
     dispatch(
-      beforeStartVideo("Caller", member, user, props.room, navigate, error)
+      errorActions.setError({
+        error: true,
+        message: "User is offline",
+      })
     );
   };
 
