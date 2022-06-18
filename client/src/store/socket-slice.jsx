@@ -5,6 +5,9 @@ const ENDPOINT_SERVER = process.env.REACT_APP_ENDPOINT_SERVER;
 export const socketSlice = createSlice({
   name: "socket",
   initialState: {
+    notifySocket: io(`${ENDPOINT_SERVER}/notify`, {
+      transports: ["websocket"],
+    }),
     chatSocket: io(`${ENDPOINT_SERVER}/chat-rooms`, {
       transports: ["websocket"],
     }),
@@ -14,10 +17,14 @@ export const socketSlice = createSlice({
   },
   reducers: {
     disconnectSocket(state) {
+      state.notifySocket = state.notifySocket.disconnect();
       state.chatSocket = state.chatSocket.disconnect();
       state.meetingSocket = state.meetingSocket.disconnect();
     },
     setupSocket(state) {
+      state.notifySocket = io(`${ENDPOINT_SERVER}/notify`, {
+        transports: ["websocket"],
+      });
       state.chatSocket = io(`${ENDPOINT_SERVER}/chat-rooms`, {
         transports: ["websocket"],
       });

@@ -28,7 +28,7 @@ const InfoBar = (props) => {
 
       timer = setTimeout(() => {
         setIsFetch(true);
-      }, 1000);
+      }, 50);
     });
 
     return () => {

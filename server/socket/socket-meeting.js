@@ -1,4 +1,3 @@
-const Conversation = module.require("../models/conversation");
 const Meetings = module.require("../models/meetings");
 
 exports = module.exports = (socket, type, io = null) => {
@@ -11,8 +10,6 @@ exports = module.exports = (socket, type, io = null) => {
           socket.join(conversationId);
 
           console.log(io.adapter.rooms);
-
-          socket.broadcast.to(conversationId).emit("notifyingUserIsOnline");
         } catch (err) {
           console.error(err);
         }
@@ -116,11 +113,6 @@ exports = module.exports = (socket, type, io = null) => {
       socket.on(type, () => {
         console.log("A user disconnected to meeting channel");
         console.log(io.adapter.rooms);
-      });
-      break;
-    case "notifyingUserIsOffline":
-      socket.on(type, () => {
-        socket.broadcast.emit("notifyingUserIsOffline");
       });
       break;
   }

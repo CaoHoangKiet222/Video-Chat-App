@@ -32,7 +32,7 @@ const Chat = () => {
   const params = useParams();
   const [isChosen, setIsChosen] = useState(false);
   const [showModalDialog, setShowModalDialog] = useState(false);
-  const meetingSocket = useSelector((state) => state.socket.meetingSocket);
+  const { notifySocket, meetingSocket } = useSelector((state) => state.socket);
   const navigate = useNavigate();
   const CLIENT_ENDPOINT = process.env.REACT_APP_ENDPOINT_CLIENT;
 
@@ -76,13 +76,13 @@ const Chat = () => {
 
   useEffect(() => {
     // to be careful to put socket-client in map() because it can run multiple times
-    meetingSocket.on("notifyingUserIsOnline", () => {
+    notifySocket.on("notifyingUserIsOnline", () => {
       console.log("notifyingUserIsOnline");
       dispatch(fetchConversation());
       dispatch(fetchFriends());
     });
 
-    meetingSocket.on("notifyingUserIsOffline", () => {
+    notifySocket.on("notifyingUserIsOffline", () => {
       console.log("notifyingUserIsOffline");
       dispatch(fetchConversation());
       dispatch(fetchFriends());

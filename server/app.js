@@ -9,6 +9,7 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 const socketMessageListen = require("./socket/socket-message");
 const socketMeetingListen = require("./socket/socket-meeting");
+const socketNotifyListen = require("./socket/socket-notify");
 
 const PORT = process.env.YOUR_PORT || process.env.PORT || 5000;
 const MONGODB_URI =
@@ -51,6 +52,15 @@ app.use(require("./routes/user"));
 app.use(require("./routes/messages"));
 app.use(require("./routes/meetings"));
 
+const io_notify = io.of("/notify");
+io_notify.on("connection", (socket) => {
+  console.log("A user connected to channel notify");
+
+  socketNotifyListen(socket, "notifyingUserIsOnline", io_notify);
+
+  socketNotifyListen(socket, "notifyingUserIsOffline", io_notify);
+});
+
 const io_chat = io.of("/chat-rooms");
 io_chat.on("connection", (socket) => {
   console.log("A user connected to channel chat-rooms");
@@ -89,8 +99,6 @@ io_meeting.on("connection", (socket) => {
   socketMeetingListen(socket, "showMyVideo");
 
   socketMeetingListen(socket, "toggleSound");
-
-  socketMeetingListen(socket, "notifyingUserIsOffline", io_meeting);
 
   socketMeetingListen(socket, "disconnect", io_meeting);
 });

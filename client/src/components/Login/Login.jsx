@@ -34,6 +34,7 @@ const Login = (props) => {
   const [confirmPass, setConfirmPass] = useState("");
   const [clearErr, setClearErr] = useState(false);
   const [isRemember, setIsRemember] = useState(false);
+  const [isTermsService, setIsTermService] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,19 +45,24 @@ const Login = (props) => {
 
   useEffect(() => {
     setTimeout(() => {
-      // userState.error === null important statement
-      if (userState.error === null && userState.user) {
-        !props.isSignUp ? navigate("/video-chat/Chats") : navigate("/login");
+      if (!props.isSignUp) {
+        // userState.error === null important statement
+        if (userState.error === null && userState.user) {
+          navigate("/video-chat/Chats");
+        }
       }
-    }, 1000);
+    }, 50);
   }, [userState, navigate, props.isSignUp]);
 
   useEffect(() => {
+    props.isSignUp && navigate("/signup");
     setEmail("");
     setPassword("");
     setConfirmPass("");
-    setClearErr(false);
-  }, [props.isSignUp]);
+    setClearErr(true);
+    setIsRemember(false);
+    setIsTermService(false);
+  }, [props.isSignUp, navigate]);
 
   useEffect(() => {
     if (!userState.error) {
@@ -66,13 +72,19 @@ const Login = (props) => {
 
   const submitHandle = (e) => {
     e.preventDefault();
+
     dispatch(
-      fetchLogin(`${process.env.REACT_APP_ENDPOINT_SERVER}/${props.formType}`, {
-        email,
-        password,
-        confirmPass,
-        isRemember,
-      })
+      fetchLogin(
+        `${process.env.REACT_APP_ENDPOINT_SERVER}/${props.formType}`,
+        {
+          email,
+          password,
+          confirmPass,
+          isRemember,
+        },
+        props.formType,
+        navigate
+      )
     );
   };
 
@@ -139,10 +151,16 @@ const Login = (props) => {
                 <CheckBox>
                   <FormCheck>
                     {props.isSignUp ? (
-                      <input type="checkbox" required />
+                      <input
+                        type="checkbox"
+                        checked={isTermsService}
+                        onChange={(e) => setIsTermService(e.target.checked)}
+                        required
+                      />
                     ) : (
                       <input
                         type="checkbox"
+                        checked={isRemember}
                         onChange={(e) => setIsRemember(e.target.checked)}
                       />
                     )}

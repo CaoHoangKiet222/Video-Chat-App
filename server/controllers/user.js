@@ -180,6 +180,7 @@ exports.postUserSignUp = async (req, res, _next) => {
       avata: "images/user.jpg",
       lastOnline: new Date(Date.now()),
     });
+
     await user.save();
 
     res.send(user);
