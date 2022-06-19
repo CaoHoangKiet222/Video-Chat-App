@@ -8,27 +8,36 @@ import {
 import { ChatsList } from "../Chat/SideBars.styled";
 
 export const DialogList = styled(ChatsList)`
-  max-height: 400px;
-  ${(props) => props.isForward && "padding: 0"};
+  max-height: ${(props) => (props.newGroup ? "150px" : "400px")};
+  ${(props) => (props.isForward || props.newGroup) && "padding: 0"};
+  ${(props) => props.newGroup && "margin-bottom: 0"}
 `;
 
 export const DialogItem = styled(ChatItem)`
   ${(props) =>
-    !props.isForward
+    !props.isForward && !props.newGroup
       ? `
-      & > a:hover {
+      & > div:hover {
         background-color: #665dfe;
       }
     `
       : `
-  background-color: #383f44;
-  margin: 0;
-  padding: 0;
+      background-color: #383f44;
+      margin: 0;
+      padding: 0;
 
-  & > a {
-  cursor: auto;
-    border: 0;
-  }
+      & > div {
+        cursor: auto;
+        border: 0;
+
+        .btn {
+            & > input {
+              outline: none;
+        width: 15px;
+        height: 15px;
+            }
+        }
+      }
     `}
 `;
 

@@ -19,6 +19,8 @@ import Notification from "../UI/Notification";
 import { errorActions } from "../../store/error-slice";
 import Settings from "../Profile/Settings";
 import { beforeStartVideo } from "../../store/video-creator";
+import { getConversationId } from "../../utilities/utilities";
+import ChatGroup from "../ChatGoup/ChatGroup";
 
 const Chat = () => {
   const { conversation } = useSelector((state) => state.conversation);
@@ -50,7 +52,9 @@ const Chat = () => {
 
   useEffect(() => {
     if (user?.name || user?.avata) {
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
     }
   }, [user]);
 
@@ -67,7 +71,7 @@ const Chat = () => {
     if (error) {
       timer = setTimeout(() => {
         dispatch(errorActions.resetError({ error: false }));
-      }, 6000);
+      }, 2500);
     }
     return () => {
       clearTimeout(timer);
@@ -104,7 +108,7 @@ const Chat = () => {
         );
       }
     );
-  }, [meetingSocket, dispatch, navigate]);
+  }, [notifySocket, dispatch, navigate, meetingSocket]);
 
   const startConversation = () => {
     setShowModalDialog(true);
@@ -146,25 +150,39 @@ const Chat = () => {
           />
         </Routes>
         <Routes>
-          {conversation?.conv?.map(({ members, messages, _id: id }) => {
-            const { userId: member } = members.find((member) => {
-              return member.userId._id !== conversation.user._id;
-            });
-            return (
-              <Route
-                path={`/Chats/${encodeURIComponent(member.name)}`}
-                key={uuidv4()}
-                element={
-                  <InfoBar
-                    room={id}
-                    user={conversation.user}
-                    member={member}
-                    messages={messages}
+          {conversation?.conv?.map(
+            ({ groupName, groupImg, members, messages, _id: id }) => {
+              if (groupName !== "" && groupImg !== "") {
+                return (
+                  <Route
+                    path={`Chats/group/${encodeURIComponent(groupName)}`}
+                    key={uuidv4()}
+                    element={<ChatGroup />}
                   />
-                }
-              />
-            );
-          })}
+                );
+              }
+              const { userId: member } = members.find((member) => {
+                return member.userId._id !== conversation.user._id;
+              });
+
+              return (
+                <Route
+                  path={`/Chats/${encodeURIComponent(member.name)}`}
+                  key={uuidv4()}
+                  element={
+                    <InfoBar
+                      room={id}
+                      user={conversation.user}
+                      member={member}
+                      messages={messages}
+                      groupName={groupName}
+                      groupImg={groupImg}
+                    />
+                  }
+                />
+              );
+            }
+          )}
 
           {friends?.map((friend) => {
             return (
@@ -173,7 +191,12 @@ const Chat = () => {
                   friend.name
                 )}`}
                 key={friend._id}
-                element={<Friends friend={friend} />}
+                element={
+                  <Friends
+                    friend={friend}
+                    room={getConversationId(conversation?.conv, friend, user)}
+                  />
+                }
               />
             );
           })}

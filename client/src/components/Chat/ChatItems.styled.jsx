@@ -7,7 +7,8 @@ export const ChatItem = styled.li`
   position: relative;
   overflow: hidden;
 
-  & > a {
+  & > a,
+  & > div {
     display: flex;
     border: 1px solid #4b4b60;
     border-radius: 0.25rem;

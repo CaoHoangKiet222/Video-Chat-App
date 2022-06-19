@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Avatar } from "../Chat/ChatItems.styled";
 import {
   Body,
@@ -27,18 +27,39 @@ import { FiLinkedin, FiFacebook, FiTwitter, FiInstagram } from "react-icons/fi";
 import { MdAccessTime } from "react-icons/md";
 import { formatDate } from "../../utilities/utilities";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { postAddFriend } from "../../store/friends-creator";
+import { beforeStartVideo } from "../../store/video-creator";
+import { errorActions } from "../../store/error-slice";
 
 const Friends = (props) => {
   const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
-  const { avata, name, _id } = props.friend;
+  const { avata, name, _id, isLoggined } = props.friend;
+  const user = useSelector((state) => state.user.user);
+  const error = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const callHandle = () => {
-    // dispatch(videoStart(myVideo));
-    // navigate(`/video-chat/Friends/meeting/${encodeURIComponent(_id)}`);
+    if (isLoggined) {
+      return dispatch(
+        beforeStartVideo(
+          "Caller",
+          props.friend,
+          user,
+          props.room,
+          navigate,
+          error
+        )
+      );
+    }
+
+    dispatch(
+      errorActions.setError({
+        error: true,
+        message: "Can't call user because user is offline",
+      })
+    );
   };
 
   // const buttonHandle = () => {

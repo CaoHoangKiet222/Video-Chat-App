@@ -134,13 +134,14 @@ export const Content = styled(MessageWrap)`
 
 export const DropDown = styled.div`
   position: relative;
+  cursor: pointer;
 `;
 
 export const DropDownContent = styled.div`
   position: absolute;
   inset: 0px auto auto 0px;
   margin: 0px;
-  transform: translate(0px, 25px);
+  transform: ${({ translate }) => translate};
   min-width: 10rem;
   padding: 0.5rem 0;
   z-index: 3;
@@ -155,9 +156,6 @@ export const DropDownContent = styled.div`
   align-items: center;
   justify-content: center;
   background: #2b2b2b;
-  &.menu-show {
-    display: flex;
-  }
 
   a {
     display: flex;

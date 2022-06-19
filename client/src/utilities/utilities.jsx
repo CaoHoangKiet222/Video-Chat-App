@@ -262,3 +262,28 @@ export const shareScreen = (stream, peer) => {
       console.log(error);
     });
 };
+
+export const getConversationId = (conversation, member, user) => {
+  const existConv = conversation?.find(({ members }) => {
+    const memberIdIndex = members?.findIndex(
+      (mem) => mem?.userId._id === member?._id
+    );
+    const userIdIndex = members?.findIndex(
+      (mem) => mem?.userId._id === user?._id
+    );
+    return memberIdIndex !== -1 && userIdIndex !== -1;
+  });
+  return existConv?._id;
+};
+
+export const closeComponent = (showSomething, setShowSomething) => {
+  const checkClickOutSide = () => {
+    if (showSomething) {
+      setShowSomething(false);
+    }
+  };
+  document.addEventListener("click", checkClickOutSide);
+  return () => {
+    document.removeEventListener("click", checkClickOutSide);
+  };
+};

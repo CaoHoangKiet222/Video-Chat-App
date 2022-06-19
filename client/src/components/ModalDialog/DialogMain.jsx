@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BsEnvelopeFill } from "react-icons/bs";
 import { FaTelegramPlane, FaUndo } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { fetchConversation } from "../../store/conversations-creator";
 import { postAddFriend } from "../../store/friends-creator";
 import { checkIsFriend } from "../../utilities/utilities";
@@ -16,7 +16,7 @@ import {
 } from "./DialogItems.styled";
 
 const DialogMain = (props) => {
-  const friend = props.friend;
+  const { friend, setNewMembers } = props;
   const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
   const dispatch = useDispatch();
   const { forward } = useSelector((state) => state.forward);
@@ -25,6 +25,7 @@ const DialogMain = (props) => {
   const [isSend, setIsSend] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [isSentDone, setIsSentDone] = useState(false);
+  const [isCheckBox, setIsCheckBox] = useState(false);
   const conversation = useSelector((state) => state.conversation.conversation);
   const navigate = useNavigate();
 
@@ -75,16 +76,26 @@ const DialogMain = (props) => {
     isSentDone,
   ]);
 
+  useEffect(() => {
+    console.log(isCheckBox);
+    if (isCheckBox) {
+      return setNewMembers((preMembers) => [...preMembers, friend]);
+    }
+    setNewMembers((preMembers) => {
+      const index = preMembers.findIndex((member) => member._id === friend._id);
+      preMembers.splice(index, 1);
+      return [...preMembers];
+    });
+  }, [isCheckBox, friend, setNewMembers]);
+
   const closeDialog = () => {
     if (!isSent) {
       return setIsSend(!isSend);
     }
   };
 
-  const newChatHandler = (e) => {
-    e.preventDefault();
-
-    if (!props.isForward) {
+  const newChatHandler = () => {
+    if (!props.isForward && !props.newGroup) {
       if (checkIsFriend(user, friend, conversation?.conv)) {
         navigate(`/video-chat/Chats/${encodeURIComponent(friend.name)}`);
       } else {
@@ -94,9 +105,13 @@ const DialogMain = (props) => {
     }
   };
 
+  const addNewMembers = (e) => {
+    setIsCheckBox(e.target.checked);
+  };
+
   return (
-    <DialogItem isForward={props.isForward}>
-      <Link to={"#"} onClick={newChatHandler}>
+    <DialogItem newGroup={props.newGroup} isForward={props.isForward}>
+      <div onClick={newChatHandler}>
         <Avatar isLoggined={friend.isLoggined} header="Chats">
           <img src={`${ENDPOINT_CLIENT}/${friend.avata}`} alt="" />
         </Avatar>
@@ -131,7 +146,16 @@ const DialogMain = (props) => {
             </div>
           </SentButton>
         )}
-      </Link>
+        {props.newGroup && (
+          <div className="btn">
+            <input
+              type="checkbox"
+              checked={isCheckBox}
+              onChange={addNewMembers}
+            />
+          </div>
+        )}
+      </div>
     </DialogItem>
   );
 };

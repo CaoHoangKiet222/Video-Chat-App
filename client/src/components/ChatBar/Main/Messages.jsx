@@ -13,7 +13,12 @@ import {
 } from "./Main.styled";
 import { Avatar } from "../../Chat/ChatItems.styled";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
-import { formatDate, formatHour, postData } from "../../../utilities/utilities";
+import {
+  closeComponent,
+  formatDate,
+  formatHour,
+  postData,
+} from "../../../utilities/utilities";
 import {
   IoCopyOutline,
   IoReturnUpForward,
@@ -36,15 +41,7 @@ const Messages = (props) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const checkClickOutSide = () => {
-      if (showMenu) {
-        setShowMenu(false);
-      }
-    };
-    document.addEventListener("click", checkClickOutSide);
-    return () => {
-      document.removeEventListener("click", checkClickOutSide);
-    };
+    return closeComponent(showMenu, setShowMenu);
   }, [showMenu]);
 
   useEffect(() => {
@@ -167,7 +164,7 @@ const Messages = (props) => {
         <DropDown onClick={dropDownHandle}>
           <BiDotsHorizontalRounded />
           {showMenu && (
-            <DropDownContent>
+            <DropDownContent translate="translate(0px, 25px)">
               <CopyToClipboard text={props.message.content}>
                 <a href="#">
                   <IoCopyOutline></IoCopyOutline>

@@ -13,11 +13,15 @@ import { BsBell, BsSearch } from "react-icons/bs";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import {
   arrangePhoneTime,
+  closeComponent,
   getPhoneTime,
   searchUser,
 } from "../../utilities/utilities";
 import SkeletonComponent from "../UI/Skeleton";
 import Profile from "../Profile/Profile";
+import { DropDown, DropDownContent } from "../ChatBar/Main/Main.styled";
+import ModalGroup from "../ModalGroup/ModalGroup";
+import ChatGroupItems from "./ChatGroupItems";
 
 const SideBars = (props) => {
   console.log("SideBars running");
@@ -26,6 +30,8 @@ const SideBars = (props) => {
   const calls = useSelector((state) => state.calls.calls);
   const isDiff = useRef(false);
   const [searchName, setSearchName] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [showModalGroup, setShowModalGroup] = useState(false);
   const chatsList = useRef(null);
 
   const removeAllBackground = useCallback(() => {
@@ -54,27 +60,55 @@ const SideBars = (props) => {
     removeAllBackground,
   ]);
 
+  useEffect(() => {
+    return closeComponent(showDropdown, setShowDropdown);
+  }, [showDropdown]);
+
   const startSearch = (e) => {
     setSearchName(e.target.value);
+  };
+
+  const dropDownHandler = () => {
+    setShowDropdown(true);
+  };
+
+  const createGroupHandler = () => {
+    setShowModalGroup(true);
   };
 
   return (
     <SideBar>
       <ContactsContent>
+        {showModalGroup && (
+          <ModalGroup setShowModalGroup={setShowModalGroup} friends={friends} />
+        )}
         <ChatsHeader>
           <HeaderContent>
             <h5>{props.header}</h5>
             {props.header !== "Profile" && (
               <ul>
                 <li>
-                  <a href="#">
+                  <DropDown>
                     <BsBell />
-                  </a>
+                  </DropDown>
                 </li>
                 <li>
-                  <a href="#">
+                  <DropDown onClick={dropDownHandler}>
                     <BiDotsVerticalRounded />
-                  </a>
+                    {showDropdown && (
+                      <DropDownContent translate="translate(-140px, 15px)">
+                        <a href="#">
+                          <span>New Chat</span>
+                        </a>
+                        <a href="#" onClick={createGroupHandler}>
+                          <span>Create Group</span>
+                        </a>
+                        <a href="#">
+                          <span>Invite Others</span>
+                        </a>
+                      </DropDownContent>
+                    )}
+                  </DropDown>
                 </li>
               </ul>
             )}
@@ -116,11 +150,28 @@ const SideBars = (props) => {
                     );
                     return searchUser(member, searchName);
                   })
-                  .map(({ members, messages, _id }) => {
+                  .map(({ groupName, groupImg, members, messages, _id }) => {
+                    const lastMessage = messages?.slice(-1)[0];
+
+                    // Chat for multiple users
+                    if (groupName !== "" && groupImg !== "") {
+                      return (
+                        <ChatGroupItems
+                          key={_id}
+                          groupImg={groupImg}
+                          groupName={groupName}
+                          content={lastMessage?.content}
+                          messageDate={lastMessage?.messageDate}
+                          room={_id}
+                        />
+                      );
+                    }
+
+                    // Chat for only user and another person
                     const { userId: member } = members.find(
                       (member) => member.userId._id !== conversation.user._id
                     );
-                    const lastMessage = messages?.slice(-1)[0];
+
                     return (
                       <ChatItems
                         key={_id}

@@ -1,6 +1,14 @@
 const { Schema, model } = require("mongoose");
 
 const conversationSchema = new Schema({
+  groupImg: {
+    type: String,
+    default: "",
+  },
+  groupName: {
+    type: String,
+    default: "",
+  },
   members: [
     {
       userId: {

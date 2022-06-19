@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Avatar,
   ChatContent,
@@ -54,7 +54,11 @@ const ChatItems = (props) => {
             <ChatInfo>
               <h6>{member.name}</h6>
               {props.header === "Chats" && (
-                <div>{formatHour(props.messageDate)}</div>
+                <div>
+                  {props.messageDate
+                    ? formatHour(props.messageDate)
+                    : formatHour(Date.now())}
+                </div>
               )}
             </ChatInfo>
             <ChatText accepted={props.call?.accepted} type={props.header}>
