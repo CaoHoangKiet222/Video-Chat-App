@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { formatHour } from "../../utilities/utilities";
 import {
@@ -10,17 +10,13 @@ import {
 import { ChatInfo } from "./ChatItems.styled";
 
 const ChatGroupItems = (props) => {
-  const pathName = useRef(null);
-
-  useEffect(() => {
-    pathName.current = `/video-chat/Chats/group/${encodeURIComponent(
-      props.groupName
-    )}`;
-  }, [pathName, props.groupName]);
+  let pathname = `/video-chat/Chats/group/${encodeURIComponent(
+    props.groupName
+  )}`;
 
   return (
     <ChatGroupItem>
-      <Link to={pathName.current}>
+      <Link to={pathname}>
         <ChatGroupAvatar>
           <img src={`${props.groupImg}`} alt="" />
         </ChatGroupAvatar>

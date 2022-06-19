@@ -36,7 +36,6 @@ const ChatHeader = (props) => {
       })
     );
   };
-  console.log(props);
 
   return (
     <HeaderBar>

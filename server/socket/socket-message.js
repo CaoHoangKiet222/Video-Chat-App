@@ -35,9 +35,13 @@ exports = module.exports = (socket, type, io = null) => {
           console.log(message);
           const { content, messageDate, sender: senderId, reply } = message;
 
+          console.log(io.adapter.rooms);
+          console.log(message);
           socket.broadcast
             .to(room)
             .emit("receiveMessage", { content, messageDate, senderId, reply });
+
+          console.log(io.adapter.rooms);
 
           callback(null, { content, messageDate, senderId, reply });
 
