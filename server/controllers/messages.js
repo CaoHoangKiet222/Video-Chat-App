@@ -1,16 +1,17 @@
 const Conversation = require("../models/conversation");
+const { getConversation } = require("./user");
 
 exports.newGroup = async (req, res, _next) => {
   try {
     console.log(req.body.newMembers);
-    const newGroup = await new Conversation({
+    await new Conversation({
       members: [...req.body.newMembers, { userId: req.session.user }],
       groupImg: req.body.groupImg,
       groupName: req.body.groupName,
       messages: [],
     }).save();
-    // console.log(newGroup);
-    res.json(newGroup);
+
+    getConversation(req, res, _next);
   } catch (error) {
     console.log(error);
     res.json({ error: error.messsage });

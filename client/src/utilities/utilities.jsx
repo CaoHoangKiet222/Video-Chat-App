@@ -230,7 +230,8 @@ export const checkIsFriend = (user, friend, conversation) => {
     const member = conv.members.find((mem) => {
       return user._id !== mem.userId._id;
     });
-    if (member.userId._id === friend._id) {
+
+    if (member.userId._id === friend._id && conv.members.length < 3) {
       return true;
     }
   }
@@ -286,4 +287,25 @@ export const closeComponent = (showSomething, setShowSomething) => {
   return () => {
     document.removeEventListener("click", checkClickOutSide);
   };
+};
+
+export const getMembersInGroupOnline = (members) => {
+  const onlineMems = [];
+  for (const member of members) {
+    console.log(member);
+    if (member.userId.isLoggined) {
+      onlineMems.push(member);
+    }
+  }
+  return onlineMems;
+};
+
+export const findImgGroup = (conversation, room) => {
+  const { groupImg } = conversation.find(({ _id }) => _id === room);
+  return groupImg;
+};
+
+export const findNameGroup = (conversation, room) => {
+  const { groupName } = conversation.find(({ _id }) => _id === room);
+  return groupName;
 };

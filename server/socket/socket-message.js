@@ -30,16 +30,27 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "sendMessage":
-      socket.on(type, async (message, room, callback) => {
+      socket.on(type, async ({ message, room, type }, callback) => {
         try {
-          console.log(message);
           const { content, messageDate, sender: senderId, reply } = message;
 
-          console.log(io.adapter.rooms);
           console.log(message);
-          socket.broadcast
-            .to(room)
-            .emit("receiveMessage", { content, messageDate, senderId, reply });
+
+          if (type === "group") {
+            socket.broadcast.to(room).emit("receiveGroupMessage", {
+              content,
+              messageDate,
+              senderId,
+              reply,
+            });
+          } else {
+            socket.broadcast.to(room).emit("receiveMessage", {
+              content,
+              messageDate,
+              senderId,
+              reply,
+            });
+          }
 
           console.log(io.adapter.rooms);
 
@@ -72,6 +83,7 @@ exports = module.exports = (socket, type, io = null) => {
               $and: [
                 { "members.userId": user._id },
                 { "members.userId": friend._id },
+                { groupName: "" },
               ],
             },
             {
@@ -82,7 +94,6 @@ exports = module.exports = (socket, type, io = null) => {
             { new: true },
             async (_err, conversation) => {
               if (!conversation) {
-                console.log("conversation not exists");
                 await new Conversation({
                   members: [{ userId: user._id }, { userId: friend._id }],
                   messages: [message],
@@ -94,6 +105,33 @@ exports = module.exports = (socket, type, io = null) => {
                 );
                 console.log("emit done");
               }
+              callback();
+            }
+          ).populate("messages.senderId");
+        } catch (err) {
+          console.log(err);
+        }
+      });
+      break;
+    case "forwardGroupMessage":
+      socket.on(type, ({ message, room }, callback) => {
+        try {
+          console.log(message, room);
+          Conversation.findOneAndUpdate(
+            {
+              _id: room,
+            },
+            {
+              $push: {
+                messages: message,
+              },
+            },
+            { new: true },
+            async (_err, conversation) => {
+              io.to(conversation._id.toString()).emit(
+                "receiveGroupMessage",
+                conversation.messages.splice(-1)[0]
+              );
               callback();
             }
           ).populate("messages.senderId");

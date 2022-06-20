@@ -14,8 +14,8 @@ const BouncyLoading = () => {
 export default BouncyLoading;
 
 const Loader = styled.div`
-  width: 120px;
-  height: 75px;
+  width: 80px;
+  height: 55px;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -23,10 +23,11 @@ const Loader = styled.div`
 `;
 
 const Ball = styled.div`
-  width: 20px;
-  height: 20px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background-color: #fff;
+  transform: translateY(-15px);
   animation: bounce 0.5s alternate infinite;
   &:nth-child(2) {
     animation-delay: 0.16s;
@@ -38,10 +39,10 @@ const Ball = styled.div`
 
   @keyframes bounce {
     from {
-      transform: scaleX(1.15);
+      transform: translateY(-12px) scaleX(1.15);
     }
     to {
-      transform: translateY(-40px) scaleX(1);
+      transform: translateY(-35px) scaleX(1);
     }
   }
 `;

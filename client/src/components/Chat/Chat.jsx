@@ -123,6 +123,7 @@ const Chat = () => {
         <Notification text={message} active={error ? true : false} />
         {showModalDialog && (
           <ModalDialog
+            conversation={conversation?.conv}
             isForward={forward?.isClick}
             friends={friends}
             setShowModalDialog={setShowModalDialog}

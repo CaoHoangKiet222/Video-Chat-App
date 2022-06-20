@@ -14,12 +14,22 @@ export const DialogList = styled(ChatsList)`
 `;
 
 export const DialogItem = styled(ChatItem)`
+  ${({ isFetch }) =>
+    isFetch &&
+    `
+  & > div {
+      display: flex!important;
+      justify-content: center!important;
+      align-items: center!important;
+  }
+`}
+
   ${(props) =>
     !props.isForward && !props.newGroup
       ? `
-      & > div:hover {
-        background-color: #665dfe;
-      }
+        & > div:hover {
+          background-color: #665dfe;
+        }
     `
       : `
       background-color: #383f44;
@@ -31,11 +41,11 @@ export const DialogItem = styled(ChatItem)`
         border: 0;
 
         .btn {
-            & > input {
-              outline: none;
-        width: 15px;
-        height: 15px;
-            }
+          & > input {
+            outline: none;
+            width: 15px;
+            height: 15px;
+          }
         }
       }
     `}

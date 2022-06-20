@@ -88,6 +88,7 @@ exports.postAddFriend = async (req, res, _next) => {
       $and: [
         { "members.userId": req.body.friendId },
         { "members.userId": req.session.user._id },
+        { groupName: "" },
       ],
     });
 

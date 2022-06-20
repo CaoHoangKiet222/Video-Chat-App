@@ -15,6 +15,7 @@ const DialogItems = (props) => {
             <DialogMain
               key={friend._id}
               friend={friend}
+              isGroup={false}
               isForward={props.isForward}
               newGroup={props.newGroup}
               setShowModalDialog={props.setShowModalDialog}
@@ -22,6 +23,24 @@ const DialogItems = (props) => {
             />
           );
         })}
+      {props.conversation?.map(({ groupName, groupImg, members, _id: id }) => {
+        if (groupName !== "" && groupImg !== "") {
+          return (
+            <DialogMain
+              key={id}
+              groupName={groupName}
+              groupImg={groupImg}
+              isGroup={true}
+              room={id}
+              numsPeople={members.length}
+              isForward={props.isForward}
+              newGroup={props.newGroup}
+              setShowModalDialog={props.setShowModalDialog}
+              setNewMembers={props.setNewMembers}
+            />
+          );
+        }
+      })}
     </DialogList>
   );
 };

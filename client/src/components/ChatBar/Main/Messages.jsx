@@ -44,21 +44,6 @@ const Messages = (props) => {
     return closeComponent(showMenu, setShowMenu);
   }, [showMenu]);
 
-  useEffect(() => {
-    chatSocket.on("deleteMessage", (message) => {
-      props.setMessages((prepMess) => {
-        const index = prepMess.findIndex((mess) => mess._id === message._id);
-        index !== -1 && prepMess.splice(index, 1);
-        return [...prepMess];
-      });
-      dispatch(fetchConversation());
-    });
-
-    return () => {
-      chatSocket.off("deleteMessage");
-    };
-  }, [chatSocket, props, dispatch]);
-
   const dropDownHandle = () => {
     setShowMenu(true);
   };
@@ -131,7 +116,11 @@ const Messages = (props) => {
                   : props.isRight
                   ? "You replyed to " +
                     props.message.reply.message.senderId.name
-                  : props.message.senderId.name + " replyed to you"}
+                  : props.message.reply.message.senderId._id === user._id
+                  ? props.message.senderId.name + " replyed to you"
+                  : props.message.senderId.name +
+                    " replyed to " +
+                    props.message.reply.message.senderId.name}
               </span>
             </div>
           </ReplyHeader>
@@ -152,6 +141,9 @@ const Messages = (props) => {
       )}
       <MessageWrap>
         <Content isRight={props.isRight}>
+          {!props.isRight && props.isGroup && (
+            <h6>{props.message.senderId.name}</h6>
+          )}
           <span>{props.message.content}</span>
         </Content>
       </MessageWrap>

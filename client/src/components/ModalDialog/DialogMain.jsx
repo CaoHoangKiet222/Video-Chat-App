@@ -7,6 +7,7 @@ import { fetchConversation } from "../../store/conversations-creator";
 import { postAddFriend } from "../../store/friends-creator";
 import { checkIsFriend } from "../../utilities/utilities";
 import { Avatar } from "../Chat/ChatItems.styled";
+import BouncyLoading from "../UI/BouncyLoading";
 import {
   DialogContent,
   DialogInfo,
@@ -26,6 +27,7 @@ const DialogMain = (props) => {
   const [isSent, setIsSent] = useState(false);
   const [isSentDone, setIsSentDone] = useState(false);
   const [isCheckBox, setIsCheckBox] = useState(false);
+  const [isFetch, setIsFetch] = useState(false);
   const conversation = useSelector((state) => state.conversation.conversation);
   const navigate = useNavigate();
 
@@ -43,25 +45,42 @@ const DialogMain = (props) => {
 
   useEffect(() => {
     const forwardHandler = (friend) => {
-      props.isForward &&
-        chatSocket.emit(
-          "forwardMessage",
-          {
-            message: {
-              isForward: true,
-              content: forward.message.content,
-              messageDate: new Date(Date.now()),
-              senderId: user,
-              reply: null,
+      props.isForward && !props.isGroup
+        ? chatSocket.emit(
+            "forwardMessage",
+            {
+              message: {
+                isForward: true,
+                content: forward.message.content,
+                messageDate: new Date(Date.now()),
+                senderId: user,
+                reply: null,
+              },
+              user,
+              friend,
             },
-            user,
-            friend,
-          },
-          () => {
-            dispatch(fetchConversation());
-            setIsSentDone(true);
-          }
-        );
+            () => {
+              dispatch(fetchConversation());
+              setIsSentDone(true);
+            }
+          )
+        : chatSocket.emit(
+            "forwardGroupMessage",
+            {
+              message: {
+                isForward: true,
+                content: forward.message.content,
+                messageDate: new Date(Date.now()),
+                senderId: user,
+                reply: null,
+              },
+              room: props.room,
+            },
+            () => {
+              dispatch(fetchConversation());
+              setIsSentDone(true);
+            }
+          );
     };
 
     isSent && !isSentDone && forwardHandler(friend);
@@ -73,11 +92,12 @@ const DialogMain = (props) => {
     forward,
     user,
     props.isForward,
+    props.isGroup,
+    props.room,
     isSentDone,
   ]);
 
   useEffect(() => {
-    console.log(isCheckBox);
     if (isCheckBox) {
       return setNewMembers((preMembers) => [...preMembers, friend]);
     }
@@ -96,12 +116,28 @@ const DialogMain = (props) => {
 
   const newChatHandler = () => {
     if (!props.isForward && !props.newGroup) {
+      if (props.isGroup) {
+        navigate(
+          `/video-chat/Chats/group/${encodeURIComponent(props.groupName)}`
+        );
+        return props.setShowModalDialog(false);
+      }
+
       if (checkIsFriend(user, friend, conversation?.conv)) {
         navigate(`/video-chat/Chats/${encodeURIComponent(friend.name)}`);
+        props.setShowModalDialog(false);
       } else {
-        dispatch(postAddFriend(friend._id, friend.name, navigate));
+        // create group between 2 people
+        return dispatch(
+          postAddFriend(
+            friend._id,
+            friend.name,
+            navigate,
+            props.setShowModalDialog,
+            setIsFetch
+          )
+        );
       }
-      props.setShowModalDialog(false);
     }
   };
 
@@ -110,19 +146,42 @@ const DialogMain = (props) => {
   };
 
   return (
-    <DialogItem newGroup={props.newGroup} isForward={props.isForward}>
+    <DialogItem
+      isFetch={isFetch}
+      newGroup={props.newGroup}
+      isForward={props.isForward}
+    >
       <div onClick={newChatHandler}>
-        <Avatar isLoggined={friend.isLoggined} header="Chats">
-          <img src={`${ENDPOINT_CLIENT}/${friend.avata}`} alt="" />
-        </Avatar>
-        <DialogContent>
-          <DialogInfo>
-            <h6>{friend.name}</h6>
-          </DialogInfo>
-          <DialogText>
-            <p>{friend.isLoggined ? "Online" : "Offline"}</p>
-          </DialogText>
-        </DialogContent>
+        {isFetch ? (
+          <BouncyLoading />
+        ) : (
+          <>
+            <Avatar isLoggined={friend?.isLoggined} header="Chats">
+              <img
+                src={
+                  props.groupImg
+                    ? props.groupImg
+                    : `${ENDPOINT_CLIENT}/${friend.avata}`
+                }
+                alt=""
+              />
+            </Avatar>
+            <DialogContent>
+              <DialogInfo>
+                <h6>{props.isGroup ? props.groupName : friend.name}</h6>
+              </DialogInfo>
+              <DialogText>
+                <p>
+                  {props.isGroup
+                    ? props.numsPeople + " participants"
+                    : friend?.isLoggined
+                    ? "Online"
+                    : "Offline"}
+                </p>
+              </DialogText>
+            </DialogContent>
+          </>
+        )}
         {props.isForward && (
           <SentButton
             isSent={isSent}

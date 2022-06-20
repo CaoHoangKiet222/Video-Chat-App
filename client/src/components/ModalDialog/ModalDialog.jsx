@@ -2,8 +2,10 @@ import React, { useRef, useState } from "react";
 import { BsSearch } from "react-icons/bs";
 import { useDispatch } from "react-redux";
 import { fetchConversation } from "../../store/conversations-creator";
+import { conversationActions } from "../../store/conversations-slice";
 import { errorActions } from "../../store/error-slice";
 import { postData } from "../../utilities/utilities";
+import { LoadingSpinner } from "../UI/Loading";
 import DialogItems from "./DialogItems";
 import {
   Container,
@@ -23,6 +25,7 @@ import {
 const ModalDialog = (props) => {
   const [searchName, setSearchName] = useState("");
   const [newMembers, setNewMembers] = useState([]);
+  const [isFetch, setIsFetch] = useState(false);
   const groupName = useRef(null);
   const profilePicture = useRef(null);
   const dispatch = useDispatch();
@@ -47,12 +50,11 @@ const ModalDialog = (props) => {
   };
 
   const createGroupHandler = async () => {
-    console.log(groupName.current.value);
     if (groupName.current.value !== "") {
       if (profilePicture.current) {
-        console.log(profilePicture.current);
         if (newMembers.length >= 2) {
           try {
+            setIsFetch(true);
             const data = await postData(
               `${process.env.REACT_APP_ENDPOINT_SERVER}/new-group`,
               "post",
@@ -71,12 +73,19 @@ const ModalDialog = (props) => {
                 })
               );
             } else {
-              dispatch(fetchConversation());
+              dispatch(
+                conversationActions.setConversation({
+                  conversation: data,
+                  error: null,
+                })
+              );
             }
 
             setNewMembers([]);
             groupName.current = null;
             profilePicture.current = null;
+            props.setShowModalDialog(false);
+            setIsFetch(false);
           } catch (error) {}
         } else {
           dispatch(
@@ -162,7 +171,7 @@ const ModalDialog = (props) => {
                     </DialogGroupPicture>
                   </>
                 )}
-                <DialogSearch>
+                <DialogSearch newGroup={props.newGroup}>
                   <div>
                     <input
                       type="text"
@@ -177,6 +186,7 @@ const ModalDialog = (props) => {
                   </div>
                 </DialogSearch>
                 <DialogItems
+                  conversation={props.conversation}
                   friends={props.friends}
                   searchName={searchName}
                   setSearchName={setSearchName}
@@ -191,7 +201,11 @@ const ModalDialog = (props) => {
               <ModalFooter>
                 <button className="cancel">Cancel</button>
                 <button className="new-group" onClick={createGroupHandler}>
-                  Create Group
+                  {isFetch ? (
+                    <LoadingSpinner newGroup={props.newGroup} />
+                  ) : (
+                    <>Create Group</>
+                  )}
                 </button>
               </ModalFooter>
             )}

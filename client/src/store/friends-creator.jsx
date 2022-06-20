@@ -25,8 +25,15 @@ export const fetchFriends = () => {
   };
 };
 
-export const postAddFriend = (id, name, navigate) => {
+export const postAddFriend = (
+  id,
+  name,
+  navigate,
+  setShowModalDialog,
+  setIsFetch
+) => {
   return async (dispatch) => {
+    setIsFetch(true);
     dispatch(
       conversationActions.setConversation({
         conversation: await postData(
@@ -39,5 +46,7 @@ export const postAddFriend = (id, name, navigate) => {
       })
     );
     navigate(`/video-chat/Chats/${encodeURIComponent(name)}`);
+    setShowModalDialog(false);
+    setIsFetch(false);
   };
 };

@@ -36,6 +36,7 @@ const ChatGroupMain = (props) => {
               isRight={true}
               setMessages={props.setMessages}
               conversationId={props.room}
+              isGroup={props.isGroup}
             />
           );
         }
@@ -47,12 +48,11 @@ const ChatGroupMain = (props) => {
             timeChange={timeChange.current}
             setMessages={props.setMessages}
             conversationId={props.room}
+            isGroup={props.isGroup}
           />
         );
       }
     });
-
-  // console.log(messages);
 
   return (
     <MessageContainer>

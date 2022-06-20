@@ -178,8 +178,16 @@ export const DialogGroupPicture = styled.div`
 
 export const DialogSearch = styled(ChatsSubHeader)`
   width: 100%;
-  padding: 12px 12px 28px 12px;
-  height: 48px;
+  ${({ newGroup }) =>
+    newGroup
+      ? `
+        padding: 12px 12px 28px 12px;
+        height: 48px;
+  `
+      : `
+        padding: 12px 12px 18px 12px;
+        height: 78px;
+  `}
   display: flex;
   border-bottom: 1px solid #2a2a2a;
 
@@ -215,6 +223,7 @@ export const ModalFooter = styled.div`
       text-decoration: underline;
     }
   }
+
   .new-group {
     color: #fff;
     background-color: #44a675;

@@ -28,12 +28,14 @@ const ChatGroupFooter = (props) => {
       if (reply?.isUser) {
         nameRef.current.innerText = "myself";
       } else {
-        // Need to be fixed
-        // nameRef.current.innerText = props.member.name;
+        const member = props.members.find(
+          (member) => member.userId._id === reply.message.senderId._id
+        );
+        nameRef.current.innerText = member.userId.name;
       }
       textRef.current.innerText = reply.message.content;
     }
-  }, [reply, reply?.isUser, closeRepForm]);
+  }, [reply, reply?.isUser, closeRepForm, props.members]);
 
   const inputChangeHanle = (e) => {
     inputValue.current.value = e.target.value;

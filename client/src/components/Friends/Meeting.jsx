@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Avatar } from "../Chat/ChatItems.styled";
 import {
   Buttons,
@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { answerCall, callToUser, leaveCall } from "../../store/video-creator";
 import { videoActions } from "../../store/video-slice";
+import { findImgGroup, findNameGroup } from "../../utilities/utilities";
 
 const Meeting = () => {
   console.log("Meeting running");
@@ -22,10 +23,20 @@ const Meeting = () => {
   const { isReceiving, callee, caller } = useSelector(
     (state) => state.video.call
   );
+  const areCallees = useRef(Array.isArray(callee));
+  const [callees, setCallees] = useState(areCallees.current ? callee : []);
+  const { conversation } = useSelector((state) => state.conversation);
+  const user = useSelector((state) => state.user.user);
   const { callAccepted, stream, error } = useSelector((state) => state.video);
   const { meetingSocket } = useSelector((state) => state.socket);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (areCallees.current) {
+      setCallees([...callee]);
+    }
+  }, [callee]);
 
   useEffect(() => {
     if (callAccepted) {
@@ -44,13 +55,24 @@ const Meeting = () => {
   }, [dispatch, meetingSocket, navigate]);
 
   useEffect(() => {
-    // Off stream when close video
+    // Off stream for only 2 members when close video
     meetingSocket.on("notAnswerCall", () => {
       dispatch(leaveCall(navigate, stream));
     });
 
+    // Off stream for multiple members when close video
+    meetingSocket.on("notAnswerGroupCall", ({ callId, call }) => {
+      console.log("notAnswerGroupCall");
+      console.log(call.callees);
+      if (call.callees.length < 1) {
+        return dispatch(leaveCall(navigate, stream));
+      }
+      setCallees([...call.callees]);
+    });
+
     return () => {
       meetingSocket.off("notAnswerCall");
+      meetingSocket.off("notAnswerGroupCall");
     };
   }, [dispatch, meetingSocket, navigate, stream]);
 
@@ -61,46 +83,73 @@ const Meeting = () => {
     }
   }, [stream, dispatch, isReceiving]);
 
+  console.log(callees);
+
   const closeVideo = () => {
-    meetingSocket.emit("notAnswerCall", {
-      callId: params.meetingId,
-      call: {
-        calleeId: callee._id,
-        callerId: caller._id,
-        startCall: new Date(Date.now()),
-        callAccepted: false,
-      },
-    });
+    if (!areCallees.current) {
+      meetingSocket.emit("notAnswerCall", {
+        callId: params.meetingId,
+        call: {
+          calleeId: callee._id,
+          callerId: caller._id,
+          startCall: new Date(Date.now()),
+          callAccepted: false,
+        },
+      });
+    } else {
+      console.log("sssssssssssssssssss");
+      meetingSocket.emit(
+        "notAnswerGroupCall",
+        {
+          callId: params.meetingId,
+          userReject: user,
+          call: {
+            groupName: findNameGroup(conversation?.conv, params.meetingId),
+            groupImg: findImgGroup(conversation?.conv, params.meetingId),
+            callees,
+            caller,
+            startCall: new Date(Date.now()),
+            callAccepted: false,
+          },
+        },
+        () => {
+          dispatch(leaveCall(navigate, stream));
+        }
+      );
+    }
     // dispatch(leaveCall(connectionRef));
   };
 
   const acceptPhone = () => {
-    dispatch(
-      answerCall(
-        {
-          calleeId: callee._id,
-          callerId: caller._id,
-          startCall: new Date(Date.now()),
-          callAccepted: true,
-        },
-        "phone"
-      )
-    );
+    if (!areCallees.current) {
+      dispatch(
+        answerCall(
+          {
+            calleeId: callee._id,
+            callerId: caller._id,
+            startCall: new Date(Date.now()),
+            callAccepted: true,
+          },
+          "phone"
+        )
+      );
+    }
   };
 
   const acceptVideo = () => {
-    console.log(error);
-    dispatch(
-      answerCall(
-        {
-          calleeId: callee._id,
-          callerId: caller._id,
-          startCall: new Date(Date.now()),
-          callAccepted: true,
-        },
-        "video"
-      )
-    );
+    if (!areCallees.current) {
+      return dispatch(
+        answerCall(
+          {
+            calleeId: callee._id,
+            callerId: caller._id,
+            startCall: new Date(Date.now()),
+            callAccepted: true,
+          },
+          "video"
+        )
+      );
+    }
   };
 
   return (
@@ -116,14 +165,26 @@ const Meeting = () => {
           <p className="name">
             {!isReceiving ? "OUTGOING CALL" : "INCOMING CALL"}
           </p>
-          <p className="title">{isReceiving ? caller.name : callee.name}</p>
+          <p className="title">
+            {areCallees && !isReceiving
+              ? "Calling to " + callees.length + " other participants"
+              : areCallees && isReceiving
+              ? "Group member " + caller.name
+              : isReceiving
+              ? caller.name
+              : callee.name}
+          </p>
           <Picture>
             <ImgWrapper>
               <Avatar>
                 <img
-                  src={`${ENDPOINT_CLIENT}/${
-                    isReceiving ? callee.avata : caller.avata
-                  }`}
+                  src={
+                    areCallees
+                      ? `${findImgGroup(conversation?.conv, params.meetingId)}`
+                      : `${ENDPOINT_CLIENT}/${
+                          isReceiving ? callee.avata : caller.avata
+                        }`
+                  }
                   alt=""
                 />
               </Avatar>

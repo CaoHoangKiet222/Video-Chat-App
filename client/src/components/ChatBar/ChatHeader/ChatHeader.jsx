@@ -22,7 +22,7 @@ const ChatHeader = (props) => {
   const navigate = useNavigate();
   const error = useRef(null);
 
-  const callHandle = () => {
+  const callHandler = () => {
     if (member.isLoggined) {
       return dispatch(
         beforeStartVideo("Caller", member, user, props.room, navigate, error)
@@ -56,7 +56,7 @@ const ChatHeader = (props) => {
             <BsSearch />
           </Link>
         </li>
-        <li onClick={callHandle}>
+        <li onClick={callHandler}>
           <Link to="">
             <BsTelephone />
           </Link>

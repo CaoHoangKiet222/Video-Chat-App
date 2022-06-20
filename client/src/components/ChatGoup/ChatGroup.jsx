@@ -17,7 +17,6 @@ const ChatGroup = (props) => {
   const [isFetch, setIsFetch] = useState(false);
   const dispatch = useDispatch();
   const chatSocket = useSelector((state) => state.socket.chatSocket);
-  // console.log(messages);
 
   useEffect(() => {
     chatSocket.emit("joinRoom", props.room, (messages, error = null) => {
@@ -39,14 +38,28 @@ const ChatGroup = (props) => {
   }, [props.room, chatSocket]);
 
   useEffect(() => {
+    chatSocket.on("deleteMessage", (message) => {
+      setMessages((prepMess) => {
+        const index = prepMess.findIndex((mess) => mess._id === message._id);
+        index !== -1 && prepMess.splice(index, 1);
+        return [...prepMess];
+      });
+      dispatch(fetchConversation());
+    });
+
+    return () => {
+      chatSocket.off("deleteMessage");
+    };
+  }, [chatSocket, dispatch]);
+
+  useEffect(() => {
     chatSocket.on("leaveRoom", () => {
       setIsSendMess(false);
     });
   }, [chatSocket]);
 
   useEffect(() => {
-    chatSocket.on("receiveMessage", (message) => {
-      console.log("receiveMessage");
+    chatSocket.on("receiveGroupMessage", (message) => {
       dispatch(fetchConversation());
       setIsSendMess(true);
       setMessages((preMessages) => [...preMessages, message]);
@@ -64,11 +77,13 @@ const ChatGroup = (props) => {
           reply: replyContent,
         };
 
-        console.log("dsfasdfasdfasdfasdfas");
         chatSocket.emit(
           "sendMessage",
-          newMesage,
-          props.room,
+          {
+            message: newMesage,
+            room: props.room,
+            type: "group",
+          },
           (error, message) => {
             if (error) {
               return setError(error);
@@ -91,6 +106,8 @@ const ChatGroup = (props) => {
           groupImg={props.groupImg}
           groupName={props.groupName}
           numsPeople={props.members.length + 1}
+          members={props.members}
+          room={props.room}
         />
         {!isFetch && !isSendMess ? (
           <InfoBarLoading />
@@ -99,6 +116,7 @@ const ChatGroup = (props) => {
             messages={messages}
             setMessages={setMessages}
             room={props.room}
+            isGroup={props.groupName !== "" ? true : false}
           />
         )}
         <ChatGroupFooter

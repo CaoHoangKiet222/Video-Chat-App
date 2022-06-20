@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useRef } from "react";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { BsSearch, BsTelephone } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { errorActions } from "../../../store/error-slice";
+import { beforeStartVideo } from "../../../store/video-creator";
+import { getMembersInGroupOnline } from "../../../utilities/utilities";
 import { ChatGroupAvatar } from "../../Chat/ChatGroupItems.styled";
 import {
   HeaderBar,
@@ -11,7 +15,34 @@ import {
   MediaNav,
 } from "../../ChatBar/ChatHeader/ChatHeader.styled";
 
-const ChatGroupHeader = ({ groupImg, groupName, numsPeople }) => {
+const ChatGroupHeader = ({
+  groupImg,
+  groupName,
+  numsPeople,
+  members,
+  room,
+}) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.user.user);
+  const error = useRef(null);
+
+  const callGroupHandler = () => {
+    const onlineMems = getMembersInGroupOnline(members);
+    if (onlineMems.length > 1) {
+      return dispatch(
+        beforeStartVideo("Caller", onlineMems, user, room, navigate, error)
+      );
+    }
+
+    dispatch(
+      errorActions.setError({
+        error: true,
+        message: "Can't call members because no one is online",
+      })
+    );
+  };
+
   return (
     <HeaderBar>
       <Media>
@@ -31,7 +62,7 @@ const ChatGroupHeader = ({ groupImg, groupName, numsPeople }) => {
             <BsSearch />
           </Link>
         </li>
-        <li>
+        <li onClick={callGroupHandler}>
           <Link to="">
             <BsTelephone />
           </Link>

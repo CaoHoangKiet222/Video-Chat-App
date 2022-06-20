@@ -45,7 +45,23 @@ const InfoBar = (props) => {
   }, [chatSocket]);
 
   useEffect(() => {
+    chatSocket.on("deleteMessage", (message) => {
+      setMessages((prepMess) => {
+        const index = prepMess.findIndex((mess) => mess._id === message._id);
+        index !== -1 && prepMess.splice(index, 1);
+        return [...prepMess];
+      });
+      dispatch(fetchConversation());
+    });
+
+    return () => {
+      chatSocket.off("deleteMessage");
+    };
+  }, [chatSocket, dispatch]);
+
+  useEffect(() => {
     chatSocket.on("receiveMessage", (message) => {
+      console.log(message);
       dispatch(fetchConversation());
       setIsSendMess(true);
       setMessages((preMessages) => [...preMessages, message]);
@@ -65,8 +81,11 @@ const InfoBar = (props) => {
 
         chatSocket.emit(
           "sendMessage",
-          newMesage,
-          props.room,
+          {
+            message: newMesage,
+            room: props.room,
+            type: "single",
+          },
           (error, message) => {
             if (error) {
               return setError(error);

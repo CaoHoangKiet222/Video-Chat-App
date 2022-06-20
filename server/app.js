@@ -73,6 +73,8 @@ io_chat.on("connection", (socket) => {
 
   socketMessageListen(socket, "forwardMessage", io_chat);
 
+  socketMessageListen(socket, "forwardGroupMessage", io_chat);
+
   socketMessageListen(socket, "deleteMessage", io_chat);
 
   socketMessageListen(socket, "disconnect", io_chat);
@@ -91,6 +93,8 @@ io_meeting.on("connection", (socket) => {
   socketMeetingListen(socket, "answerCall", io_meeting);
 
   socketMeetingListen(socket, "notAnswerCall", io_meeting);
+
+  socketMeetingListen(socket, "notAnswerGroupCall", io_meeting);
 
   socketMeetingListen(socket, "joinMeetingRoom", io_meeting);
 

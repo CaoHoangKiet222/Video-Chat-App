@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { formatHour } from "../../utilities/utilities";
 import {
@@ -10,9 +11,19 @@ import {
 import { ChatInfo } from "./ChatItems.styled";
 
 const ChatGroupItems = (props) => {
+  const { meetingSocket } = useSelector((state) => state.socket);
+
   let pathname = `/video-chat/Chats/group/${encodeURIComponent(
     props.groupName
   )}`;
+
+  useEffect(() => {
+    if (props.room) {
+      meetingSocket.emit("joinVideo", {
+        conversationId: props.room,
+      });
+    }
+  }, [meetingSocket, props.room]);
 
   return (
     <ChatGroupItem>

@@ -6,6 +6,7 @@ export const MessageContainer = styled(ScrollToBottom)`
   padding: 0.75rem;
   width: 100%;
   max-width: 1320px;
+  margin: 0 auto;
   // max-height: 84vh;
 
   & > div {
@@ -130,6 +131,13 @@ export const Content = styled(MessageWrap)`
   text-align: left;
   display: inline-block;
   max-width: 25rem;
+
+  h6 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.075rem;
+    margin-bottom: 8px;
+  }
 `;
 
 export const DropDown = styled.div`
