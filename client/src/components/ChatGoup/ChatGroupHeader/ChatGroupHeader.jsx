@@ -30,9 +30,9 @@ const ChatGroupHeader = ({
   const callGroupHandler = () => {
     const onlineMems = getMembersInGroupOnline(members);
     if (onlineMems.length > 1) {
-      return dispatch(
-        beforeStartVideo("Caller", onlineMems, user, room, navigate, error)
-      );
+      // return dispatch(
+      //   beforeStartVideo("Caller", onlineMems, user, room, navigate, error)
+      // );
     }
 
     dispatch(

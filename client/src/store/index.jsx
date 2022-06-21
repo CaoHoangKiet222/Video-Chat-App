@@ -9,6 +9,7 @@ import timeCallReducer from "./timecall-slice";
 import replyReducer from "./reply-slice";
 import forwardReducer from "./forward-slice";
 import errorReducer from "./error-slice";
+import videoGroupReducer from "./videoGroup-slice";
 
 const store = configureStore({
   middleware: (getDefaultMiddleware) =>
@@ -26,6 +27,7 @@ const store = configureStore({
     reply: replyReducer,
     forward: forwardReducer,
     error: errorReducer,
+    videoGroup: videoGroupReducer,
   },
 });
 

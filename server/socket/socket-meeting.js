@@ -60,9 +60,10 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "notAnswerCall":
-      socket.on(type, async ({ callId, call }) => {
+      socket.on(type, async ({ callId, call }, callback) => {
         try {
-          io.to(callId).emit("notAnswerCall");
+          socket.to(callId).emit("notAnswerCall");
+          callback();
 
           const { callerId, calleeId, startCall, callAccepted } = call;
           await new Meetings({
@@ -109,52 +110,6 @@ exports = module.exports = (socket, type, io = null) => {
     case "toggleSound":
       socket.on(type, ({ callId }) => {
         socket.broadcast.to(callId).emit("toggleSound");
-      });
-      break;
-    case "notAnswerGroupCall":
-      socket.on(type, async ({ callId, call, userReject }, callback) => {
-        try {
-          const {
-            caller,
-            callees,
-            startCall,
-            callAccepted,
-            groupName,
-            groupImg,
-          } = call;
-
-          console.log(callees.length);
-          callees.splice(
-            callees.findIndex(({ userId: { _id } }) => _id === userReject._id),
-            1
-          );
-          console.log(callees.length);
-
-          socket.broadcast
-            .to(callId)
-            .emit("notAnswerGroupCall", { callId, call });
-
-          callback();
-
-          if (callees.length < 1) {
-            console.log("Save into MeetingsGroup");
-            await new MeetingsGroup({
-              groupName,
-              groupImg,
-              caller,
-              callees,
-              startCall,
-            }).save();
-          }
-          // await new MeetingsGroup({
-          //   callerId,
-          //   calleeId,
-          //   startCall,
-          //   callAccepted
-          // }).save();
-        } catch (error) {
-          console.log(error);
-        }
       });
       break;
     case "disconnect":

@@ -92,9 +92,7 @@ io_meeting.on("connection", (socket) => {
 
   socketMeetingListen(socket, "answerCall", io_meeting);
 
-  socketMeetingListen(socket, "notAnswerCall", io_meeting);
-
-  socketMeetingListen(socket, "notAnswerGroupCall", io_meeting);
+  socketMeetingListen(socket, "notAnswerCall");
 
   socketMeetingListen(socket, "joinMeetingRoom", io_meeting);
 

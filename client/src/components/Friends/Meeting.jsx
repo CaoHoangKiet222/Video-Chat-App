@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import { Avatar } from "../Chat/ChatItems.styled";
 import {
   Buttons,
@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { answerCall, callToUser, leaveCall } from "../../store/video-creator";
 import { videoActions } from "../../store/video-slice";
-import { findImgGroup, findNameGroup } from "../../utilities/utilities";
+import { errorActions } from "../../store/error-slice";
 
 const Meeting = () => {
   console.log("Meeting running");
@@ -23,20 +23,10 @@ const Meeting = () => {
   const { isReceiving, callee, caller } = useSelector(
     (state) => state.video.call
   );
-  const areCallees = useRef(Array.isArray(callee));
-  const [callees, setCallees] = useState(areCallees.current ? callee : []);
-  const { conversation } = useSelector((state) => state.conversation);
-  const user = useSelector((state) => state.user.user);
-  const { callAccepted, stream, error } = useSelector((state) => state.video);
+  const { callAccepted, stream } = useSelector((state) => state.video);
   const { meetingSocket } = useSelector((state) => state.socket);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (areCallees.current) {
-      setCallees([...callee]);
-    }
-  }, [callee]);
 
   useEffect(() => {
     if (callAccepted) {
@@ -57,24 +47,21 @@ const Meeting = () => {
   useEffect(() => {
     // Off stream for only 2 members when close video
     meetingSocket.on("notAnswerCall", () => {
+      dispatch(
+        errorActions.setError({
+          error: true,
+          message: isReceiving
+            ? "Caller canceled the call"
+            : "Your callee canceled the call",
+        })
+      );
       dispatch(leaveCall(navigate, stream));
-    });
-
-    // Off stream for multiple members when close video
-    meetingSocket.on("notAnswerGroupCall", ({ callId, call }) => {
-      console.log("notAnswerGroupCall");
-      console.log(call.callees);
-      if (call.callees.length < 1) {
-        return dispatch(leaveCall(navigate, stream));
-      }
-      setCallees([...call.callees]);
     });
 
     return () => {
       meetingSocket.off("notAnswerCall");
-      meetingSocket.off("notAnswerGroupCall");
     };
-  }, [dispatch, meetingSocket, navigate, stream]);
+  }, [dispatch, meetingSocket, navigate, stream, isReceiving]);
 
   useEffect(() => {
     console.log(isReceiving);
@@ -83,11 +70,10 @@ const Meeting = () => {
     }
   }, [stream, dispatch, isReceiving]);
 
-  console.log(callees);
-
   const closeVideo = () => {
-    if (!areCallees.current) {
-      meetingSocket.emit("notAnswerCall", {
+    meetingSocket.emit(
+      "notAnswerCall",
+      {
         callId: params.meetingId,
         call: {
           calleeId: callee._id,
@@ -95,61 +81,39 @@ const Meeting = () => {
           startCall: new Date(Date.now()),
           callAccepted: false,
         },
-      });
-    } else {
-      console.log("sssssssssssssssssss");
-      meetingSocket.emit(
-        "notAnswerGroupCall",
-        {
-          callId: params.meetingId,
-          userReject: user,
-          call: {
-            groupName: findNameGroup(conversation?.conv, params.meetingId),
-            groupImg: findImgGroup(conversation?.conv, params.meetingId),
-            callees,
-            caller,
-            startCall: new Date(Date.now()),
-            callAccepted: false,
-          },
-        },
-        () => {
-          dispatch(leaveCall(navigate, stream));
-        }
-      );
-    }
-    // dispatch(leaveCall(connectionRef));
+      },
+      () => {
+        dispatch(leaveCall(navigate, stream));
+      }
+    );
   };
 
   const acceptPhone = () => {
-    if (!areCallees.current) {
-      dispatch(
-        answerCall(
-          {
-            calleeId: callee._id,
-            callerId: caller._id,
-            startCall: new Date(Date.now()),
-            callAccepted: true,
-          },
-          "phone"
-        )
-      );
-    }
+    dispatch(
+      answerCall(
+        {
+          calleeId: callee._id,
+          callerId: caller._id,
+          startCall: new Date(Date.now()),
+          callAccepted: true,
+        },
+        "phone"
+      )
+    );
   };
 
   const acceptVideo = () => {
-    if (!areCallees.current) {
-      return dispatch(
-        answerCall(
-          {
-            calleeId: callee._id,
-            callerId: caller._id,
-            startCall: new Date(Date.now()),
-            callAccepted: true,
-          },
-          "video"
-        )
-      );
-    }
+    dispatch(
+      answerCall(
+        {
+          calleeId: callee._id,
+          callerId: caller._id,
+          startCall: new Date(Date.now()),
+          callAccepted: true,
+        },
+        "video"
+      )
+    );
   };
 
   return (
@@ -165,26 +129,14 @@ const Meeting = () => {
           <p className="name">
             {!isReceiving ? "OUTGOING CALL" : "INCOMING CALL"}
           </p>
-          <p className="title">
-            {areCallees && !isReceiving
-              ? "Calling to " + callees.length + " other participants"
-              : areCallees && isReceiving
-              ? "Group member " + caller.name
-              : isReceiving
-              ? caller.name
-              : callee.name}
-          </p>
+          <p className="title">{isReceiving ? caller.name : callee.name}</p>
           <Picture>
             <ImgWrapper>
               <Avatar>
                 <img
-                  src={
-                    areCallees
-                      ? `${findImgGroup(conversation?.conv, params.meetingId)}`
-                      : `${ENDPOINT_CLIENT}/${
-                          isReceiving ? callee.avata : caller.avata
-                        }`
-                  }
+                  src={`${ENDPOINT_CLIENT}/${
+                    isReceiving ? callee.avata : caller.avata
+                  }`}
                   alt=""
                 />
               </Avatar>
