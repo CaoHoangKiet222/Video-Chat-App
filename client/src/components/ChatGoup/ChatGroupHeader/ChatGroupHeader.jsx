@@ -5,7 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { errorActions } from "../../../store/error-slice";
 import { beforeStartVideo } from "../../../store/video-creator";
-import { getMembersInGroupOnline } from "../../../utilities/utilities";
+import { videoGroupStart } from "../../../store/videoGroup-creator";
+import { videoGroupActions } from "../../../store/videoGroup-slice";
+import {
+  findImgGroup,
+  getMembersInGroupOnline,
+} from "../../../utilities/utilities";
 import { ChatGroupAvatar } from "../../Chat/ChatGroupItems.styled";
 import {
   HeaderBar,
@@ -24,15 +29,19 @@ const ChatGroupHeader = ({
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const meetingSocket = useSelector((state) => state.socket.meetingSocket);
   const user = useSelector((state) => state.user.user);
-  const error = useRef(null);
 
   const callGroupHandler = () => {
     const onlineMems = getMembersInGroupOnline(members);
     if (onlineMems.length > 1) {
-      // return dispatch(
-      //   beforeStartVideo("Caller", onlineMems, user, room, navigate, error)
-      // );
+      meetingSocket.emit(
+        "meetingGroupConnection",
+        { room, caller: user },
+        () => {
+          navigate(`/meeting-group/${room}`);
+        }
+      );
     }
 
     dispatch(

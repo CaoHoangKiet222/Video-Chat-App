@@ -112,6 +112,14 @@ exports = module.exports = (socket, type, io = null) => {
         socket.broadcast.to(callId).emit("toggleSound");
       });
       break;
+    case "meetingGroupConnection":
+      socket.on(type, ({ room, caller }, callback) => {
+        socket.broadcast
+          .to(room)
+          .emit("meetingGroupConnection", { room, caller });
+        callback();
+      });
+      break;
     case "disconnect":
       socket.on(type, () => {
         console.log("A user disconnected to meeting channel");

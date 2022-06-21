@@ -54,6 +54,12 @@ export const Join = styled.div`
       margin-top: 8px;
       font-size: 17px;
     }
+
+    &.message {
+      margin: 0;
+      padding-top: 5px;
+      margin-bottom: 4px;
+    }
   }
 `;
 

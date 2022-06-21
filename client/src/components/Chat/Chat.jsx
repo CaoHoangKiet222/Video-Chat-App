@@ -21,6 +21,8 @@ import Settings from "../Profile/Settings";
 import { beforeStartVideo } from "../../store/video-creator";
 import { getConversationId } from "../../utilities/utilities";
 import ChatGroup from "../ChatGoup/ChatGroup";
+import MeetingGroup from "../MeetingGroup/MeetingGroup";
+import { videoGroupActions } from "../../store/videoGroup-slice";
 
 const Chat = () => {
   const { conversation } = useSelector((state) => state.conversation);
@@ -90,6 +92,11 @@ const Chat = () => {
       console.log("notifyingUserIsOffline");
       dispatch(fetchConversation());
       dispatch(fetchFriends());
+    });
+
+    meetingSocket.on("meetingGroupConnection", ({ room, caller }) => {
+      navigate(`/video-chat/Chats/meeting-group/${encodeURIComponent(room)}`);
+      dispatch(videoGroupActions.setCaller({ caller }));
     });
 
     meetingSocket.on(
@@ -226,6 +233,10 @@ const Chat = () => {
           })}
 
           <Route path={`Chats/meeting/:meetingId`} element={<Meeting />} />
+          <Route
+            path={`Chats/meeting-group/:meetingId`}
+            element={<MeetingGroup />}
+          />
         </Routes>
         {params["*"] !== "Profile" ? (
           !isChosen && (

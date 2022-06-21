@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Chat from "./components/Chat/Chat";
 import MeetingRoom from "./components/Friends/MeetingRoom/MeetingRoom";
 import Login from "./components/Login/Login";
+import MeetingGroupRoom from "./components/MeetingGroup/MeetingGroupRoom/MeetingGroupRoom";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
       />
       <Route path="/video-chat/*" element={<Chat />} />
       <Route path="/meeting/:meetingId" element={<MeetingRoom />} />
+      <Route path="/meeting-group/:meetingId" element={<MeetingGroupRoom />} />
     </Routes>
   );
 }
