@@ -43,7 +43,7 @@ const MeetingGroup = () => {
           <p className="title">{videoGroup.caller?.name}</p>
           <p className="message">
             {" "}
-            in group {group.current?.groupName} start video
+            in group {group.current?.groupName} starts video
           </p>
           <Picture>
             <ImgWrapper>

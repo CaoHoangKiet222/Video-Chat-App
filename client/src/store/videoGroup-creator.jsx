@@ -5,7 +5,8 @@ export const createPeerForCallee = (
   calleeId,
   stream,
   meetingGroupSocket,
-  setStreams
+  setStreams,
+  calleeInfo
 ) => {
   // We need to create peer(initiator: true) for callee to send signal to
   // users(caller and other callees) already waiting in room
@@ -19,12 +20,16 @@ export const createPeerForCallee = (
     meetingGroupSocket.emit("sendingSignal", {
       userAlreadyInRoomId,
       calleeId,
+      calleeInfo,
       signal,
     });
   });
 
   peer.on("stream", (currentStream) => {
-    setStreams((preStreams) => [...preStreams, currentStream]);
+    setStreams((preStreams) => [
+      ...preStreams,
+      { stream: currentStream, peerId: userAlreadyInRoomId },
+    ]);
   });
 
   return peer;
@@ -32,7 +37,7 @@ export const createPeerForCallee = (
 
 export const addPeerForJoinedUsers = (
   incomingSignal,
-  calleeId,
+  userJoinId,
   stream,
   meetingGroupSocket,
   setStreams
@@ -45,11 +50,14 @@ export const addPeerForJoinedUsers = (
   });
 
   peer.on("signal", (signal) => {
-    meetingGroupSocket.emit("returningSignal", { calleeId, signal });
+    meetingGroupSocket.emit("returningSignal", { userJoinId, signal });
   });
 
   peer.on("stream", (currentStream) => {
-    setStreams((preStreams) => [...preStreams, currentStream]);
+    setStreams((preStreams) => [
+      ...preStreams,
+      { stream: currentStream, peerId: userJoinId },
+    ]);
   });
 
   peer.signal(incomingSignal);

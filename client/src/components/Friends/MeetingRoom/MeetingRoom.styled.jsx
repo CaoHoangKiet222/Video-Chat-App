@@ -55,16 +55,33 @@ export const Peers = styled.div`
   overflow: hidden;
 `;
 
+export const VideosWrapper = styled.div`
+  margin: 20px;
+  width: 719px;
+  height: 405px;
+  display: flex;
+  flex-wrap: wrap;
+`;
+
+export const VideoStyle = styled.div`
+  width: inherit;
+  height: inherit;
+  background-color: #3c4043;
+  border-radius: 8px;
+`;
+
 export const Videos = styled.div`
   min-width: 140px;
   position: relative;
 
   & > video {
     object-fit: cover;
-    background-color: black;
     z-index: 100;
     width: 140px;
     min-width: 140px;
+    border-radius: 8px;
+    max-height: 405px;
+    height: 405px;
     height: ${(props) => (!props.isShowTop ? "105px" : "95px")};
     cursor: pointer;
     margin: 0 1px;
@@ -74,11 +91,17 @@ export const Videos = styled.div`
 export const Streams = styled.div`
   width: 100%;
   height: 100%;
-  background-color: #000;
+  background-color: #202124;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  position: relative;
+  flex-wrap: wrap;
+  padding: 20px;
+  overflow: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  /* position: relative; */
 
   video {
     display: block;
@@ -86,6 +109,7 @@ export const Streams = styled.div`
     height: ${({ showUserVideo, showTop }) =>
       showUserVideo && !showTop ? "100%" : "0%"};
     object-fit: cover;
+    border-radius: 8px;
   }
 `;
 

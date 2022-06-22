@@ -1,18 +1,7 @@
 const { Schema, model } = require("mongoose");
 
 const meetingsGroupSchema = new Schema({
-  groupName: {
-    type: String,
-    default: "",
-  },
-  groupImg: {
-    type: String,
-    default: "",
-  },
-  caller: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-  },
+  caller: Schema.Types.Mixed,
   callees: Schema.Types.Mixed,
   startCall: {
     type: String,
@@ -21,10 +10,6 @@ const meetingsGroupSchema = new Schema({
   callTime: {
     type: String,
     default: "",
-  },
-  callAccepted: {
-    type: Boolean,
-    default: false,
   },
 });
 

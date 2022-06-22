@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Videos } from "../../Friends/MeetingRoom/MeetingRoom.styled";
 
 const VideoDisplay = ({ showTop, stream }) => {
   const userVideo = useRef(null);
 
   useEffect(() => {
-    console.log(stream);
     userVideo.current.srcObject = stream;
   }, [stream]);
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   CommonControl,
   Container,
@@ -9,6 +9,8 @@ import {
   Peers,
   Streams,
   Videos,
+  VideoStyle,
+  VideosWrapper,
 } from "../../Friends/MeetingRoom/MeetingRoom.styled";
 import {
   FiMenu,
@@ -40,6 +42,8 @@ import {
 } from "../../../store/videoGroup-creator";
 import VideoDisplay from "./VideoDisplay";
 import CommonPeer from "../../Friends/MeetingRoom/CommonPeer";
+import Notification from "../../UI/Notification";
+import { errorActions } from "../../../store/error-slice";
 
 const MeetingGroupRoom = () => {
   const [showTop, setShowTop] = useState(false);
@@ -48,23 +52,38 @@ const MeetingGroupRoom = () => {
   const [changeScale, setChangeScale] = useState(false);
   const [muteSound, setMuteSound] = useState(false);
   const [toggleIconSound, setToggleIconSound] = useState(false);
-  // const [peers, setPeers] = useState([]);
   const [streams, setStreams] = useState([]);
+  // const [userJoins, setUserJoins] = useState([]);
+  const userJoinsRef = useRef([]);
   const myVideo = useRef(null),
     peersRef = useRef([]);
+  const dispatch = useDispatch();
   const params = useParams();
   const navigate = useNavigate();
   const meetingGroupSocket = useSelector(
     (state) => state.socket.meetingGroupSocket
   );
+  const { error, message } = useSelector((state) => state.error);
   // const timeCall = useSelector((state) => state.timeCall.timeCall);
   const groupImg = null,
     groupName = null;
+
+  const calleeInfo = useMemo(() => {
+    return {
+      name: "kkkkkkkkkkkk",
+      avata: "sssssssssssss",
+    };
+  }, []);
+
   // const conversation = useSelector((state) => state.conversation.conversation);
+  // const { user: calleeInfo } = useSelector((state) => state.user);
   // const { groupName, groupImg } = findImgAndNameGroup(
   //   conversation?.conv,
   //   params.meetingId
   // );
+  console.log(userJoinsRef);
+  console.log(peersRef);
+  console.log(streams);
 
   useEffect(() => {
     navigator.mediaDevices
@@ -73,51 +92,52 @@ const MeetingGroupRoom = () => {
         myVideo.current.srcObject = stream;
         const calleeSocketId = meetingGroupSocket.id;
 
-        meetingGroupSocket.emit("joinVideoGroup", { room: params.meetingId });
+        meetingGroupSocket.emit("joinVideoGroup", {
+          room: params.meetingId,
+          user: calleeInfo,
+        });
 
         meetingGroupSocket.on("allUsers", (users) => {
-          const peers = [];
-
           users.forEach((userAlreadyInRoomId) => {
             const peer = createPeerForCallee(
               userAlreadyInRoomId,
               calleeSocketId,
               stream,
               meetingGroupSocket,
-              setStreams
+              setStreams,
+              calleeInfo
             );
 
             peersRef.current.push({
               peer,
-              peerToUserId: userAlreadyInRoomId,
+              peerId: userAlreadyInRoomId,
+            });
+          });
+        });
+
+        meetingGroupSocket.on(
+          "userJoined",
+          ({ signal, userJoinId, userJoinInfo }) => {
+            const peer = addPeerForJoinedUsers(
+              signal,
+              userJoinId,
+              stream,
+              meetingGroupSocket,
+              setStreams
+            );
+
+            peersRef.current.push({
+              peerId: userJoinId,
+              peer,
             });
 
-            peers.push(peer);
-          });
-
-          // setPeers(peers);
-        });
-
-        meetingGroupSocket.on("userJoined", ({ signal, calleeId }) => {
-          const peer = addPeerForJoinedUsers(
-            signal,
-            calleeId,
-            stream,
-            meetingGroupSocket,
-            setStreams
-          );
-
-          peersRef.current.push({
-            receivingPeerId: calleeId,
-            peer,
-          });
-
-          // setPeers((prePeers) => [...prePeers, peer]);
-        });
+            userJoinsRef.current.push(userJoinInfo);
+          }
+        );
 
         meetingGroupSocket.on("receivingSignal", ({ signal, userInRoomId }) => {
           const { peer } = peersRef.current.find(
-            ({ peerToUserId }) => peerToUserId === userInRoomId
+            ({ peerId }) => peerId === userInRoomId
           );
 
           peer.signal(signal);
@@ -126,13 +146,66 @@ const MeetingGroupRoom = () => {
       .catch((error) => {
         console.log(error);
       });
-  }, [meetingGroupSocket, params.meetingId]);
+  }, [meetingGroupSocket, params.meetingId, calleeInfo]);
+
+  useEffect(() => {
+    let timer = 0;
+    if (error) {
+      timer = setTimeout(() => {
+        dispatch(errorActions.resetError({ error: false }));
+      }, 2500);
+    }
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [error, dispatch]);
+
+  useEffect(() => {
+    meetingGroupSocket.on("userLeaving", ({ userLeaveId, user }) => {
+      dispatch(
+        errorActions.setError({
+          error: true,
+          message: user.name + " has leaved the room",
+        })
+      );
+
+      setStreams((preStreams) => {
+        preStreams.splice(
+          preStreams.findIndex(({ peerId }) => peerId === userLeaveId),
+          1
+        );
+        return [...preStreams];
+      });
+
+      peersRef.current.splice(
+        peersRef.current.findIndex(({ peerId }) => peerId === userLeaveId),
+        1
+      );
+
+      // userJoinsRef.current.splice(userJoinInfo);
+    });
+
+    return () => {
+      // console.log("ssssssssssssssssssssssssssss");
+      // meetingGroupSocket.emit("leaveGroupRoom", {
+      //   userLeaveId: meetingGroupSocket.id,
+      //   room: params.meetingId,
+      //   user: calleeInfo,
+      // });
+      meetingGroupSocket.off("userLeaving");
+    };
+  }, [meetingGroupSocket, streams, dispatch]);
 
   const showTopControls = () => {
     setShowTop(!showTop);
   };
 
   const phoneOffHandle = () => {
+    meetingGroupSocket.emit("leaveGroupRoom", {
+      userLeaveId: meetingGroupSocket.id,
+      user: calleeInfo,
+      room: params.meetingId,
+    });
     leaveGroupCall(navigate, myVideo.current.srcObject, true);
   };
 
@@ -177,6 +250,7 @@ const MeetingGroupRoom = () => {
     <Container>
       <MeetingMain>
         <MeetingTopControls className={`${!showTop ? "transparent" : ""}`}>
+          <Notification text={message} active={error ? true : false} />
           {showTop && (
             <>
               <PanelControl>
@@ -184,7 +258,7 @@ const MeetingGroupRoom = () => {
                 {/* <FaChevronLeft /> */}
               </PanelControl>
               <Peers>
-                {streams.map((stream, index) => {
+                {streams.map(({ stream }, index) => {
                   return (
                     <VideoDisplay
                       key={index}
@@ -224,6 +298,7 @@ const MeetingGroupRoom = () => {
               autoPlay={true}
             />
           </Videos>
+
           {showTop && (
             <PanelControl>
               <FaChevronDown />
@@ -235,17 +310,27 @@ const MeetingGroupRoom = () => {
           showUserVideo={showUserVideo}
           showTop={showTop}
         >
+          {streams.map(({ stream }, index) => {
+            return (
+              <VideosWrapper key={index}>
+                <VideoStyle>
+                  <VideoDisplay showTop={showTop} stream={stream} />
+                </VideoStyle>
+              </VideosWrapper>
+            );
+          })}
+
           {/* {returnPeer(call, userVideo, showTop, showUserVideo, muteSound)} */}
 
-          <CommonPeer
-            font-size="18px"
-            padding="5px 0"
-            height="120px"
-            width="120px"
-            type="video-container"
-            groupImg={groupImg}
-            groupName={groupName}
-          />
+          {/* <CommonPeer */}
+          {/*   font-size="18px" */}
+          {/*   padding="5px 0" */}
+          {/*   height="120px" */}
+          {/*   width="120px" */}
+          {/*   type="video-container" */}
+          {/*   groupImg={groupImg} */}
+          {/*   groupName={groupName} */}
+          {/* /> */}
 
           <MeetingBottomControls>
             <CommonControl onClick={videoHandle}>

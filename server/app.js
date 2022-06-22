@@ -118,6 +118,8 @@ io_meeting_group.on("connection", (socket) => {
 
   socketMeetingGroupListen(socket, "returningSignal", io_meeting_group);
 
+  socketMeetingGroupListen(socket, "leaveGroupRoom", io_meeting_group);
+
   socketMeetingGroupListen(socket, "disconnect", io_meeting_group);
 });
 
