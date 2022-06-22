@@ -9,6 +9,7 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 const socketMessageListen = require("./socket/socket-message");
 const socketMeetingListen = require("./socket/socket-meeting");
+const socketMeetingGroupListen = require("./socket/socket-meeting-group");
 const socketNotifyListen = require("./socket/socket-notify");
 
 const PORT = process.env.YOUR_PORT || process.env.PORT || 5000;
@@ -105,6 +106,19 @@ io_meeting.on("connection", (socket) => {
   socketMeetingListen(socket, "meetingGroupConnection", io_meeting);
 
   socketMeetingListen(socket, "disconnect", io_meeting);
+});
+
+const io_meeting_group = io.of("/meeting-group-rooms");
+io_meeting_group.on("connection", (socket) => {
+  console.log("A user connected to channel meeting-group-rooms");
+
+  socketMeetingGroupListen(socket, "joinVideoGroup", io_meeting_group);
+
+  socketMeetingGroupListen(socket, "sendingSignal", io_meeting_group);
+
+  socketMeetingGroupListen(socket, "returningSignal", io_meeting_group);
+
+  socketMeetingGroupListen(socket, "disconnect", io_meeting_group);
 });
 
 (async () => {

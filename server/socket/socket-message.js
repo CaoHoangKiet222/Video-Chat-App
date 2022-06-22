@@ -15,7 +15,7 @@ exports = module.exports = (socket, type, io = null) => {
           socket.join(room);
 
           console.log("A user joins chat-rooms");
-          console.log(io.adapter.rooms);
+          // console.log(io.adapter.rooms);
         } catch (err) {
           console.error(err);
           callback(null, err.message);
@@ -149,7 +149,7 @@ exports = module.exports = (socket, type, io = null) => {
     case "disconnect":
       socket.on(type, () => {
         console.log("A user disconnected to message channel");
-        console.log(io.adapter.rooms);
+        // console.log(io.adapter.rooms);
       });
       break;
   }

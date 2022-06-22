@@ -300,12 +300,7 @@ export const getMembersInGroupOnline = (members) => {
   return onlineMems;
 };
 
-export const findImgGroup = (conversation, room) => {
-  const { groupImg } = conversation.find(({ _id }) => _id === room);
-  return groupImg;
-};
-
-export const findNameGroup = (conversation, room) => {
-  const { groupName } = conversation.find(({ _id }) => _id === room);
-  return groupName;
+export const findImgAndNameGroup = (conversation, room) => {
+  const { groupImg, groupName } = conversation.find(({ _id }) => _id === room);
+  return { groupImg, groupName };
 };

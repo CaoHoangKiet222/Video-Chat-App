@@ -10,32 +10,29 @@ import {
   RoundedButton,
 } from "../Friends/Meeting.styled";
 import { FiPhoneOff, FiPhone, FiVideo } from "react-icons/fi";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { findImgGroup, findNameGroup } from "../../utilities/utilities";
+import { findImgAndNameGroup } from "../../utilities/utilities";
 
 const MeetingGroup = () => {
   console.log("MeetingGroup running");
   const params = useParams();
   const { conversation } = useSelector((state) => state.conversation);
   const videoGroup = useSelector((state) => state.videoGroup);
-  const groupImg = useRef(null);
-  const groupName = useRef(null);
+  const group = useRef(null);
   const navigate = useNavigate();
-  console.log(videoGroup);
 
   useEffect(() => {
-    groupImg.current = findImgGroup(conversation?.conv, params.meetingId);
-    groupName.current = findNameGroup(conversation?.conv, params.meetingId);
+    group.current = findImgAndNameGroup(conversation?.conv, params.meetingId);
   }, [conversation?.conv, params.meetingId]);
 
   const closeVideo = () => {
     navigate("/video-chat/Chats");
   };
 
-  const acceptPhone = () => {};
-
-  const acceptVideo = () => {};
+  const acceptVideo = () => {
+    navigate(`/meeting-group/${params.meetingId}`);
+  };
 
   return (
     <Container>
@@ -43,12 +40,15 @@ const MeetingGroup = () => {
         <Join>
           <img src="/images/incoming-call.svg" alt="" />
           <p className="name">INCOMING CALL</p>
-          <p className="title">{videoGroup.caller.name}</p>
-          <p className="message"> in group {groupName.current} start video</p>
+          <p className="title">{videoGroup.caller?.name}</p>
+          <p className="message">
+            {" "}
+            in group {group.current?.groupName} start video
+          </p>
           <Picture>
             <ImgWrapper>
               <Avatar>
-                <img src={groupImg.current} alt="" />
+                <img src={group.current?.groupImg} alt="" />
               </Avatar>
             </ImgWrapper>
           </Picture>

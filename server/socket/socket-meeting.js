@@ -10,7 +10,7 @@ exports = module.exports = (socket, type, io = null) => {
 
           socket.join(conversationId);
 
-          console.log(io.adapter.rooms);
+          // console.log(io.adapter.rooms);
         } catch (err) {
           console.error(err);
         }
@@ -123,7 +123,7 @@ exports = module.exports = (socket, type, io = null) => {
     case "disconnect":
       socket.on(type, () => {
         console.log("A user disconnected to meeting channel");
-        console.log(io.adapter.rooms);
+        // console.log(io.adapter.rooms);
       });
       break;
   }

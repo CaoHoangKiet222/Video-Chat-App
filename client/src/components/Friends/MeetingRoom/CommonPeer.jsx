@@ -7,10 +7,13 @@ const CommonPeer = (props) => {
     <PeerInfo className={props.className} type={props.type}>
       <RemotePeer>
         <Name font-size={props["font-size"]} padding={props.padding}>
-          {props.user?.name}
+          {props.groupName || props.user?.name}
         </Name>
         <Img height={props.height} width={props.width}>
-          <img src={`${ENDPOINT_CLIENT}/${props.user?.avata}`} alt="" />
+          <img
+            src={props.groupImg || `${ENDPOINT_CLIENT}/${props.user?.avata}`}
+            alt=""
+          />
         </Img>
         <Status font-size={props["font-size"]} padding={props.padding}>
           spectator

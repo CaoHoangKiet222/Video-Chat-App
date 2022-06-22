@@ -1,16 +1,10 @@
-import React, { useRef } from "react";
+import React from "react";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { BsSearch, BsTelephone } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { errorActions } from "../../../store/error-slice";
-import { beforeStartVideo } from "../../../store/video-creator";
-import { videoGroupStart } from "../../../store/videoGroup-creator";
-import { videoGroupActions } from "../../../store/videoGroup-slice";
-import {
-  findImgGroup,
-  getMembersInGroupOnline,
-} from "../../../utilities/utilities";
+import { getMembersInGroupOnline } from "../../../utilities/utilities";
 import { ChatGroupAvatar } from "../../Chat/ChatGroupItems.styled";
 import {
   HeaderBar,
@@ -35,7 +29,7 @@ const ChatGroupHeader = ({
   const callGroupHandler = () => {
     const onlineMems = getMembersInGroupOnline(members);
     if (onlineMems.length > 1) {
-      meetingSocket.emit(
+      return meetingSocket.emit(
         "meetingGroupConnection",
         { room, caller: user },
         () => {

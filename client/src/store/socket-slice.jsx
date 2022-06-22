@@ -14,12 +14,16 @@ export const socketSlice = createSlice({
     meetingSocket: io(`${ENDPOINT_SERVER}/meeting-rooms`, {
       transports: ["websocket"],
     }),
+    meetingGroupSocket: io(`${ENDPOINT_SERVER}/meeting-group-rooms`, {
+      transports: ["websocket"],
+    }),
   },
   reducers: {
     disconnectSocket(state) {
       state.notifySocket = state.notifySocket.disconnect();
       state.chatSocket = state.chatSocket.disconnect();
       state.meetingSocket = state.meetingSocket.disconnect();
+      state.meetingGroupSocket = state.meetingGroupSocket.disconnect();
     },
     setupSocket(state) {
       state.notifySocket = io(`${ENDPOINT_SERVER}/notify`, {
@@ -29,6 +33,9 @@ export const socketSlice = createSlice({
         transports: ["websocket"],
       });
       state.meetingSocket = io(`${ENDPOINT_SERVER}/meeting-rooms`, {
+        transports: ["websocket"],
+      });
+      state.meetingGroupSocket = io(`${ENDPOINT_SERVER}/meeting-group-rooms`, {
         transports: ["websocket"],
       });
     },
