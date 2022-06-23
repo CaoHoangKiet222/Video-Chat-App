@@ -29,7 +29,6 @@ import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
 // import CommonPeer from "./CommonPeer.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { leaveCall } from "../../../store/video-creator.jsx";
 import {
   formatCallTime,
   shareScreen,
@@ -65,18 +64,18 @@ const MeetingGroupRoom = () => {
   );
   const { error, message } = useSelector((state) => state.error);
   // const timeCall = useSelector((state) => state.timeCall.timeCall);
-  const groupImg = null,
-    groupName = null;
-
-  const calleeInfo = useMemo(() => {
-    return {
-      name: "kkkkkkkkkkkk",
-      avata: "sssssssssssss",
-    };
-  }, []);
+  // const groupImg = null,
+  //   groupName = null;
+  //
+  // const calleeInfo = useMemo(() => {
+  //   return {
+  //     name: "kkkkkkkkkkkk",
+  //     avata: "sssssssssssss",
+  //   };
+  // }, []);
 
   // const conversation = useSelector((state) => state.conversation.conversation);
-  // const { user: calleeInfo } = useSelector((state) => state.user);
+  const { user: calleeInfo } = useSelector((state) => state.user);
   // const { groupName, groupImg } = findImgAndNameGroup(
   //   conversation?.conv,
   //   params.meetingId
@@ -104,8 +103,7 @@ const MeetingGroupRoom = () => {
               calleeSocketId,
               stream,
               meetingGroupSocket,
-              setStreams,
-              calleeInfo
+              setStreams
             );
 
             peersRef.current.push({
@@ -131,6 +129,7 @@ const MeetingGroupRoom = () => {
               peer,
             });
 
+            console.log(userJoinInfo);
             userJoinsRef.current.push(userJoinInfo);
           }
         );
@@ -165,7 +164,7 @@ const MeetingGroupRoom = () => {
       dispatch(
         errorActions.setError({
           error: true,
-          message: user.name + " has leaved the room",
+          message: user?.name + " has leaved the room",
         })
       );
 
@@ -182,16 +181,15 @@ const MeetingGroupRoom = () => {
         1
       );
 
-      // userJoinsRef.current.splice(userJoinInfo);
+      userJoinsRef.current.splice(
+        userJoinsRef.current.findIndex(
+          ({ userJoinId }) => userJoinId === userLeaveId
+        ),
+        1
+      );
     });
 
     return () => {
-      // console.log("ssssssssssssssssssssssssssss");
-      // meetingGroupSocket.emit("leaveGroupRoom", {
-      //   userLeaveId: meetingGroupSocket.id,
-      //   room: params.meetingId,
-      //   user: calleeInfo,
-      // });
       meetingGroupSocket.off("userLeaving");
     };
   }, [meetingGroupSocket, streams, dispatch]);
@@ -202,11 +200,11 @@ const MeetingGroupRoom = () => {
 
   const phoneOffHandle = () => {
     meetingGroupSocket.emit("leaveGroupRoom", {
-      userLeaveId: meetingGroupSocket.id,
       user: calleeInfo,
+      userLeaveId: meetingGroupSocket.id,
       room: params.meetingId,
     });
-    leaveGroupCall(navigate, myVideo.current.srcObject, true);
+    leaveGroupCall(navigate, myVideo.current.srcObject);
   };
 
   const videoHandle = () => {};
@@ -238,8 +236,6 @@ const MeetingGroupRoom = () => {
           height="120px"
           width="120px"
           type="video-container"
-          groupImg={groupImg}
-          groupName={groupName}
         />
         <video ref={userVideo} muted={muteSound} autoPlay={true} />
       </>

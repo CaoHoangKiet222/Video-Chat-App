@@ -145,7 +145,8 @@ const MeetingRoom = () => {
 
   useEffect(() => {
     meetingSocket.on("callEnded", () => {
-      dispatch(leaveCall(navigate, stream, true));
+      // dispatch(leaveCall(navigate, stream, true));
+      dispatch(leaveCall(navigate, stream));
     });
   }, [dispatch, meetingSocket, navigate, stream]);
 
@@ -245,6 +246,7 @@ const MeetingRoom = () => {
               </Peers>
             </>
           )}
+
           <Videos isShowTop={showTop}>
             {showVideo && (
               <video

@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { fetchConversation } from "../../store/conversations-creator";
 import { conversationActions } from "../../store/conversations-slice";
 import { errorActions } from "../../store/error-slice";
-import { postData } from "../../utilities/utilities";
+import { postData, postDataFile } from "../../utilities/utilities";
 import { LoadingSpinner } from "../UI/Loading";
 import DialogItems from "./DialogItems";
 import {
@@ -41,12 +41,13 @@ const ModalDialog = (props) => {
 
   const handleFile = (e) => {
     // console.log(e.target.files[0]);
-    const fReader = new FileReader();
-    fReader.readAsDataURL(e.target.files[0]);
-    fReader.onload = (event) => {
-      // console.log(event.target.result);
-      profilePicture.current = event.target.result;
-    };
+    profilePicture.current = e.target.files[0];
+    // const fReader = new FileReader();
+    // fReader.readAsDataURL(e.target.files[0]);
+    // fReader.onload = (event) => {
+    //   // console.log(event.target.result);
+    //   profilePicture.current = event.target.result;
+    // };
   };
 
   const createGroupHandler = async () => {
@@ -55,31 +56,41 @@ const ModalDialog = (props) => {
         if (newMembers.length >= 2) {
           try {
             setIsFetch(true);
-            const data = await postData(
+
+            const data = await postDataFile(
               `${process.env.REACT_APP_ENDPOINT_SERVER}/new-group`,
-              "post",
               {
+                file: profilePicture.current,
                 newMembers,
-                groupImg: profilePicture.current,
                 groupName: groupName.current.value,
               }
             );
+            console.log(data);
+            // const data = await postData(
+            //   `${process.env.REACT_APP_ENDPOINT_SERVER}/new-group`,
+            //   "post",
+            //   {
+            //     newMembers,
+            //     groupImg: profilePicture.current,
+            //     groupName: groupName.current.value,
+            //   }
+            // );
 
-            if (data.error) {
-              dispatch(
-                errorActions.setError({
-                  error: true,
-                  message: data.error,
-                })
-              );
-            } else {
-              dispatch(
-                conversationActions.setConversation({
-                  conversation: data,
-                  error: null,
-                })
-              );
-            }
+            // if (data.error) {
+            //   dispatch(
+            //     errorActions.setError({
+            //       error: true,
+            //       message: data.error,
+            //     })
+            //   );
+            // } else {
+            //   dispatch(
+            //     conversationActions.setConversation({
+            //       conversation: data,
+            //       error: null,
+            //     })
+            //   );
+            // }
 
             setNewMembers([]);
             groupName.current = null;
@@ -163,6 +174,7 @@ const ModalDialog = (props) => {
                           <input
                             type="file"
                             accept="image/*"
+                            name="groupImg"
                             id="profilePictureInput"
                             onChange={handleFile}
                           />

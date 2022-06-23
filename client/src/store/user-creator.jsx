@@ -41,7 +41,9 @@ export const fetchLogin = (url, user, type, navigate) => {
               error: null,
             })
           );
-          getState().socket.notifySocket.emit("notifyingUserIsOnline");
+          getState().socket.notifySocket.emit("notifyingUserIsOnline", {
+            userId: data._id,
+          });
         }, 50);
       }
     } catch (error) {

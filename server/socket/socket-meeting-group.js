@@ -7,6 +7,7 @@ exports = module.exports = (socket, type, io = null) => {
         socket.join(room);
 
         console.log(io.adapter.rooms);
+        socket.userInfo = { ...user, inRoom: room };
 
         const allUsersInRoom = Array.from(io.adapter.rooms.get(room));
         console.log(allUsersInRoom);
@@ -18,16 +19,13 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "sendingSignal":
-      socket.on(
-        type,
-        ({ userAlreadyInRoomId, calleeId, signal, calleeInfo }) => {
-          io.to(userAlreadyInRoomId).emit("userJoined", {
-            signal,
-            userJoinId: calleeId,
-            userJoinInfo: { ...calleeInfo, userJoinId: calleeId },
-          });
-        }
-      );
+      socket.on(type, ({ userAlreadyInRoomId, calleeId, signal }) => {
+        io.to(userAlreadyInRoomId).emit("userJoined", {
+          signal,
+          userJoinId: calleeId,
+          userJoinInfo: { ...socket.userInfo, userJoinId: socket.id },
+        });
+      });
       break;
     case "returningSignal":
       socket.on(type, ({ userJoinId, signal }) => {
@@ -40,11 +38,8 @@ exports = module.exports = (socket, type, io = null) => {
     case "leaveGroupRoom":
       socket.on(type, ({ userLeaveId, room, user }) => {
         socket.broadcast.to(room).emit("userLeaving", { userLeaveId, user });
-        console.log("sdfasdfsadfssssssssssss", io.adapter.rooms);
 
         socket.leave(room);
-
-        console.log("sdfasdfsadfssssssssssss", io.adapter.rooms);
       });
       break;
     case "disconnect":
@@ -52,8 +47,13 @@ exports = module.exports = (socket, type, io = null) => {
         console.log("A user disconnected to meeting-group channel");
         console.log(io.adapter.rooms);
         // need to be fixed in server
-        // socket.broadcast.to(room).emit("userLeaving", { userLeaveId: socket.id});
-        socket.leave();
+        console.log(socket.userInfo);
+        console.log("sdfasdfasfdasdf", Array.from(io.adapter.rooms));
+
+        socket.broadcast.to(socket.userInfo?.inRoom).emit("userLeaving", {
+          userLeaveId: socket.id,
+          user: socket.userInfo,
+        });
       });
       break;
   }

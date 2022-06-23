@@ -9,10 +9,12 @@ exports.getCall = async (req, res, _next) => {
     const { members } = await Conversation.findOne({
       _id: req.params.conversationId,
     }).populate({ path: "members.userId" });
+
     const friend = members.find(
       (member) =>
         member.userId._id.toString() !== req.session.user._id.toString()
     );
+
     res.send({ friend: friend.userId });
   } catch (err) {
     res.send({ error: err.message });
@@ -21,11 +23,14 @@ exports.getCall = async (req, res, _next) => {
 
 exports.getListFriends = async (req, res, _next) => {
   try {
-    const friends = await User.find();
-    const listFriends = friends.filter(
-      (friend) => friend._id.toString() !== req.session.user._id.toString()
-    );
+    const listFriends = await User.find({
+      _id: {
+        $ne: req.session.user._id.toString(),
+      },
+    });
+
     const sortedName = sortName(listFriends);
+
     return res.send(sortedName);
   } catch (err) {
     res.send({ error: err.message });

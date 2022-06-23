@@ -3,10 +3,9 @@ const { getConversation } = require("./user");
 
 exports.newGroup = async (req, res, _next) => {
   try {
-    console.log(req.body.newMembers);
     await new Conversation({
       members: [...req.body.newMembers, { userId: req.session.user }],
-      groupImg: req.body.groupImg,
+      groupImg: req.file.filename,
       groupName: req.body.groupName,
       messages: [],
     }).save();

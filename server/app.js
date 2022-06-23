@@ -7,14 +7,12 @@ const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
+require("dotenv").config();
 const socketMessageListen = require("./socket/socket-message");
 const socketMeetingListen = require("./socket/socket-meeting");
 const socketMeetingGroupListen = require("./socket/socket-meeting-group");
 const socketNotifyListen = require("./socket/socket-notify");
-
 const PORT = process.env.YOUR_PORT || process.env.PORT || 5000;
-const MONGODB_URI =
-  "mongodb+srv://kietcao:thangcho@cluster0.kfugn.mongodb.net/video-chat?retryWrites=true&w=majority";
 
 // Body Parser Middleware
 app.use(express.json({ limit: "50mb" })); // Allow us to handle raw json
@@ -23,7 +21,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: false })); // Allow us to 
 const MongoDBStore = require("connect-mongodb-session")(session);
 
 const store = new MongoDBStore({
-  uri: MONGODB_URI,
+  uri: process.env.MONGODB_URI,
   collection: "mySessions",
 });
 
@@ -49,6 +47,7 @@ app.get("/", (_req, res) => {
   res.send("Server is running");
 });
 
+app.use(require("./routes/image-group"));
 app.use(require("./routes/user"));
 app.use(require("./routes/messages"));
 app.use(require("./routes/meetings"));
@@ -56,10 +55,13 @@ app.use(require("./routes/meetings"));
 const io_notify = io.of("/notify");
 io_notify.on("connection", (socket) => {
   console.log("A user connected to channel notify");
+  console.log(io_notify.adapter.rooms);
 
   socketNotifyListen(socket, "notifyingUserIsOnline", io_notify);
 
   socketNotifyListen(socket, "notifyingUserIsOffline", io_notify);
+
+  socketNotifyListen(socket, "disconnect", io_notify);
 });
 
 const io_chat = io.of("/chat-rooms");
@@ -125,7 +127,7 @@ io_meeting_group.on("connection", (socket) => {
 
 (async () => {
   try {
-    mongoose.connect(MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI);
     server.listen(PORT, () => {
       console.log(`Server is listening on port ${PORT}`);
     });

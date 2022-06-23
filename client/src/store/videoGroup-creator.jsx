@@ -5,8 +5,7 @@ export const createPeerForCallee = (
   calleeId,
   stream,
   meetingGroupSocket,
-  setStreams,
-  calleeInfo
+  setStreams
 ) => {
   // We need to create peer(initiator: true) for callee to send signal to
   // users(caller and other callees) already waiting in room
@@ -20,7 +19,6 @@ export const createPeerForCallee = (
     meetingGroupSocket.emit("sendingSignal", {
       userAlreadyInRoomId,
       calleeId,
-      calleeInfo,
       signal,
     });
   });
