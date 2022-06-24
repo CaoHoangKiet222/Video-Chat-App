@@ -48,7 +48,10 @@ export const addPeerForJoinedUsers = (
   });
 
   peer.on("signal", (signal) => {
-    meetingGroupSocket.emit("returningSignal", { userJoinId, signal });
+    meetingGroupSocket.emit("returningSignal", {
+      userJoinId,
+      signal,
+    });
   });
 
   peer.on("stream", (currentStream) => {

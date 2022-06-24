@@ -7,10 +7,17 @@ exports = module.exports = (socket, type, io = null) => {
         socket.join(room);
 
         console.log(io.adapter.rooms);
-        socket.userInfo = { ...user, inRoom: room };
+        socket.userInfo = user;
+        socket.room = room;
+        console.log(io.clients);
 
         const allUsersInRoom = Array.from(io.adapter.rooms.get(room));
         console.log(allUsersInRoom);
+
+        // for (const clientId of io.adapter.rooms.get(room)) {
+        //   const clientSocket = io.sockets.get(clientId);
+        //   console.log(clientSocket.userInfo);
+        // }
 
         socket.emit(
           "allUsers",
@@ -23,7 +30,7 @@ exports = module.exports = (socket, type, io = null) => {
         io.to(userAlreadyInRoomId).emit("userJoined", {
           signal,
           userJoinId: calleeId,
-          userJoinInfo: { ...socket.userInfo, userJoinId: socket.id },
+          userJoinInfo: socket.userInfo,
         });
       });
       break;
@@ -32,6 +39,7 @@ exports = module.exports = (socket, type, io = null) => {
         io.to(userJoinId).emit("receivingSignal", {
           signal,
           userInRoomId: socket.id,
+          userInRoomInfo: socket.userInfo,
         });
       });
       break;
@@ -42,15 +50,26 @@ exports = module.exports = (socket, type, io = null) => {
         socket.leave(room);
       });
       break;
+    case "showMyVideo":
+      socket.on(type, ({ room }) => {
+        console.log(io.adapter.rooms);
+        socket.userInfo.showVideo = !socket.userInfo.showVideo;
+        socket.broadcast.to(room).emit("showUserVideo", { userId: socket.id });
+      });
+      break;
+    case "toggleSound":
+      socket.on(type, ({ room }) => {
+        console.log(io.adapter.rooms);
+        socket.userInfo.muteSound = !socket.userInfo.muteSound;
+        socket.broadcast.to(room).emit("toggleSound", { userId: socket.id });
+      });
+      break;
     case "disconnect":
       socket.on(type, () => {
         console.log("A user disconnected to meeting-group channel");
         console.log(io.adapter.rooms);
-        // need to be fixed in server
-        console.log(socket.userInfo);
-        console.log("sdfasdfasfdasdf", Array.from(io.adapter.rooms));
 
-        socket.broadcast.to(socket.userInfo?.inRoom).emit("userLeaving", {
+        socket.broadcast.to(socket.room).emit("userLeaving", {
           userLeaveId: socket.id,
           user: socket.userInfo,
         });

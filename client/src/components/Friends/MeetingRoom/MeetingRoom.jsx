@@ -9,6 +9,8 @@ import {
   Peers,
   Streams,
   Videos,
+  VideoStyle,
+  VideosWrapper,
 } from "./MeetingRoom.styled.jsx";
 import {
   FiMenu,
@@ -268,7 +270,11 @@ const MeetingRoom = () => {
           showUserVideo={showUserVideo}
           showTop={showTop}
         >
-          {returnPeer(call, userVideo, showTop, showUserVideo, muteSound)}
+          <VideosWrapper isSingle={true} changeScale={changeScale}>
+            <VideoStyle>
+              {returnPeer(call, userVideo, showTop, showUserVideo, muteSound)}
+            </VideoStyle>
+          </VideosWrapper>
 
           <MeetingBottomControls>
             <CommonControl onClick={videoHandle}>

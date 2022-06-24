@@ -276,13 +276,40 @@ export const shareScreen = (stream, peer) => {
     });
 };
 
+export const shareGroupScreen = (stream, peers) => {
+  navigator.mediaDevices
+    .getDisplayMedia({ cursor: true })
+    .then((shareStream) => {
+      const screenTrack = shareStream.getTracks()[0];
+
+      const videoTrack = stream
+        .getTracks()
+        .find((track) => track.kind === "video");
+
+      peers.forEach(({ peer }) => {
+        peer.replaceTrack(videoTrack, screenTrack, stream);
+        console.log(screenTrack);
+      });
+
+      screenTrack.onended = () => {
+        peers.forEach(({ peer }) => {
+          console.log("ssssssssssssssss");
+          peer.replaceTrack(screenTrack, videoTrack, stream);
+        });
+      };
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
 export const getConversationId = (conversation, member, user) => {
   const existConv = conversation?.find(({ members }) => {
     const memberIdIndex = members?.findIndex(
-      (mem) => mem?.userId._id === member?._id
+      (mem) => mem?.userId?._id === member?._id
     );
     const userIdIndex = members?.findIndex(
-      (mem) => mem?.userId._id === user?._id
+      (mem) => mem?.userId?._id === user?._id
     );
     return memberIdIndex !== -1 && userIdIndex !== -1;
   });
@@ -304,7 +331,6 @@ export const closeComponent = (showSomething, setShowSomething) => {
 export const getMembersInGroupOnline = (members) => {
   const onlineMems = [];
   for (const member of members) {
-    console.log(member);
     if (member.userId.isLoggined) {
       onlineMems.push(member);
     }
@@ -315,4 +341,10 @@ export const getMembersInGroupOnline = (members) => {
 export const findImgAndNameGroup = (conversation, room) => {
   const { groupImg, groupName } = conversation.find(({ _id }) => _id === room);
   return { groupImg, groupName };
+};
+
+export const toggleAttributePeers = (peers, userId, attribute) => {
+  const peer = peers.find((peer) => peer.peerId === userId);
+  peer[attribute] = !peer[attribute];
+  return peers;
 };

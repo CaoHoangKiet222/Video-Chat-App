@@ -122,6 +122,10 @@ io_meeting_group.on("connection", (socket) => {
 
   socketMeetingGroupListen(socket, "leaveGroupRoom", io_meeting_group);
 
+  socketMeetingGroupListen(socket, "showMyVideo", io_meeting_group);
+
+  socketMeetingGroupListen(socket, "toggleSound", io_meeting_group);
+
   socketMeetingGroupListen(socket, "disconnect", io_meeting_group);
 });
 

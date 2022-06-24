@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import CommonPeer from "./CommonPeer.jsx";
 
 export const Container = styled.div`
   height: 100vh;
@@ -57,8 +56,14 @@ export const Peers = styled.div`
 
 export const VideosWrapper = styled.div`
   margin: 20px;
-  width: 719px;
-  height: 405px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: ${({ isSingle, changeScale }) =>
+    isSingle ? (changeScale ? "90%" : "100%") : "719px"};
+  height: ${({ isSingle, changeScale }) =>
+    isSingle ? (changeScale ? "90%" : "100%") : "405px"};
+  max-height: 90vh;
   display: flex;
   flex-wrap: wrap;
 `;
@@ -68,11 +73,16 @@ export const VideoStyle = styled.div`
   height: inherit;
   background-color: #3c4043;
   border-radius: 8px;
+
+  & > video {
+    height: ${({ showVideo }) => (showVideo ? "100%" : "0%")}!important;
+  }
 `;
 
 export const Videos = styled.div`
-  min-width: 140px;
+  /* min-width: 140px; */
   position: relative;
+  height: 100%;
 
   & > video {
     object-fit: cover;
@@ -101,13 +111,12 @@ export const Streams = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
-  /* position: relative; */
 
   video {
     display: block;
-    width: ${({ changeScale }) => (changeScale ? "90%" : "100%")};
-    height: ${({ showUserVideo, showTop }) =>
-      showUserVideo && !showTop ? "100%" : "0%"};
+    width: 100%;
+    height: ${({ isGroup, showUserVideo, showTop }) =>
+      isGroup ? "100%" : showUserVideo && !showTop ? "100%" : "0%"};
     object-fit: cover;
     border-radius: 8px;
   }
