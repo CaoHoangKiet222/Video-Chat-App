@@ -271,7 +271,7 @@ const MeetingRoom = () => {
           showTop={showTop}
         >
           <VideosWrapper isSingle={true} changeScale={changeScale}>
-            <VideoStyle>
+            <VideoStyle isSingle={true}>
               {returnPeer(call, userVideo, showTop, showUserVideo, muteSound)}
             </VideoStyle>
           </VideosWrapper>

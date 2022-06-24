@@ -80,7 +80,8 @@ export const VideoStyle = styled.div`
   border-radius: 8px;
 
   & > video {
-    height: ${({ showVideo }) => (showVideo ? "100%" : "0%")}!important;
+    height: ${({ showVideo, isSingle }) =>
+      isSingle ? "100%" : showVideo ? "100%" : "0%"}!important;
   }
 `;
 

@@ -45,6 +45,8 @@ exports = module.exports = (socket, type, io = null) => {
       break;
     case "leaveGroupRoom":
       socket.on(type, ({ userLeaveId, room, user }) => {
+        socket.room = null;
+        socket.userInfo = null;
         socket.broadcast.to(room).emit("userLeaving", { userLeaveId, user });
 
         socket.leave(room);
