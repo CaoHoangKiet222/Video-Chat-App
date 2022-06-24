@@ -4,7 +4,6 @@ import { Img, Name, PeerInfo, RemotePeer, Status } from "./CommonPeer.styled";
 const CommonPeer = (props) => {
   const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
   const avata = props.avata || props.user?.avata;
-  // console.log(props.avata, props.user?.avata);
 
   return (
     <PeerInfo className={props.className} type={props.type}>

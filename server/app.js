@@ -126,6 +126,8 @@ io_meeting_group.on("connection", (socket) => {
 
   socketMeetingGroupListen(socket, "toggleSound", io_meeting_group);
 
+  socketMeetingGroupListen(socket, "toggleControls", io_meeting_group);
+
   socketMeetingGroupListen(socket, "disconnect", io_meeting_group);
 });
 

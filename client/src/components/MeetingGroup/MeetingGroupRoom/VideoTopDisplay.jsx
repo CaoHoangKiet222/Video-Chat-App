@@ -2,14 +2,13 @@ import React, { useEffect, useRef } from "react";
 import { Videos } from "../../Friends/MeetingRoom/MeetingRoom.styled";
 import CommonPeer from "../../Friends/MeetingRoom/CommonPeer";
 
-const VideoDisplay = ({
+const VideoTopDisplay = ({
   name,
   avata,
   showTop,
   showVideo,
   stream,
   muteSound,
-  isShare,
 }) => {
   const userVideo = useRef(null);
   console.log(name, avata, showVideo);
@@ -23,9 +22,8 @@ const VideoDisplay = ({
   return (
     <>
       {showVideo ? (
-        <Videos isShowTop={showTop}>
+        <Videos isShowTop={showTop} topDisplay={true}>
           <video
-            controls={isShare}
             ref={userVideo}
             muted={muteSound}
             playsInline={true}
@@ -35,13 +33,14 @@ const VideoDisplay = ({
       ) : (
         <>
           <CommonPeer
-            font-size="18px"
-            padding="5px 0"
-            height="120px"
-            width="120px"
-            type="video-container"
+            font-size="11px"
+            padding="1px 0"
+            height="40px"
+            width="40px"
+            type="peer-info"
             name={name}
             avata={avata}
+            className="main-peer"
           />
           <video ref={userVideo} muted={muteSound} autoPlay={true} />
         </>
@@ -50,4 +49,4 @@ const VideoDisplay = ({
   );
 };
 
-export default VideoDisplay;
+export default VideoTopDisplay;

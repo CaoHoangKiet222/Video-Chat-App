@@ -35,6 +35,8 @@ import {
   findImgAndNameGroup,
   toggleAttributePeers,
   shareGroupScreen,
+  splicePeers,
+  replacePeersTrack,
 } from "../../../utilities/utilities.jsx";
 import {
   addPeerForJoinedUsers,
@@ -44,15 +46,18 @@ import {
 import VideoDisplay from "./VideoDisplay";
 import Notification from "../../UI/Notification";
 import { errorActions } from "../../../store/error-slice";
+import VideoTopDisplay from "./VideoTopDisplay";
 
 const MeetingGroupRoom = () => {
   const [showTop, setShowTop] = useState(false);
   const [changeScale, setChangeScale] = useState(false);
+  const [isShare, setIsShare] = useState(false);
   const [toggleIconSound, setToggleIconSound] = useState(true);
   const [streams, setStreams] = useState([]);
   const [peers, setPeers] = useState([]);
   const myVideo = useRef(null),
-    peersRef = useRef([]);
+    peersRef = useRef([]),
+    shareStreamRef = useRef(null);
   const dispatch = useDispatch();
   const params = useParams();
   const [searchParams] = useSearchParams();
@@ -94,6 +99,7 @@ const MeetingGroupRoom = () => {
             ...calleeInfo,
             showVideo: searchParams.get("showVideo") === "true",
             muteSound: true,
+            isShare: false,
           },
         });
 
@@ -203,26 +209,11 @@ const MeetingGroupRoom = () => {
         })
       );
 
-      setStreams((preStreams) => {
-        preStreams.splice(
-          preStreams.findIndex(({ peerId }) => peerId === userLeaveId),
-          1
-        );
-        return [...preStreams];
-      });
+      setStreams((preStreams) => [...splicePeers(preStreams, userLeaveId)]);
 
-      peersRef.current.splice(
-        peersRef.current.findIndex(({ peerId }) => peerId === userLeaveId),
-        1
-      );
+      peersRef.current = splicePeers(peersRef.current, userLeaveId);
 
-      setPeers((prePeers) => {
-        prePeers.splice(
-          prePeers.findIndex(({ peerId }) => peerId === userLeaveId),
-          1
-        );
-        return [...prePeers];
-      });
+      setPeers((prePeers) => [...splicePeers(prePeers, userLeaveId)]);
     });
 
     return () => {
@@ -246,7 +237,29 @@ const MeetingGroupRoom = () => {
         return [...toggleAttributePeers(prePeers, userId, "muteSound")];
       });
     });
+
+    meetingGroupSocket.on("toggleControls", ({ userId }) => {
+      console.log("toggleControls", userId);
+
+      setPeers((prePeers) => {
+        return [...toggleAttributePeers(prePeers, userId, "isShare")];
+      });
+    });
   }, [meetingGroupSocket]);
+
+  useEffect(() => {
+    // if another user join while someone is sharing run it to render again
+    if (isShare && shareStreamRef.current && peers) {
+      replacePeersTrack(
+        shareStreamRef.current,
+        myStream,
+        peersRef.current,
+        setIsShare,
+        meetingGroupSocket,
+        params.meetingId
+      );
+    }
+  }, [isShare, myStream, peers, meetingGroupSocket, params.meetingId]);
 
   const showTopControls = () => {
     setShowTop(!showTop);
@@ -276,7 +289,16 @@ const MeetingGroupRoom = () => {
   };
 
   const handleShareScreen = () => {
-    shareGroupScreen(myStream, peersRef.current);
+    setIsShare(true);
+    meetingGroupSocket.emit("toggleControls", { room: params.meetingId });
+    shareGroupScreen(
+      myStream,
+      peersRef.current,
+      setIsShare,
+      shareStreamRef,
+      meetingGroupSocket,
+      params.meetingId
+    );
   };
 
   // const returnPeer = (call, userVideo, showTop, showUserVideo, muteSound) => {
@@ -312,37 +334,23 @@ const MeetingGroupRoom = () => {
                 <FiMenu />
                 {/* <FaChevronLeft /> */}
               </PanelControl>
-              <Peers>
-                {streams.map(({ stream }, index) => {
+              <Peers showTop={showTop}>
+                {streams.map(({ stream, peerId }, index) => {
+                  const { name, showVideo, avata, muteSound } = peers.find(
+                    (peer) => peer.peerId === peerId
+                  );
                   return (
-                    <VideoDisplay
+                    <VideoTopDisplay
                       key={index}
                       showTop={showTop}
                       stream={stream}
                       muteSound={true}
+                      showVideo={showVideo}
+                      name={name}
+                      avata={avata}
                     />
                   );
                 })}
-                {/* {showUserVideo ? ( */}
-                {/*   <Videos isShowTop={showTop}> */}
-                {/*     <video */}
-                {/*       ref={userTopVideo} */}
-                {/*       muted={true} */}
-                {/*       playsInline={true} */}
-                {/*       autoPlay={true} */}
-                {/*     /> */}
-                {/*   </Videos> */}
-                {/* ) : ( */}
-                {/*   <CommonPeer */}
-                {/*     font-size="11px" */}
-                {/*     padding="1px 0" */}
-                {/*     height="40px" */}
-                {/*     width="40px" */}
-                {/*     type="peer-info" */}
-                {/*     user={call.isReceiving ? call.caller : call.callee} */}
-                {/*     className="main-peer" */}
-                {/*   /> */}
-                {/* )} */}
               </Peers>
             </>
           )}
@@ -363,9 +371,10 @@ const MeetingGroupRoom = () => {
         </MeetingTopControls>
         <Streams isGroup={true} changeScale={changeScale} showTop={showTop}>
           {streams.map(({ stream, peerId }, index) => {
-            const { name, showVideo, avata, muteSound } = peers.find(
+            const { name, showVideo, avata, muteSound, isShare } = peers.find(
               (peer) => peer.peerId === peerId
             );
+            console.log(isShare);
 
             return (
               <VideosWrapper key={index}>
@@ -377,6 +386,7 @@ const MeetingGroupRoom = () => {
                     showVideo={showVideo}
                     name={name}
                     avata={avata}
+                    isShare={isShare}
                   />
                 </VideoStyle>
               </VideosWrapper>

@@ -8,11 +8,12 @@ export const PeerInfo = styled.div`
   width: 135px;
   height: 95px;
   cursor: pointer;
-  margin: 0 1px;
+  margin: 0 8px;
   z-index: 1;
 
   &.main-peer {
     border: 3px solid #da7d02;
+    border-radius: 8px
   }
   `
       : props.type === "video-container" &&

@@ -276,31 +276,51 @@ export const shareScreen = (stream, peer) => {
     });
 };
 
-export const shareGroupScreen = (stream, peers) => {
+export const shareGroupScreen = (
+  stream,
+  peers,
+  setIsShare,
+  shareStreamRef,
+  socket,
+  room
+) => {
   navigator.mediaDevices
     .getDisplayMedia({ cursor: true })
     .then((shareStream) => {
-      const screenTrack = shareStream.getTracks()[0];
+      shareStreamRef.current = shareStream;
 
-      const videoTrack = stream
-        .getTracks()
-        .find((track) => track.kind === "video");
-
-      peers.forEach(({ peer }) => {
-        peer.replaceTrack(videoTrack, screenTrack, stream);
-        console.log(screenTrack);
-      });
-
-      screenTrack.onended = () => {
-        peers.forEach(({ peer }) => {
-          console.log("ssssssssssssssss");
-          peer.replaceTrack(screenTrack, videoTrack, stream);
-        });
-      };
+      replacePeersTrack(shareStream, stream, peers, setIsShare, socket, room);
     })
     .catch((error) => {
       console.log(error);
     });
+};
+
+export const replacePeersTrack = (
+  shareStream,
+  stream,
+  peers,
+  setIsShare,
+  socket,
+  room
+) => {
+  const screenTrack = shareStream.getTracks()[0];
+
+  const videoTrack = stream.getTracks().find((track) => track.kind === "video");
+
+  peers.forEach(({ peer }) => {
+    peer.replaceTrack(videoTrack, screenTrack, stream);
+    console.log(screenTrack);
+  });
+
+  screenTrack.onended = () => {
+    setIsShare(false);
+    socket.emit("toggleControls", { room });
+
+    peers.forEach(({ peer }) => {
+      peer.replaceTrack(screenTrack, videoTrack, stream);
+    });
+  };
 };
 
 export const getConversationId = (conversation, member, user) => {
@@ -346,5 +366,11 @@ export const findImgAndNameGroup = (conversation, room) => {
 export const toggleAttributePeers = (peers, userId, attribute) => {
   const peer = peers.find((peer) => peer.peerId === userId);
   peer[attribute] = !peer[attribute];
+  return peers;
+};
+
+export const splicePeers = (peers, id) => {
+  const index = peers.findIndex(({ peerId }) => peerId === id);
+  index !== -1 && peers.splice(index, 1);
   return peers;
 };

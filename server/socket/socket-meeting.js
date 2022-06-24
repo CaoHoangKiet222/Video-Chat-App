@@ -1,5 +1,4 @@
 const Meetings = module.require("../models/meetings");
-const MeetingsGroup = module.require("../models/meetings-group");
 
 exports = module.exports = (socket, type, io = null) => {
   switch (type) {

@@ -64,15 +64,29 @@ exports = module.exports = (socket, type, io = null) => {
         socket.broadcast.to(room).emit("toggleSound", { userId: socket.id });
       });
       break;
+    case "toggleControls":
+      socket.on(type, ({ room }) => {
+        console.log(io.adapter.rooms);
+        console.log(socket.userInfo.isShare);
+        socket.userInfo.isShare = !socket.userInfo.isShare;
+        console.log(socket.userInfo.isShare);
+        socket.broadcast.to(room).emit("toggleControls", { userId: socket.id });
+      });
+      break;
     case "disconnect":
       socket.on(type, () => {
         console.log("A user disconnected to meeting-group channel");
         console.log(io.adapter.rooms);
 
-        socket.broadcast.to(socket.room).emit("userLeaving", {
-          userLeaveId: socket.id,
-          user: socket.userInfo,
-        });
+        if (socket.room && socket.userInfo) {
+          socket.broadcast.to(socket.room).emit("userLeaving", {
+            userLeaveId: socket.id,
+            user: socket.userInfo,
+          });
+        }
+
+        socket.room = null;
+        socket.userInfo = null;
       });
       break;
   }

@@ -52,6 +52,11 @@ export const Peers = styled.div`
   height: 95px;
   z-index: 1;
   overflow: hidden;
+
+  & > video {
+    height: ${({ showTop }) => showTop && "0px"};
+    margin: 0px 10px !important;
+  }
 `;
 
 export const VideosWrapper = styled.div`
@@ -94,7 +99,7 @@ export const Videos = styled.div`
     height: 405px;
     height: ${(props) => (!props.isShowTop ? "105px" : "95px")};
     cursor: pointer;
-    margin: 0 1px;
+    margin: ${(props) => (!props.topDisplay ? "0 1px" : "0px 10px")};
   }
 `;
 
