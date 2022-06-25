@@ -15,7 +15,7 @@ const CommonPeer = (props) => {
           <img src={`${ENDPOINT_CLIENT}/${avata}`} alt="" />
         </Img>
         <Status font-size={props["font-size"]} padding={props.padding}>
-          spectator
+          {props.displayText}
         </Status>
       </RemotePeer>
     </PeerInfo>

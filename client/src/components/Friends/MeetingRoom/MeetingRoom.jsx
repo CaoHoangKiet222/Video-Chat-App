@@ -208,6 +208,15 @@ const MeetingRoom = () => {
           width="120px"
           type="video-container"
           user={call.isReceiving ? call.caller : call.callee}
+          displayText={
+            !muteSound
+              ? !showUserVideo
+                ? "Audio Only!"
+                : "Both Video and Audio"
+              : muteSound && showUserVideo
+              ? "Video Only!"
+              : "Spectator!"
+          }
         />
         <video ref={userVideo} muted={muteSound} autoPlay={true} />
       </>
@@ -243,6 +252,7 @@ const MeetingRoom = () => {
                     type="peer-info"
                     user={call.isReceiving ? call.caller : call.callee}
                     className="main-peer"
+                    displayText={muteSound ? "Spectator!" : "Audio Only!"}
                   />
                 )}
               </Peers>
@@ -271,7 +281,11 @@ const MeetingRoom = () => {
           showTop={showTop}
         >
           <VideosWrapper isSingle={true} changeScale={changeScale}>
-            <VideoStyle isSingle={true}>
+            <VideoStyle
+              isSingle={true}
+              showUserVideo={showUserVideo}
+              showTop={showTop}
+            >
               {returnPeer(call, userVideo, showTop, showUserVideo, muteSound)}
             </VideoStyle>
           </VideosWrapper>

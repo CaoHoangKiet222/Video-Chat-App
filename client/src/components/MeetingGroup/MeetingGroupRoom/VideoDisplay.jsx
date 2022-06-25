@@ -12,17 +12,16 @@ const VideoDisplay = ({
   isShare,
 }) => {
   const userVideo = useRef(null);
-  console.log(name, avata, showVideo);
 
   useEffect(() => {
-    if (showVideo || stream) {
+    if (showVideo || stream || showTop) {
       userVideo.current.srcObject = stream;
     }
-  }, [stream, showVideo]);
+  }, [stream, showVideo, showTop]);
 
   return (
     <>
-      {showVideo ? (
+      {showVideo && !showTop ? (
         <Videos isShowTop={showTop}>
           <video
             controls={isShare}
@@ -42,8 +41,22 @@ const VideoDisplay = ({
             type="video-container"
             name={name}
             avata={avata}
+            displayText={
+              !muteSound
+                ? !showVideo
+                  ? "Audio Only!"
+                  : "Both Video and Audio"
+                : muteSound && showVideo
+                ? "Video Only!"
+                : "Spectator!"
+            }
           />
-          <video ref={userVideo} muted={muteSound} autoPlay={true} />
+          <video
+            ref={userVideo}
+            muted={muteSound}
+            autoPlay={true}
+            controls={false}
+          />
         </>
       )}
     </>

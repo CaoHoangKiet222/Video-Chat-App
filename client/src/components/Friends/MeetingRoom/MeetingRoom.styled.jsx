@@ -78,10 +78,15 @@ export const VideoStyle = styled.div`
   height: inherit;
   background-color: #3c4043;
   border-radius: 8px;
-
   & > video {
-    height: ${({ showVideo, isSingle }) =>
-      isSingle ? "100%" : showVideo ? "100%" : "0%"}!important;
+    height: ${({ showUserVideo, showVideo, isSingle, showTop }) =>
+      isSingle
+        ? showUserVideo && !showTop
+          ? "100%"
+          : "0%"
+        : showVideo && !showTop /* group */
+        ? "100%"
+        : "0%"}!important;
   }
 `;
 

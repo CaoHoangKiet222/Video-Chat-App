@@ -9,6 +9,7 @@ const VideoTopDisplay = ({
   showVideo,
   stream,
   muteSound,
+  isShare,
 }) => {
   const userVideo = useRef(null);
   console.log(name, avata, showVideo);
@@ -24,8 +25,9 @@ const VideoTopDisplay = ({
       {showVideo ? (
         <Videos isShowTop={showTop} topDisplay={true}>
           <video
+            controls={isShare}
             ref={userVideo}
-            muted={muteSound}
+            muted={true}
             playsInline={true}
             autoPlay={true}
           />
@@ -41,8 +43,14 @@ const VideoTopDisplay = ({
             name={name}
             avata={avata}
             className="main-peer"
+            displayText={muteSound ? "Spectator!" : "Audio Only!"}
           />
-          <video ref={userVideo} muted={muteSound} autoPlay={true} />
+          <video
+            ref={userVideo}
+            muted={true}
+            autoPlay={true}
+            controls={false}
+          />
         </>
       )}
     </>

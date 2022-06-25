@@ -301,28 +301,6 @@ const MeetingGroupRoom = () => {
     );
   };
 
-  // const returnPeer = (call, userVideo, showTop, showUserVideo, muteSound) => {
-  //   return showUserVideo && !showTop ? (
-  //     <video
-  //       ref={userVideo}
-  //       muted={muteSound}
-  //       playsInline={true}
-  //       autoPlay={true}
-  //     />
-  //   ) : (
-  //     <>
-  //       <CommonPeer
-  //         font-size="18px"
-  //         padding="5px 0"
-  //         height="120px"
-  //         width="120px"
-  //         type="video-container"
-  //       />
-  //       <video ref={userVideo} muted={muteSound} autoPlay={true} />
-  //     </>
-  //   );
-  // };
-
   return (
     <Container>
       <MeetingMain>
@@ -336,18 +314,18 @@ const MeetingGroupRoom = () => {
               </PanelControl>
               <Peers showTop={showTop}>
                 {streams.map(({ stream, peerId }, index) => {
-                  const { name, showVideo, avata, muteSound } = peers.find(
-                    (peer) => peer.peerId === peerId
-                  );
+                  const { name, showVideo, avata, muteSound, isShare } =
+                    peers.find((peer) => peer.peerId === peerId);
                   return (
                     <VideoTopDisplay
                       key={index}
                       showTop={showTop}
                       stream={stream}
-                      muteSound={true}
+                      muteSound={muteSound}
                       showVideo={showVideo}
                       name={name}
                       avata={avata}
+                      isShare={isShare}
                     />
                   );
                 })}
@@ -378,7 +356,7 @@ const MeetingGroupRoom = () => {
 
             return (
               <VideosWrapper key={index}>
-                <VideoStyle showVideo={showVideo}>
+                <VideoStyle showVideo={showVideo} showTop={showTop}>
                   <VideoDisplay
                     showTop={showTop}
                     stream={stream}
