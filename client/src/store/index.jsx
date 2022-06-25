@@ -10,6 +10,7 @@ import replyReducer from "./reply-slice";
 import forwardReducer from "./forward-slice";
 import errorReducer from "./error-slice";
 import videoGroupReducer from "./videoGroup-slice";
+import authReducer from "./auth-slice";
 
 const store = configureStore({
   middleware: (getDefaultMiddleware) =>
@@ -28,6 +29,7 @@ const store = configureStore({
     forward: forwardReducer,
     error: errorReducer,
     videoGroup: videoGroupReducer,
+    auth: authReducer,
   },
 });
 

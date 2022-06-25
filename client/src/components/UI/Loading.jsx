@@ -7,8 +7,8 @@ export const LoadingSpinner = styled.div`
       ? `
   width: 50px;
   height: 10px;
-  padding-left: 14px;
-  padding-bottom: 19px;
+  padding-left: 12px;
+  padding-bottom: 20px;
   `
       : `
   width: 80px;

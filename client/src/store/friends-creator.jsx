@@ -32,7 +32,8 @@ export const postAddFriend = (
   setShowModalDialog,
   setIsFetch
 ) => {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
+    const { notifySocket } = getState().socket;
     setIsFetch(true);
     dispatch(
       conversationActions.setConversation({
@@ -45,6 +46,7 @@ export const postAddFriend = (
         ),
       })
     );
+    notifySocket.emit("notifyingUserAddFriend");
     navigate(`/video-chat/Chats/${encodeURIComponent(name)}`);
     setShowModalDialog(false);
     setIsFetch(false);

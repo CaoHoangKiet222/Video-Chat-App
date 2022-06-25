@@ -44,6 +44,9 @@ exports.getConversation = (req, res, _next) => {
         "members.userId": req.session.user,
       },
       (_err, convTest) => {
+        if (_err) {
+          throw new Error("Conversation not found!!");
+        }
         return res.status(200).json({
           conv: convTest,
           user: req.session.user,
@@ -132,6 +135,7 @@ exports.postUserLogin = async (req, res, _next) => {
       { new: true },
       (_error, user) => {
         req.session.user = user;
+        req.session.isLoggined = true;
         req.session.isRemember = req.body.rememberToLogin;
         req.session.save((err) => {
           if (err) {
@@ -193,5 +197,18 @@ exports.postUserSignUp = async (req, res, _next) => {
   } catch (err) {
     console.log(err);
     res.send({ error: err.message });
+  }
+};
+
+exports.checkAuthUser = (req, res, _next) => {
+  try {
+    console.log(req.session.isLoggined);
+    if (!req.session.isLoggined) {
+      return res.json({ isAuth: false });
+    }
+
+    res.json({ isAuth: true });
+  } catch (error) {
+    res.send({ error: error.message });
   }
 };

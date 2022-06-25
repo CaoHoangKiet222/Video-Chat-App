@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { BsSearch } from "react-icons/bs";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchConversation } from "../../store/conversations-creator";
 import { conversationActions } from "../../store/conversations-slice";
 import { errorActions } from "../../store/error-slice";
@@ -26,6 +26,7 @@ const ModalDialog = (props) => {
   const [searchName, setSearchName] = useState("");
   const [newMembers, setNewMembers] = useState([]);
   const [isFetch, setIsFetch] = useState(false);
+  const { notifySocket } = useSelector((state) => state.socket);
   const groupName = useRef(null);
   const profilePicture = useRef(null);
   const dispatch = useDispatch();
@@ -42,12 +43,12 @@ const ModalDialog = (props) => {
   const handleFile = (e) => {
     // console.log(e.target.files[0]);
     profilePicture.current = e.target.files[0];
-    // const fReader = new FileReader();
-    // fReader.readAsDataURL(e.target.files[0]);
-    // fReader.onload = (event) => {
-    //   // console.log(event.target.result);
-    //   profilePicture.current = event.target.result;
-    // };
+    const fReader = new FileReader();
+    fReader.readAsDataURL(e.target.files[0]);
+    fReader.onload = (event) => {
+      // console.log(event.target.result);
+      profilePicture.current = event.target.result;
+    };
   };
 
   const createGroupHandler = async () => {
@@ -56,41 +57,33 @@ const ModalDialog = (props) => {
         if (newMembers.length >= 2) {
           try {
             setIsFetch(true);
-
-            const data = await postDataFile(
+            const data = await postData(
               `${process.env.REACT_APP_ENDPOINT_SERVER}/new-group`,
+              "post",
               {
-                file: profilePicture.current,
                 newMembers,
+                groupImg: profilePicture.current,
                 groupName: groupName.current.value,
               }
             );
             console.log(data);
-            // const data = await postData(
-            //   `${process.env.REACT_APP_ENDPOINT_SERVER}/new-group`,
-            //   "post",
-            //   {
-            //     newMembers,
-            //     groupImg: profilePicture.current,
-            //     groupName: groupName.current.value,
-            //   }
-            // );
 
-            // if (data.error) {
-            //   dispatch(
-            //     errorActions.setError({
-            //       error: true,
-            //       message: data.error,
-            //     })
-            //   );
-            // } else {
-            //   dispatch(
-            //     conversationActions.setConversation({
-            //       conversation: data,
-            //       error: null,
-            //     })
-            //   );
-            // }
+            if (data.error) {
+              dispatch(
+                errorActions.setError({
+                  error: true,
+                  message: data.error,
+                })
+              );
+            } else {
+              notifySocket.emit("notifyingUserAddGroup");
+              dispatch(
+                conversationActions.setConversation({
+                  conversation: data,
+                  error: null,
+                })
+              );
+            }
 
             setNewMembers([]);
             groupName.current = null;

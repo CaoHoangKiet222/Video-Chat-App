@@ -47,7 +47,6 @@ app.get("/", (_req, res) => {
   res.send("Server is running");
 });
 
-app.use(require("./routes/image-group"));
 app.use(require("./routes/user"));
 app.use(require("./routes/messages"));
 app.use(require("./routes/meetings"));
@@ -57,11 +56,15 @@ io_notify.on("connection", (socket) => {
   console.log("A user connected to channel notify");
   console.log(io_notify.adapter.rooms);
 
-  socketNotifyListen(socket, "notifyingUserIsOnline", io_notify);
+  socketNotifyListen(socket, "notifyingUserIsOnline");
 
-  socketNotifyListen(socket, "notifyingUserIsOffline", io_notify);
+  socketNotifyListen(socket, "notifyingUserIsOffline");
 
-  socketNotifyListen(socket, "disconnect", io_notify);
+  socketNotifyListen(socket, "notifyingUserAddFriend");
+
+  socketNotifyListen(socket, "notifyingUserAddGroup");
+
+  socketNotifyListen(socket, "disconnect");
 });
 
 const io_chat = io.of("/chat-rooms");

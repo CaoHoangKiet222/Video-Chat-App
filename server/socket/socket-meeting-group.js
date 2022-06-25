@@ -2,77 +2,97 @@ exports = module.exports = (socket, type, io = null) => {
   switch (type) {
     case "joinVideoGroup":
       socket.on(type, ({ room, user }) => {
-        console.log("A user joins meeting-group-rooms", room);
+        try {
+          console.log("A user joins meeting-group-rooms", room);
 
-        socket.join(room);
+          socket.join(room);
 
-        console.log(io.adapter.rooms);
-        socket.userInfo = user;
-        socket.room = room;
-        console.log(io.clients);
+          socket.userInfo = user;
+          socket.room = room;
 
-        const allUsersInRoom = Array.from(io.adapter.rooms.get(room));
-        console.log(allUsersInRoom);
+          const allUsersInRoom = Array.from(io.adapter.rooms.get(room));
 
-        // for (const clientId of io.adapter.rooms.get(room)) {
-        //   const clientSocket = io.sockets.get(clientId);
-        //   console.log(clientSocket.userInfo);
-        // }
-
-        socket.emit(
-          "allUsers",
-          allUsersInRoom.filter((userSocketId) => userSocketId !== socket.id)
-        );
+          socket.emit(
+            "allUsers",
+            allUsersInRoom.filter((userSocketId) => userSocketId !== socket.id)
+          );
+        } catch (error) {
+          console.log(error);
+        }
       });
       break;
     case "sendingSignal":
       socket.on(type, ({ userAlreadyInRoomId, calleeId, signal }) => {
-        io.to(userAlreadyInRoomId).emit("userJoined", {
-          signal,
-          userJoinId: calleeId,
-          userJoinInfo: socket.userInfo,
-        });
+        try {
+          io.to(userAlreadyInRoomId).emit("userJoined", {
+            signal,
+            userJoinId: calleeId,
+            userJoinInfo: socket.userInfo,
+          });
+        } catch (error) {
+          console.log(error);
+        }
       });
       break;
     case "returningSignal":
       socket.on(type, ({ userJoinId, signal }) => {
-        io.to(userJoinId).emit("receivingSignal", {
-          signal,
-          userInRoomId: socket.id,
-          userInRoomInfo: socket.userInfo,
-        });
+        try {
+          io.to(userJoinId).emit("receivingSignal", {
+            signal,
+            userInRoomId: socket.id,
+            userInRoomInfo: socket.userInfo,
+          });
+        } catch (error) {
+          console.log(error);
+        }
       });
       break;
     case "leaveGroupRoom":
       socket.on(type, ({ userLeaveId, room, user }) => {
-        socket.room = null;
-        socket.userInfo = null;
-        socket.broadcast.to(room).emit("userLeaving", { userLeaveId, user });
+        try {
+          socket.room = null;
+          socket.userInfo = null;
+          socket.broadcast.to(room).emit("userLeaving", { userLeaveId, user });
 
-        socket.leave(room);
+          socket.leave(room);
+        } catch (error) {
+          console.log(error);
+        }
       });
       break;
     case "showMyVideo":
       socket.on(type, ({ room }) => {
-        console.log(io.adapter.rooms);
-        socket.userInfo.showVideo = !socket.userInfo.showVideo;
-        socket.broadcast.to(room).emit("showUserVideo", { userId: socket.id });
+        try {
+          socket.userInfo.showVideo = !socket.userInfo.showVideo;
+          socket.broadcast
+            .to(room)
+            .emit("showUserVideo", { userId: socket.id });
+        } catch (error) {
+          console.log(error);
+        }
       });
       break;
     case "toggleSound":
       socket.on(type, ({ room }) => {
-        console.log(io.adapter.rooms);
-        socket.userInfo.muteSound = !socket.userInfo.muteSound;
-        socket.broadcast.to(room).emit("toggleSound", { userId: socket.id });
+        try {
+          console.log(io.adapter.rooms);
+          socket.userInfo.muteSound = !socket.userInfo.muteSound;
+          socket.broadcast.to(room).emit("toggleSound", { userId: socket.id });
+        } catch (error) {
+          console.log(error);
+        }
       });
       break;
     case "toggleControls":
       socket.on(type, ({ room }) => {
-        console.log(io.adapter.rooms);
-        console.log(socket.userInfo.isShare);
-        socket.userInfo.isShare = !socket.userInfo.isShare;
-        console.log(socket.userInfo.isShare);
-        socket.broadcast.to(room).emit("toggleControls", { userId: socket.id });
+        try {
+          socket.userInfo.isShare = !socket.userInfo.isShare;
+          socket.broadcast
+            .to(room)
+            .emit("toggleControls", { userId: socket.id });
+        } catch (error) {
+          console.log(error);
+        }
       });
       break;
     case "disconnect":

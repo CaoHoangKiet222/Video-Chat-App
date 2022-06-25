@@ -4,6 +4,8 @@ const router = express.Router();
 const { checkValidation } = require("../middleware/isAuth");
 const userController = require("../controllers/user");
 
+router.get("/isAuth", userController.checkAuthUser);
+
 router.get("/Friends/list-friends", userController.getListFriends);
 
 router.get("/Chats/conversation", userController.getConversation);

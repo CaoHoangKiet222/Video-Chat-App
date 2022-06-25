@@ -28,7 +28,8 @@ const ChatGroupHeader = ({
 
   const callGroupHandler = () => {
     const onlineMems = getMembersInGroupOnline(members);
-    if (onlineMems.length > 1) {
+    console.log(onlineMems);
+    if (onlineMems.length >= 1) {
       return meetingSocket.emit(
         "meetingGroupConnection",
         { room, caller: user },

@@ -41,7 +41,7 @@ const ChatGroupItems = (props) => {
             </div>
           </ChatInfo>
           <ChatGroupText>
-            <p>{props.content}</p>
+            <p>{props.senderName && props.senderName + ": " + props.content}</p>
           </ChatGroupText>
         </ChatGroupContent>
       </Link>

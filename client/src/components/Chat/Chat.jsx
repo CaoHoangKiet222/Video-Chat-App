@@ -94,6 +94,18 @@ const Chat = () => {
       dispatch(fetchFriends());
     });
 
+    notifySocket.on("notifyingUserAddFriend", () => {
+      console.log("notifyingUserAddFriend");
+      dispatch(fetchConversation());
+      // dispatch(fetchFriends());
+    });
+
+    notifySocket.on("notifyingUserAddGroup", () => {
+      console.log("notifyingUserAddGroup");
+      dispatch(fetchConversation());
+      // dispatch(fetchFriends());
+    });
+
     meetingSocket.on("meetingGroupConnection", ({ room, caller }) => {
       navigate(`/video-chat/Chats/meeting-group/${encodeURIComponent(room)}`);
       dispatch(videoGroupActions.setCaller({ caller }));

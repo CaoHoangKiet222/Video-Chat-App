@@ -15,6 +15,16 @@ exports = module.exports = (socket, type, io = null) => {
         socket.broadcast.emit(type);
       });
       break;
+    case "notifyingUserAddFriend":
+      socket.on(type, () => {
+        socket.broadcast.emit(type);
+      });
+      break;
+    case "notifyingUserAddGroup":
+      socket.on(type, () => {
+        socket.broadcast.emit(type);
+      });
+      break;
     case "disconnect":
       socket.on(type, async () => {
         await User.findByIdAndUpdate(socket.userId, { isLoggined: false });

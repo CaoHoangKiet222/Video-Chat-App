@@ -35,34 +35,38 @@ const Login = (props) => {
   const [clearErr, setClearErr] = useState(false);
   const [isRemember, setIsRemember] = useState(false);
   const [isTermsService, setIsTermService] = useState(false);
+  const { auth } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    dispatch(
-      fetchSession(`${process.env.REACT_APP_ENDPOINT_SERVER}/session`, navigate)
-    );
-  }, [dispatch, navigate]);
+  // useEffect(() => {
+  //   dispatch(
+  //     fetchSession(`${process.env.REACT_APP_ENDPOINT_SERVER}/session`, navigate)
+  //   );
+  // }, [dispatch, navigate]);
 
   useEffect(() => {
-    setTimeout(() => {
-      if (!props.isSignUp) {
-        // userState.error === null important statement
-        if (userState.error === null && userState.user) {
-          navigate("/video-chat/Chats");
-        }
+    if (!props.isSignUp) {
+      // userState.error === null important statement
+      if ((userState.error === null && userState.user) || auth) {
+        navigate("/video-chat/Chats");
       }
-    }, 50);
-  }, [userState, navigate, props.isSignUp]);
+    }
+  }, [userState, navigate, props.isSignUp, props, auth]);
 
   useEffect(() => {
-    props.isSignUp && navigate("/signup");
+    if (props.isSignUp) {
+      navigate("/signup");
+      props.signupRef.current = true;
+    } else {
+      props.signupRef.current = false;
+    }
     setEmail("");
     setPassword("");
     setConfirmPass("");
     setClearErr(true);
     setIsRemember(false);
     setIsTermService(false);
-  }, [props.isSignUp, navigate]);
+  }, [props.isSignUp, navigate, dispatch, props.signupRef]);
 
   useEffect(() => {
     if (!userState.error) {
@@ -83,7 +87,8 @@ const Login = (props) => {
           isRemember,
         },
         props.formType,
-        navigate
+        navigate,
+        props.signupRef
       )
     );
   };

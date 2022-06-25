@@ -155,11 +155,16 @@ const SideBars = (props) => {
 
                     // Chat for multiple users
                     if (groupName !== "" && groupImg !== "") {
+                      const sender = members?.find(
+                        (member) => member?.userId._id === lastMessage?.senderId
+                      );
+
                       return (
                         <ChatGroupItems
                           key={_id}
                           groupImg={groupImg}
                           groupName={groupName}
+                          senderName={sender?.userId.name}
                           content={lastMessage?.content}
                           messageDate={lastMessage?.messageDate}
                           room={_id}
