@@ -1,4 +1,7 @@
+const { cloudinary, uploads } = require("../cloudinary/cloudinary");
+
 const Conversation = module.require("../models/conversation");
+const Files = module.require("../models/files");
 
 exports = module.exports = (socket, type, io = null) => {
   switch (type) {
@@ -7,9 +10,10 @@ exports = module.exports = (socket, type, io = null) => {
       socket.on(type, async (room, callback) => {
         try {
           const conv = await Conversation.findOne({ _id: room }).populate({
-            path: "members.userId messages.senderId",
+            path: "members.userId messages.senderId messages.files",
           });
 
+          console.log(conv.messages);
           callback(conv.messages);
 
           socket.join(room);
@@ -30,31 +34,35 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "sendMessage":
-      socket.on(type, async ({ message, room, type }, callback) => {
+      socket.on(type, async ({ message, room }, callback) => {
         try {
-          const { content, messageDate, sender: senderId, reply } = message;
+          const {
+            content,
+            files,
+            messageDate,
+            sender: senderId,
+            reply,
+          } = message;
 
-          console.log(message);
-
-          if (type === "group") {
-            socket.broadcast.to(room).emit("receiveGroupMessage", {
-              content,
-              messageDate,
-              senderId,
-              reply,
-            });
-          } else {
-            socket.broadcast.to(room).emit("receiveMessage", {
-              content,
-              messageDate,
-              senderId,
-              reply,
-            });
-          }
+          socket.broadcast.to(room).emit("receiveMessage", {
+            content,
+            files,
+            messageDate,
+            senderId,
+            reply,
+          });
 
           console.log(io.adapter.rooms);
 
-          callback(null, { content, messageDate, senderId, reply });
+          callback(null, { content, files, messageDate, senderId, reply });
+
+          const uploadedImgsUrl = await Promise.all(
+            files.images.map((data) => {
+              return uploads(data, "image-preview");
+            })
+          );
+          const newFiles = await new Files({ images: uploadedImgsUrl }).save();
+          console.log(newFiles);
 
           await Conversation.findOneAndUpdate(
             { _id: room },
@@ -62,6 +70,7 @@ exports = module.exports = (socket, type, io = null) => {
               $push: {
                 messages: {
                   content: content,
+                  files: newFiles._id,
                   messageDate: messageDate,
                   senderId: senderId._id,
                   reply: reply,

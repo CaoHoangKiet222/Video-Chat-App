@@ -23,6 +23,10 @@ const conversationSchema = new Schema({
         type: String,
         default: "",
       },
+      files: {
+        type: Schema.Types.ObjectId,
+        ref: "Files",
+      },
       messageDate: {
         type: Date,
         default: Date.now(),

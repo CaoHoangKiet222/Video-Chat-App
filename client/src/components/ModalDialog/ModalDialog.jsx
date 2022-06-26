@@ -1,10 +1,9 @@
 import React, { useRef, useState } from "react";
 import { BsSearch } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchConversation } from "../../store/conversations-creator";
 import { conversationActions } from "../../store/conversations-slice";
 import { errorActions } from "../../store/error-slice";
-import { postData, postDataFile } from "../../utilities/utilities";
+import { postData } from "../../utilities/utilities";
 import { LoadingSpinner } from "../UI/Loading";
 import DialogItems from "./DialogItems";
 import {

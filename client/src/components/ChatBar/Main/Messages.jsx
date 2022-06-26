@@ -32,6 +32,8 @@ import { replyActions } from "../../../store/reply-slice";
 import { BsReplyAllFill } from "react-icons/bs";
 import { forwardActions } from "../../../store/forward-slice";
 import { fetchConversation } from "../../../store/conversations-creator";
+import ImagesPreview from "./ImagesPreview";
+import Attachments from "./Attachments";
 
 const Messages = (props) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -144,7 +146,22 @@ const Messages = (props) => {
           {!props.isRight && props.isGroup && (
             <h6>{props.message.senderId.name}</h6>
           )}
-          <span>{props.message.content}</span>
+          {props.message.content && <span>{props.message.content}</span>}
+
+          {props.message.files?.images.length !== 0 && (
+            <div className="images-row">
+              {props.message.files?.images.map((url, index) => {
+                return (
+                  <ImagesPreview
+                    url={url}
+                    key={index}
+                    isRight={props.isRight}
+                  />
+                );
+              })}
+            </div>
+          )}
+          {/* <Attachments isRight={props.isRight} /> */}
         </Content>
       </MessageWrap>
       <MessageOptions>
@@ -152,7 +169,6 @@ const Messages = (props) => {
           <img src="/images/user.jpg" alt="" />
         </Avatar>
         <span>{formatHour(props.time)}</span>
-        <span>Edited</span>
         <DropDown onClick={dropDownHandle}>
           <BiDotsHorizontalRounded />
           {showMenu && (

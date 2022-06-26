@@ -33,6 +33,7 @@ const Main = (props) => {
               isRight={true}
               setMessages={props.setMessages}
               conversationId={props.room}
+              isGroup={props.isGroup}
             />
           );
         }
@@ -44,6 +45,7 @@ const Main = (props) => {
             timeChange={timeChange.current}
             setMessages={props.setMessages}
             conversationId={props.room}
+            isGroup={props.isGroup}
           />
         );
       }

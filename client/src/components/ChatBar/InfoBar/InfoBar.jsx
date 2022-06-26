@@ -12,7 +12,6 @@ let timer;
 const InfoBar = (props) => {
   console.log("InfoBar running");
   const [error, setError] = useState("");
-  const [message, setMessage] = useState(props.messages);
   const [messages, setMessages] = useState([]);
   const [isSendMess, setIsSendMess] = useState(false);
   const [isFetch, setIsFetch] = useState(false);
@@ -68,12 +67,13 @@ const InfoBar = (props) => {
     });
   }, [chatSocket, dispatch]);
 
-  const sendMessage = (e, replyContent = "") => {
+  const sendMessage = (e, replyContent = "", message, files) => {
     try {
       e.preventDefault();
-      if (message) {
+      if (message || files.images.length !== 0) {
         const newMesage = {
           content: message,
+          files,
           sender: props.user,
           messageDate: new Date(Date.now()),
           reply: replyContent,
@@ -84,15 +84,13 @@ const InfoBar = (props) => {
           {
             message: newMesage,
             room: props.room,
-            type: "single",
           },
           (error, message) => {
             if (error) {
               return setError(error);
             }
             setMessages((preMess) => [...preMess, message]);
-            dispatch(fetchConversation());
-            return setMessage("");
+            return dispatch(fetchConversation());
           }
         );
       }
@@ -116,11 +114,7 @@ const InfoBar = (props) => {
             />
           </Body>
         )}
-        <ChatFooter
-          member={props.member}
-          onSendMessage={sendMessage}
-          onSetMessage={setMessage}
-        />
+        <ChatFooter member={props.member} onSendMessage={sendMessage} />
       </Msger>
     </Card>
   );

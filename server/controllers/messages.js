@@ -2,7 +2,7 @@ const Conversation = require("../models/conversation");
 const { getConversation } = require("./user");
 const { cloudinary } = require("../cloudinary/cloudinary");
 
-exports.newGroup = async (req, res, _next) => {
+exports.newGroup = (req, res, _next) => {
   try {
     cloudinary.uploader.upload(
       req.body.groupImg,

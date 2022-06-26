@@ -132,6 +132,18 @@ export const Content = styled(MessageWrap)`
   display: inline-block;
   max-width: 25rem;
 
+  .images-row {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin: 4px 0;
+  }
+  & > span {
+    position: relative;
+    bottom: ${({ isRight }) => (!isRight ? "5px" : "2px")};
+    /* margin-bottom: ; */
+  }
+
   h6 {
     margin: 0;
     color: #fff;

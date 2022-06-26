@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchConversation } from "../../store/conversations-creator";
+import ChatFooter from "../ChatBar/ChatFooter/ChatFooter";
 import InfoBarLoading from "../ChatBar/InfoBar/InfoBarLoading";
+import Main from "../ChatBar/Main/Main";
 import { CardGroup, CardMsger } from "./ChatGroup.styled";
-import ChatGroupFooter from "./ChatGroupFooter/ChatGroupFooter";
 import ChatGroupHeader from "./ChatGroupHeader/ChatGroupHeader";
-import ChatGroupMain from "./ChatGroupMain/ChatGroupMain";
 let timer;
 
 const ChatGroup = (props) => {
   console.log("ChatGroup running");
   const [error, setError] = useState("");
-  const [message, setMessage] = useState(props.messages);
   const [messages, setMessages] = useState([]);
   const [isSendMess, setIsSendMess] = useState(false);
   const [isFetch, setIsFetch] = useState(false);
@@ -38,6 +37,12 @@ const ChatGroup = (props) => {
   }, [props.room, chatSocket]);
 
   useEffect(() => {
+    chatSocket.on("leaveRoom", () => {
+      setIsSendMess(false);
+    });
+  }, [chatSocket]);
+
+  useEffect(() => {
     chatSocket.on("deleteMessage", (message) => {
       setMessages((prepMess) => {
         const index = prepMess.findIndex((mess) => mess._id === message._id);
@@ -53,25 +58,21 @@ const ChatGroup = (props) => {
   }, [chatSocket, dispatch]);
 
   useEffect(() => {
-    chatSocket.on("leaveRoom", () => {
-      setIsSendMess(false);
-    });
-  }, [chatSocket]);
-
-  useEffect(() => {
-    chatSocket.on("receiveGroupMessage", (message) => {
+    chatSocket.on("receiveMessage", (message) => {
+      console.log(message);
       dispatch(fetchConversation());
       setIsSendMess(true);
       setMessages((preMessages) => [...preMessages, message]);
     });
   }, [chatSocket, dispatch]);
 
-  const sendMessage = (e, replyContent = "") => {
+  const sendMessage = (e, replyContent = "", message, files) => {
     try {
       e.preventDefault();
-      if (message) {
+      if (message || files.images.length !== 0) {
         const newMesage = {
           content: message,
+          files,
           sender: props.user,
           messageDate: new Date(Date.now()),
           reply: replyContent,
@@ -82,15 +83,13 @@ const ChatGroup = (props) => {
           {
             message: newMesage,
             room: props.room,
-            type: "group",
           },
           (error, message) => {
             if (error) {
               return setError(error);
             }
             setMessages((preMess) => [...preMess, message]);
-            dispatch(fetchConversation());
-            return setMessage("");
+            return dispatch(fetchConversation());
           }
         );
       }
@@ -112,18 +111,14 @@ const ChatGroup = (props) => {
         {!isFetch && !isSendMess ? (
           <InfoBarLoading />
         ) : (
-          <ChatGroupMain
+          <Main
             messages={messages}
             setMessages={setMessages}
             room={props.room}
             isGroup={props.groupName !== "" ? true : false}
           />
         )}
-        <ChatGroupFooter
-          members={props.members}
-          onSendMessage={sendMessage}
-          onSetMessage={setMessage}
-        />
+        <ChatFooter members={props.members} onSendMessage={sendMessage} />
       </CardMsger>
     </CardGroup>
   );

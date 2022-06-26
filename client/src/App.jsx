@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Chat from "./components/Chat/Chat";
 import MeetingRoom from "./components/Friends/MeetingRoom/MeetingRoom";

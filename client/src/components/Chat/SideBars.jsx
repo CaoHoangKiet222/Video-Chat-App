@@ -167,6 +167,7 @@ const SideBars = (props) => {
                           senderName={sender?.userId.name}
                           content={lastMessage?.content}
                           messageDate={lastMessage?.messageDate}
+                          imagesLength={lastMessage?.files?.images?.length}
                           room={_id}
                         />
                       );

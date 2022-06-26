@@ -21,7 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { LoadingSpinner } from "../UI/Loading";
 import { FiFacebook, FiTwitter } from "react-icons/fi";
 import { IoLogoGoogle } from "react-icons/io5";
-import { fetchLogin, fetchSession } from "../../store/user-creator";
+import { fetchLogin } from "../../store/user-creator";
 import { Fade, Flip } from "react-awesome-reveal";
 import Error from "../UI/Error";
 

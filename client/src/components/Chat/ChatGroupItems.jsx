@@ -41,7 +41,13 @@ const ChatGroupItems = (props) => {
             </div>
           </ChatInfo>
           <ChatGroupText>
-            <p>{props.senderName && props.senderName + ": " + props.content}</p>
+            {props.imagesLength !== 0 && props.content === "" ? (
+              <p>{props.senderName && props.senderName + ": send images"}</p>
+            ) : (
+              <p>
+                {props.senderName && props.senderName + ": " + props.content}
+              </p>
+            )}
           </ChatGroupText>
         </ChatGroupContent>
       </Link>
