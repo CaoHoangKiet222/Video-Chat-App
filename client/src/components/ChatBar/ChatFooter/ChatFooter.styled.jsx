@@ -143,7 +143,7 @@ export const ReplyForm = styled.div`
   }
 `;
 
-export const ImgPreview = styled.div`
+export const FilesContent = styled.div`
   position: absolute;
   background-color: #323333;
   width: 100%;
@@ -156,10 +156,11 @@ export const ImgPreview = styled.div`
   left: 0;
 
   .container {
-    .content-image {
+    .content {
       display: flex;
 
-      .upload-another-image {
+      .upload-another-image,
+      .upload-another-attach {
         width: 68px;
         height: 68px;
         font-size: 2.7rem;
@@ -175,6 +176,78 @@ export const ImgPreview = styled.div`
           color: #b0b3b8;
           background-color: #3e4042;
           border-radius: 10px;
+          cursor: pointer;
+
+          &:hover {
+            color: #fff;
+            background-color: #8a8d91;
+          }
+        }
+      }
+
+      .attachments {
+        width: 210px;
+        height: 68px;
+        border-radius: 10px;
+        margin: 0px 12px;
+        position: relative;
+        background-color: #d6d9dd;
+
+        .content-attachment {
+          display: flex;
+          padding: 4px 8px;
+          width: 100%;
+          height: 100%;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.9375rem;
+
+          .attachment {
+            margin-left: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            word-wrap: break-word;
+            position: relative;
+            line-height: 1.2em;
+            max-height: 3.6em;
+            text-align: justify;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 69%;
+          }
+
+          .icon {
+            background-color: #242526;
+            border-radius: 50%;
+            padding-left: 7px;
+            min-width: 45px;
+            min-height: 45px;
+            display: flex;
+            justify-items: center;
+            align-items: center;
+
+            svg {
+              font-size: 30px;
+            }
+          }
+        }
+
+        .close-btn {
+          position: absolute;
+          top: -14px;
+          right: -13px;
+          font-size: 1.7rem;
+          color: #b0b3b8;
+          background-color: #3e4042;
+          border-radius: 50%;
+          width: 35px;
+          height: 35px;
+          cursor: pointer;
+
+          svg {
+            position: relative;
+            left: 4px;
+          }
 
           &:hover {
             color: #fff;

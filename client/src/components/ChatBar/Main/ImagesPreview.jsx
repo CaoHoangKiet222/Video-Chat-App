@@ -30,9 +30,9 @@ const FormImg = styled.div`
       cursor: pointer;
 
       img {
-        max-width: 70px;
-        max-height: 70px;
-        min-height: 70px;
+        max-width: 90px;
+        max-height: 90px;
+        min-height: 90px;
         border-radius: 10px;
         width: 100%;
         height: 100%;

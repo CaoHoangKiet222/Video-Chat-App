@@ -13,7 +13,6 @@ exports = module.exports = (socket, type, io = null) => {
             path: "members.userId messages.senderId messages.files",
           });
 
-          console.log(conv.messages);
           callback(conv.messages);
 
           socket.join(room);

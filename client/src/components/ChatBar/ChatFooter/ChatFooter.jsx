@@ -10,13 +10,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { replyActions } from "../../../store/reply-slice";
 import { closeComponent } from "../../../utilities/utilities";
 import EmojiPicker from "../../UI/EmojiPicker";
-import { ImgPreview, InputForm, ReplyForm } from "./ChatFooter.styled";
+import { FilesContent, InputForm, ReplyForm } from "./ChatFooter.styled";
+import { AiFillFileText } from "react-icons/ai";
+import { BsFiles } from "react-icons/bs";
 
 const ChatFooter = (props) => {
   const inputValue = useRef("");
   const [closeRepForm, setCloseRepForm] = useState(true);
   const [clickEmoji, setClickEmoji] = useState(false);
   const [imagesPreview, setImagesPreview] = useState([]);
+  const [attachments, setAttachments] = useState([]);
   const reply = useSelector((state) => state.reply.reply);
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
@@ -66,6 +69,7 @@ const ChatFooter = (props) => {
   const closeHandler = () => {
     setCloseRepForm(true);
     setImagesPreview([]);
+    setAttachments([]);
     dispatch(replyActions.setReply({ reply: null }));
   };
 
@@ -73,21 +77,28 @@ const ChatFooter = (props) => {
     inputValue.current.value += e.native;
   };
 
-  const hadleMultipleImgages = (e) => {
+  const handleMultipleFiles = (e, type) => {
     for (const file of e.target.files) {
       const fReader = new FileReader();
       fReader.readAsDataURL(file);
       fReader.onload = (event) => {
-        setImagesPreview((preImgs) => [...preImgs, event.target.result]);
+        if (type === "images-preview") {
+          setImagesPreview((preImgs) => [...preImgs, event.target.result]);
+        } else if (type === "attachments") {
+          setAttachments((preAttachs) => [...preAttachs, event.target.result]);
+        }
       };
     }
   };
 
-  const closeImageHandler = (index) => {
-    setImagesPreview((preImgs) => {
-      preImgs.splice(index, 1);
-      return [...preImgs];
-    });
+  const closeFilesHandler = (index, type) => {
+    if (type === "images-preview") {
+      setImagesPreview((preImgs) => {
+        preImgs.splice(index, 1);
+        return [...preImgs];
+      });
+    } else if (type === "attachments") {
+    }
   };
 
   return (
@@ -113,10 +124,46 @@ const ChatFooter = (props) => {
           </div>
         </ReplyForm>
       )}
+      <FilesContent>
+        <div className="container">
+          <div className="content">
+            <div className="attachments">
+              <div className="content-attachment">
+                <div className="icon">
+                  <AiFillFileText />
+                </div>
+                <div className="attachment">
+                  ssswmmmmmmmmmmsssssssssssssssssssssss
+                </div>
+              </div>
+              <div
+                className="close-btn"
+                onClick={() => {
+                  // closeFilesHandler(index, "attachments");
+                }}
+              >
+                <IoClose />
+              </div>
+            </div>
+            <div className="upload-another-attach">
+              <label htmlFor="uploadAnotherAttach">
+                <BsFiles />
+              </label>
+              <input
+                type="file"
+                id="uploadAnotherAttach"
+                multiple
+                style={{ display: "none" }}
+                onChange={(e) => handleMultipleFiles(e, "attachments")}
+              />
+            </div>
+          </div>
+        </div>
+      </FilesContent>
       {imagesPreview.length !== 0 && (
-        <ImgPreview>
+        <FilesContent>
           <div className="container">
-            <div className="content-image">
+            <div className="content">
               {imagesPreview.map((data, index) => {
                 return (
                   <div className="image" key={index}>
@@ -124,7 +171,7 @@ const ChatFooter = (props) => {
                     <div
                       className="close-btn"
                       onClick={() => {
-                        closeImageHandler(index);
+                        closeFilesHandler(index, "images-preview");
                       }}
                     >
                       <IoClose />
@@ -142,12 +189,12 @@ const ChatFooter = (props) => {
                   id="uploadAnotherImg"
                   multiple
                   style={{ display: "none" }}
-                  onChange={hadleMultipleImgages}
+                  onChange={(e) => handleMultipleFiles(e, "images-preview")}
                 />
               </div>
             </div>
           </div>
-        </ImgPreview>
+        </FilesContent>
       )}
       <div className="container">
         <div
@@ -172,14 +219,20 @@ const ChatFooter = (props) => {
             id="imageAttach"
             style={{ display: "none" }}
             multiple
-            onChange={hadleMultipleImgages}
+            onChange={(e) => handleMultipleFiles(e, "images-preview")}
           />
         </div>
         <div className="file-attach">
           <label htmlFor="fileAttach">
             <ImAttachment />
           </label>
-          <input type="file" id="fileAttach" style={{ display: "none" }} />
+          <input
+            type="file"
+            id="fileAttach"
+            style={{ display: "none" }}
+            multiple
+            onChange={(e) => handleMultipleFiles(e, "attachments")}
+          />
         </div>
         <input
           type={props.type}
