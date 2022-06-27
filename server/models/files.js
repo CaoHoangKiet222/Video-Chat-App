@@ -9,8 +9,8 @@ const filesSchema = new Schema({
   ],
   attachments: [
     {
-      type: String,
-      default: "",
+      type: Schema.Types.Mixed,
+      default: {},
     },
   ],
 });

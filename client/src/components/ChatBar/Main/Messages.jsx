@@ -161,7 +161,18 @@ const Messages = (props) => {
               })}
             </div>
           )}
-          {/* <Attachments isRight={props.isRight} /> */}
+          {props.message.files?.attachments.length !== 0 &&
+            props.message.files.attachments.map((attachment, index) => {
+              return (
+                <Attachments
+                  key={index}
+                  url={attachment.url}
+                  isRight={props.isRight}
+                  fileName={attachment.fileName}
+                  size={attachment.size}
+                />
+              );
+            })}
         </Content>
       </MessageWrap>
       <MessageOptions>

@@ -1,4 +1,8 @@
-const { cloudinary, uploads } = require("../cloudinary/cloudinary");
+const {
+  cloudinary,
+  uploadImgs,
+  uploadAttachments,
+} = require("../cloudinary/cloudinary");
 
 const Conversation = module.require("../models/conversation");
 const Files = module.require("../models/files");
@@ -57,11 +61,20 @@ exports = module.exports = (socket, type, io = null) => {
 
           const uploadedImgsUrl = await Promise.all(
             files.images.map((data) => {
-              return uploads(data, "image-preview");
+              return uploadImgs(data, "image-preview");
             })
           );
-          const newFiles = await new Files({ images: uploadedImgsUrl }).save();
-          console.log(newFiles);
+
+          const uploadedAttachmentsUrl = await Promise.all(
+            files.attachments.map(({ url, fileName }) => {
+              return uploadAttachments({ url, fileName }, "attachments");
+            })
+          );
+
+          const newFiles = await new Files({
+            images: uploadedImgsUrl,
+            attachments: uploadedAttachmentsUrl,
+          }).save();
 
           await Conversation.findOneAndUpdate(
             { _id: room },

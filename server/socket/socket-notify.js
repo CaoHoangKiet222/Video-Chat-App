@@ -27,8 +27,8 @@ exports = module.exports = (socket, type, io = null) => {
       break;
     case "disconnect":
       socket.on(type, async () => {
-        await User.findByIdAndUpdate(socket.userId, { isLoggined: false });
-        socket.broadcast.emit("notifyingUserIsOffline");
+        // await User.findByIdAndUpdate(socket.userId, { isLoggined: false });
+        // socket.broadcast.emit("notifyingUserIsOffline");
         socket.userId = null;
       });
       break;

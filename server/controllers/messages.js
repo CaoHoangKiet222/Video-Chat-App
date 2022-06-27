@@ -1,4 +1,5 @@
 const Conversation = require("../models/conversation");
+const Files = require("../models/files");
 const { getConversation } = require("./user");
 const { cloudinary } = require("../cloudinary/cloudinary");
 
@@ -31,11 +32,27 @@ exports.newGroup = (req, res, _next) => {
 
 exports.deleteMessage = async (req, _res, _next) => {
   try {
-    await Conversation.findByIdAndUpdate(req.body.conversationId, {
-      $pull: {
-        messages: { _id: req.body.message._id },
+    console.log(req.body.message);
+    Conversation.findByIdAndUpdate(
+      req.body.conversationId,
+      {
+        $pull: {
+          messages: { _id: req.body.message._id },
+        },
       },
+      (error, _conversation) => {
+        if (error) {
+          return console.log(error.mesage);
+        }
+      }
+    );
+
+    Files.findByIdAndDelete(req.body.message.files._id, (err, _file) => {
+      if (err) {
+        return console.log(error.message);
+      }
     });
+    // need to destroy cloudinary by public_id
   } catch (error) {
     console.log(error);
   }

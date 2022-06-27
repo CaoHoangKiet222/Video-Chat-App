@@ -13,6 +13,7 @@ import EmojiPicker from "../../UI/EmojiPicker";
 import { FilesContent, InputForm, ReplyForm } from "./ChatFooter.styled";
 import { AiFillFileText } from "react-icons/ai";
 import { BsFiles } from "react-icons/bs";
+import { errorActions } from "../../../store/error-slice";
 
 const ChatFooter = (props) => {
   const inputValue = useRef("");
@@ -61,6 +62,7 @@ const ChatFooter = (props) => {
   const submitHandle = (e) => {
     props.onSendMessage(e, reply, inputValue.current.value, {
       images: imagesPreview,
+      attachments,
     });
     inputValue.current.value = "";
     closeHandler();
@@ -79,13 +81,31 @@ const ChatFooter = (props) => {
 
   const handleMultipleFiles = (e, type) => {
     for (const file of e.target.files) {
+      console.log(file);
+
+      if (file.type === "text/x-c++src") {
+        return dispatch(
+          errorActions.setError({
+            error: true,
+            message: "Cannot upload this file!!!",
+          })
+        );
+      }
+
       const fReader = new FileReader();
       fReader.readAsDataURL(file);
       fReader.onload = (event) => {
         if (type === "images-preview") {
           setImagesPreview((preImgs) => [...preImgs, event.target.result]);
         } else if (type === "attachments") {
-          setAttachments((preAttachs) => [...preAttachs, event.target.result]);
+          setAttachments((preAttachs) => [
+            ...preAttachs,
+            {
+              url: event.target.result,
+              fileName: file.name,
+              size: (file.size / 1024).toFixed(2) + "KB",
+            },
+          ]);
         }
       };
     }
@@ -98,6 +118,10 @@ const ChatFooter = (props) => {
         return [...preImgs];
       });
     } else if (type === "attachments") {
+      setAttachments((preAttachs) => {
+        preAttachs.splice(index, 1);
+        return [...preAttachs];
+      });
     }
   };
 
@@ -124,42 +148,48 @@ const ChatFooter = (props) => {
           </div>
         </ReplyForm>
       )}
-      <FilesContent>
-        <div className="container">
-          <div className="content">
-            <div className="attachments">
-              <div className="content-attachment">
-                <div className="icon">
-                  <AiFillFileText />
-                </div>
-                <div className="attachment">
-                  ssswmmmmmmmmmmsssssssssssssssssssssss
-                </div>
+      {attachments.length !== 0 && (
+        <FilesContent>
+          <div className="container">
+            <div className="content">
+              {attachments.map(({ fileName }, index) => {
+                console.log(fileName);
+                return (
+                  <div className="attachments" key={index}>
+                    <div className="content-attachment">
+                      <div className="icon">
+                        <AiFillFileText />
+                      </div>
+                      <div className="attachment">{fileName}</div>
+                    </div>
+                    <div
+                      className="close-btn"
+                      onClick={() => {
+                        closeFilesHandler(index, "attachments");
+                      }}
+                    >
+                      <IoClose />
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="upload-another-attach">
+                <label htmlFor="uploadAnotherAttach">
+                  <BsFiles />
+                </label>
+                <input
+                  type="file"
+                  id="uploadAnotherAttach"
+                  accept=".xlsx,.xls,.doc, .docx, .ppt, .pptx,.txt, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                  multiple
+                  style={{ display: "none" }}
+                  onChange={(e) => handleMultipleFiles(e, "attachments")}
+                />
               </div>
-              <div
-                className="close-btn"
-                onClick={() => {
-                  // closeFilesHandler(index, "attachments");
-                }}
-              >
-                <IoClose />
-              </div>
-            </div>
-            <div className="upload-another-attach">
-              <label htmlFor="uploadAnotherAttach">
-                <BsFiles />
-              </label>
-              <input
-                type="file"
-                id="uploadAnotherAttach"
-                multiple
-                style={{ display: "none" }}
-                onChange={(e) => handleMultipleFiles(e, "attachments")}
-              />
             </div>
           </div>
-        </div>
-      </FilesContent>
+        </FilesContent>
+      )}
       {imagesPreview.length !== 0 && (
         <FilesContent>
           <div className="container">
@@ -230,6 +260,7 @@ const ChatFooter = (props) => {
             type="file"
             id="fileAttach"
             style={{ display: "none" }}
+            accept=".xlsx,.xls,.doc, .docx, .ppt, .pptx,.txt, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
             multiple
             onChange={(e) => handleMultipleFiles(e, "attachments")}
           />

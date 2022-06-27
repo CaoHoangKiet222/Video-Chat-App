@@ -11,10 +11,10 @@ const Attachments = (props) => {
         </div>
         <div className="attachment-body">
           <h6 className="file-text">
-            <a href="#">sssssssssssssssssssssssssssssss.cpp</a>
+            <a href={props.url}>{props.fileName}</a>
           </h6>
           <div className="payload">
-            <span>14kb</span>
+            <span>{props.size}</span>
           </div>
         </div>
       </div>
@@ -31,7 +31,6 @@ const Attachment = styled.div`
     justify-content: center;
     align-items: center;
     flex-direction: wrap;
-    /* flex-direction: column; */
 
     .btn {
       display: flex;
@@ -65,6 +64,10 @@ const Attachment = styled.div`
           color: #fff;
           overflow-wrap: break-word;
           display: inline-block;
+          text-decoration: none;
+          &:hover {
+            text-decoration: underline;
+          }
         }
       }
 
