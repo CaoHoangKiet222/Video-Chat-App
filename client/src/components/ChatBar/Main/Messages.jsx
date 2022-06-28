@@ -150,7 +150,7 @@ const Messages = (props) => {
 
           {props.message.files?.images.length !== 0 && (
             <div className="images-row">
-              {props.message.files?.images.map((url, index) => {
+              {props.message.files?.images.map(({ url }, index) => {
                 return (
                   <ImagesPreview
                     url={url}
@@ -162,7 +162,7 @@ const Messages = (props) => {
             </div>
           )}
           {props.message.files?.attachments.length !== 0 &&
-            props.message.files.attachments.map((attachment, index) => {
+            props.message.files?.attachments.map((attachment, index) => {
               return (
                 <Attachments
                   key={index}

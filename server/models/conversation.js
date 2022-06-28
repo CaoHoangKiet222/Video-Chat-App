@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
 
 const conversationSchema = new Schema({
   groupImg: {
@@ -19,6 +20,10 @@ const conversationSchema = new Schema({
   ],
   messages: [
     {
+      _id: {
+        type: String,
+        default: uuidv4(),
+      },
       content: {
         type: String,
         default: "",

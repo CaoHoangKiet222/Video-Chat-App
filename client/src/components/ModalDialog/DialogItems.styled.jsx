@@ -8,7 +8,7 @@ import {
 import { ChatsList } from "../Chat/SideBars.styled";
 
 export const DialogList = styled(ChatsList)`
-  max-height: ${(props) => (props.newGroup ? "150px" : "400px")};
+  max-height: ${(props) => (props.newGroup ? "350px" : "400px")};
   ${(props) => (props.isForward || props.newGroup) && "padding: 0"};
   ${(props) => props.newGroup && "margin-bottom: 0"}
 `;

@@ -1,4 +1,5 @@
 const cloudinary = require("cloudinary").v2;
+const { v4: uuidv4 } = require("uuid");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -6,18 +7,18 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
-const uploadImgs = (data, folder, fileName = null) => {
+const uploadImgs = (data, folder) => {
   try {
     return new Promise((resolve, reject) => {
       cloudinary.uploader.upload(
         data,
-        { upload_preset: folder, resource_type: "auto", public_id: fileName },
+        { upload_preset: folder, resource_type: "auto" },
         (error, result) => {
           if (error) {
             return reject(error.message);
           }
           console.log(result);
-          resolve(result.url);
+          resolve({ url: result.url, public_id: result.public_id });
         }
       );
     });
@@ -31,7 +32,11 @@ const uploadAttachments = ({ url, fileName }, folder) => {
     return new Promise((resolve, reject) => {
       cloudinary.uploader.upload(
         url,
-        { upload_preset: folder, resource_type: "auto", public_id: fileName },
+        {
+          upload_preset: folder,
+          resource_type: "auto",
+          public_id: uuidv4() + "_" + fileName,
+        },
         (error, result) => {
           if (error) {
             return reject(error.message);
@@ -40,6 +45,7 @@ const uploadAttachments = ({ url, fileName }, folder) => {
           resolve({
             url: result.url,
             fileName,
+            public_id: result.public_id,
             size: (result.bytes / 1024).toFixed(2) + "KB",
           });
         }
@@ -50,8 +56,26 @@ const uploadAttachments = ({ url, fileName }, folder) => {
   }
 };
 
+const destroyAsset = (public_id, resource_type) => {
+  try {
+    cloudinary.uploader.destroy(
+      public_id,
+      { resource_type },
+      function (error, result) {
+        console.log("destroyAsset", result, error);
+        if (error) {
+          return new Error("Destroy asset does not completely!!!");
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   cloudinary,
   uploadImgs,
   uploadAttachments,
+  destroyAsset,
 };

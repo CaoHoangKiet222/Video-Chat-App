@@ -7,6 +7,7 @@ import ChatHeader from "../ChatHeader/ChatHeader";
 import { useDispatch, useSelector } from "react-redux";
 import InfoBarLoading from "./InfoBarLoading";
 import { fetchConversation } from "../../../store/conversations-creator";
+import { v4 as uuid4 } from "uuid";
 let timer;
 
 const InfoBar = (props) => {
@@ -72,6 +73,7 @@ const InfoBar = (props) => {
       e.preventDefault();
       if (message || files.images.length !== 0) {
         const newMesage = {
+          _id: uuid4(),
           content: message,
           files,
           sender: props.user,
@@ -84,6 +86,7 @@ const InfoBar = (props) => {
           {
             message: newMesage,
             room: props.room,
+            type: "single",
           },
           (error, message) => {
             if (error) {

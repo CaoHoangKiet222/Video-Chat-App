@@ -14,6 +14,7 @@ import { FilesContent, InputForm, ReplyForm } from "./ChatFooter.styled";
 import { AiFillFileText } from "react-icons/ai";
 import { BsFiles } from "react-icons/bs";
 import { errorActions } from "../../../store/error-slice";
+import { v4 as uuid4 } from "uuid";
 
 const ChatFooter = (props) => {
   const inputValue = useRef("");
@@ -49,9 +50,9 @@ const ChatFooter = (props) => {
       if (reply.message.senderId._id === user._id) {
         nameRef.current.innerText = "myself";
       } else {
-        nameRef.current.innerText = props.member.name;
+        nameRef.current.innerText = reply.message?.senderId.name;
       }
-      textRef.current.innerText = reply.message.content;
+      textRef.current.innerText = reply.message?.content;
     }
   }, [reply, props, closeRepForm, user]);
 
@@ -96,7 +97,12 @@ const ChatFooter = (props) => {
       fReader.readAsDataURL(file);
       fReader.onload = (event) => {
         if (type === "images-preview") {
-          setImagesPreview((preImgs) => [...preImgs, event.target.result]);
+          setImagesPreview((preImgs) => [
+            ...preImgs,
+            {
+              url: event.target.result,
+            },
+          ]);
         } else if (type === "attachments") {
           setAttachments((preAttachs) => [
             ...preAttachs,
@@ -194,10 +200,10 @@ const ChatFooter = (props) => {
         <FilesContent>
           <div className="container">
             <div className="content">
-              {imagesPreview.map((data, index) => {
+              {imagesPreview.map(({ url }, index) => {
                 return (
                   <div className="image" key={index}>
-                    <img src={data} alt="" />
+                    <img src={url} alt="" />
                     <div
                       className="close-btn"
                       onClick={() => {

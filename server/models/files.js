@@ -3,8 +3,8 @@ const { Schema, model } = require("mongoose");
 const filesSchema = new Schema({
   images: [
     {
-      type: String,
-      default: "",
+      type: Schema.Types.Mixed,
+      default: {},
     },
   ],
   attachments: [

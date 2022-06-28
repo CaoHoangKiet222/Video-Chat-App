@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   ChatsHeader,
   ChatsList,
@@ -15,13 +15,15 @@ import {
   arrangePhoneTime,
   closeComponent,
   getPhoneTime,
-  searchUser,
+  searchToDisplay,
 } from "../../utilities/utilities";
 import SkeletonComponent from "../UI/Skeleton";
 import Profile from "../Profile/Profile";
 import { DropDown, DropDownContent } from "../ChatBar/Main/Main.styled";
 import ModalGroup from "../ModalGroup/ModalGroup";
 import ChatGroupItems from "./ChatGroupItems";
+import ModalDialog from "../ModalDialog/ModalDialog";
+import { forwardActions } from "../../store/forward-slice";
 
 const SideBars = (props) => {
   console.log("SideBars running");
@@ -32,6 +34,9 @@ const SideBars = (props) => {
   const [searchName, setSearchName] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [showModalGroup, setShowModalGroup] = useState(false);
+  const [showModalDialog, setShowModalDialog] = useState(false);
+  const { forward } = useSelector((state) => state.forward);
+  const dispatch = useDispatch();
   const chatsList = useRef(null);
 
   const removeAllBackground = useCallback(() => {
@@ -76,9 +81,24 @@ const SideBars = (props) => {
     setShowModalGroup(true);
   };
 
+  const createNewChatHandler = () => {
+    setShowModalDialog(true);
+    dispatch(
+      forwardActions.setForward({ forward: { isClick: false, message: null } })
+    );
+  };
+
   return (
     <SideBar>
       <ContactsContent>
+        {showModalDialog && (
+          <ModalDialog
+            conversation={conversation?.conv}
+            isForward={forward?.isClick}
+            friends={friends}
+            setShowModalDialog={setShowModalDialog}
+          />
+        )}
         {showModalGroup && (
           <ModalGroup setShowModalGroup={setShowModalGroup} friends={friends} />
         )}
@@ -97,7 +117,7 @@ const SideBars = (props) => {
                     <BiDotsVerticalRounded />
                     {showDropdown && (
                       <DropDownContent translate="translate(-140px, 15px)">
-                        <a href="#">
+                        <a href="#" onClick={createNewChatHandler}>
                           <span>New Chat</span>
                         </a>
                         <a href="#" onClick={createGroupHandler}>
@@ -144,11 +164,15 @@ const SideBars = (props) => {
               ) : (
                 props.header === "Chats" &&
                 conversation?.conv
-                  .filter(({ members }) => {
+                  .filter(({ groupName, members }) => {
+                    if (groupName !== "") {
+                      return searchToDisplay(groupName, searchName);
+                    }
+
                     const { userId: member } = members.find(
                       (member) => member.userId._id !== conversation.user._id
                     );
-                    return searchUser(member, searchName);
+                    return searchToDisplay(member.name, searchName);
                   })
                   .map(({ groupName, groupImg, members, messages, _id }) => {
                     const lastMessage = messages?.slice(-1)[0];
@@ -221,7 +245,7 @@ const SideBars = (props) => {
                 props.header === "Friends" &&
                 friends
                   ?.filter((friend) => {
-                    return searchUser(friend, searchName);
+                    return searchToDisplay(friend.name, searchName);
                   })
                   .map((friend, index) => {
                     if (

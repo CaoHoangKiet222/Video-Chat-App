@@ -6,6 +6,7 @@ import InfoBarLoading from "../ChatBar/InfoBar/InfoBarLoading";
 import Main from "../ChatBar/Main/Main";
 import { CardGroup, CardMsger } from "./ChatGroup.styled";
 import ChatGroupHeader from "./ChatGroupHeader/ChatGroupHeader";
+import { v4 as uuid4 } from "uuid";
 let timer;
 
 const ChatGroup = (props) => {
@@ -44,6 +45,7 @@ const ChatGroup = (props) => {
 
   useEffect(() => {
     chatSocket.on("deleteMessage", (message) => {
+      console.log(message);
       setMessages((prepMess) => {
         const index = prepMess.findIndex((mess) => mess._id === message._id);
         index !== -1 && prepMess.splice(index, 1);
@@ -58,7 +60,8 @@ const ChatGroup = (props) => {
   }, [chatSocket, dispatch]);
 
   useEffect(() => {
-    chatSocket.on("receiveMessage", (message) => {
+    // this is important cannot replace
+    chatSocket.on("receiveGroupMessage", (message) => {
       console.log(message);
       dispatch(fetchConversation());
       setIsSendMess(true);
@@ -71,6 +74,7 @@ const ChatGroup = (props) => {
       e.preventDefault();
       if (message || files.images.length !== 0) {
         const newMesage = {
+          _id: uuid4(),
           content: message,
           files,
           sender: props.user,
@@ -83,6 +87,7 @@ const ChatGroup = (props) => {
           {
             message: newMesage,
             room: props.room,
+            type: "group",
           },
           (error, message) => {
             if (error) {

@@ -23,7 +23,7 @@ const Main = (props) => {
         } else {
           timeChange.current = false;
         }
-        if (message.senderId._id === conversation.user._id) {
+        if (message.senderId?._id === conversation.user?._id) {
           return (
             <Messages
               key={uuidv4()}

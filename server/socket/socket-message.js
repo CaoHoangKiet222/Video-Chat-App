@@ -1,11 +1,6 @@
-const {
-  cloudinary,
-  uploadImgs,
-  uploadAttachments,
-} = require("../cloudinary/cloudinary");
+const { uploadFilesInConversation } = require("../controllers/messages");
 
 const Conversation = module.require("../models/conversation");
-const Files = module.require("../models/files");
 
 exports = module.exports = (socket, type, io = null) => {
   switch (type) {
@@ -37,9 +32,10 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "sendMessage":
-      socket.on(type, async ({ message, room }, callback) => {
+      socket.on(type, async ({ message, room, type }, callback) => {
         try {
           const {
+            _id,
             content,
             files,
             messageDate,
@@ -47,40 +43,30 @@ exports = module.exports = (socket, type, io = null) => {
             reply,
           } = message;
 
-          socket.broadcast.to(room).emit("receiveMessage", {
-            content,
-            files,
-            messageDate,
-            senderId,
-            reply,
-          });
+          // type is important
+          socket.broadcast
+            .to(room)
+            .emit(type === "group" ? "receiveGroupMessage" : "receiveMessage", {
+              _id,
+              content,
+              files,
+              messageDate,
+              senderId,
+              reply,
+            });
 
           console.log(io.adapter.rooms);
 
-          callback(null, { content, files, messageDate, senderId, reply });
+          callback(null, { _id, content, files, messageDate, senderId, reply });
 
-          const uploadedImgsUrl = await Promise.all(
-            files.images.map((data) => {
-              return uploadImgs(data, "image-preview");
-            })
-          );
-
-          const uploadedAttachmentsUrl = await Promise.all(
-            files.attachments.map(({ url, fileName }) => {
-              return uploadAttachments({ url, fileName }, "attachments");
-            })
-          );
-
-          const newFiles = await new Files({
-            images: uploadedImgsUrl,
-            attachments: uploadedAttachmentsUrl,
-          }).save();
+          const newFiles = await uploadFilesInConversation(files);
 
           await Conversation.findOneAndUpdate(
             { _id: room },
             {
               $push: {
                 messages: {
+                  _id,
                   content: content,
                   files: newFiles._id,
                   messageDate: messageDate,
@@ -97,8 +83,30 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "forwardMessage":
-      socket.on(type, ({ message, user, friend }, callback) => {
+      socket.on(type, async ({ message, user, friend }, callback) => {
         try {
+          console.log("forwardMessage", message);
+          const {
+            _id,
+            content,
+            files,
+            messageDate,
+            senderId,
+            reply,
+            isForward,
+          } = message;
+          const newFiles = await uploadFilesInConversation(files);
+          console.log(newFiles);
+          const newMes = {
+            _id,
+            content,
+            isForward,
+            files: newFiles._id,
+            messageDate,
+            senderId: senderId._id,
+            reply,
+          };
+
           Conversation.findOneAndUpdate(
             {
               $and: [
@@ -109,7 +117,7 @@ exports = module.exports = (socket, type, io = null) => {
             },
             {
               $push: {
-                messages: message,
+                messages: newMes,
               },
             },
             { new: true },
@@ -117,7 +125,7 @@ exports = module.exports = (socket, type, io = null) => {
               if (!conversation) {
                 await new Conversation({
                   members: [{ userId: user._id }, { userId: friend._id }],
-                  messages: [message],
+                  messages: [newMes],
                 }).save();
               } else {
                 io.to(conversation._id.toString()).emit(
@@ -128,23 +136,44 @@ exports = module.exports = (socket, type, io = null) => {
               }
               callback();
             }
-          ).populate("messages.senderId");
+          ).populate("messages.senderId messages.files");
         } catch (err) {
           console.log(err);
         }
       });
       break;
     case "forwardGroupMessage":
-      socket.on(type, ({ message, room }, callback) => {
+      socket.on(type, async ({ message, room }, callback) => {
         try {
-          console.log(message, room);
-          Conversation.findOneAndUpdate(
-            {
-              _id: room,
-            },
+          console.log("forwardGroupMessage", message, room);
+
+          const {
+            _id,
+            content,
+            files,
+            messageDate,
+            senderId,
+            reply,
+            isForward,
+          } = message;
+          const newFiles = await uploadFilesInConversation(files);
+          console.log(newFiles);
+
+          const newMes = {
+            _id,
+            content,
+            isForward,
+            files: newFiles._id,
+            messageDate,
+            senderId: senderId._id,
+            reply,
+          };
+
+          Conversation.findByIdAndUpdate(
+            room,
             {
               $push: {
-                messages: message,
+                messages: newMes,
               },
             },
             { new: true },
@@ -155,7 +184,7 @@ exports = module.exports = (socket, type, io = null) => {
               );
               callback();
             }
-          ).populate("messages.senderId");
+          ).populate("messages.senderId messages.files");
         } catch (err) {
           console.log(err);
         }
@@ -163,6 +192,7 @@ exports = module.exports = (socket, type, io = null) => {
       break;
     case "deleteMessage":
       socket.on(type, ({ message, conversationId }, callback) => {
+        console.log("deleteMessage", message);
         socket.broadcast.to(conversationId).emit("deleteMessage", message);
         callback();
       });

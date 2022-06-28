@@ -1,7 +1,12 @@
 const Conversation = require("../models/conversation");
 const Files = require("../models/files");
 const { getConversation } = require("./user");
-const { cloudinary } = require("../cloudinary/cloudinary");
+const {
+  cloudinary,
+  destroyAsset,
+  uploadImgs,
+  uploadAttachments,
+} = require("../cloudinary/cloudinary");
 
 exports.newGroup = (req, res, _next) => {
   try {
@@ -32,7 +37,8 @@ exports.newGroup = (req, res, _next) => {
 
 exports.deleteMessage = async (req, _res, _next) => {
   try {
-    console.log(req.body.message);
+    console.log("deleteMessage", req.body.message);
+
     Conversation.findByIdAndUpdate(
       req.body.conversationId,
       {
@@ -40,19 +46,61 @@ exports.deleteMessage = async (req, _res, _next) => {
           messages: { _id: req.body.message._id },
         },
       },
-      (error, _conversation) => {
+      (error, conversation) => {
+        console.log(conversation);
         if (error) {
-          return console.log(error.mesage);
+          throw new Error(error.message);
         }
-      }
-    );
 
-    Files.findByIdAndDelete(req.body.message.files._id, (err, _file) => {
-      if (err) {
-        return console.log(error.message);
+        Files.findByIdAndDelete(conversation.messages[0].files, (err, file) => {
+          console.log(file);
+          if (err) {
+            throw new Error(error.message);
+          }
+
+          if (!file) {
+            throw new Error("Delete in cloudinary fail!!!");
+          }
+
+          file.images.forEach(({ public_id }) => {
+            destroyAsset(public_id, "image");
+          });
+
+          file.attachments.forEach(({ public_id }) => {
+            destroyAsset(public_id, "raw");
+          });
+        });
       }
+    )
+      .select({ messages: { $elemMatch: { _id: req.body.message._id } } })
+      .populate("messages.files");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.uploadFilesInConversation = (files) => {
+  try {
+    return new Promise(async (resolve) => {
+      const uploadedImgsUrl = await Promise.all(
+        files.images.map(({ url }) => {
+          return uploadImgs(url, "image-preview");
+        })
+      );
+
+      const uploadedAttachmentsUrl = await Promise.all(
+        files.attachments.map(({ url, fileName }) => {
+          return uploadAttachments({ url, fileName }, "attachments");
+        })
+      );
+
+      const newFiles = await new Files({
+        images: uploadedImgsUrl,
+        attachments: uploadedAttachmentsUrl,
+      }).save();
+
+      resolve({ _id: newFiles._id });
     });
-    // need to destroy cloudinary by public_id
   } catch (error) {
     console.log(error);
   }

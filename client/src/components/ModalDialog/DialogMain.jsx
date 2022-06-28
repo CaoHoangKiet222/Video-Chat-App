@@ -15,6 +15,7 @@ import {
   DialogText,
   SentButton,
 } from "./DialogItems.styled";
+import { v4 as uuid4 } from "uuid";
 
 const DialogMain = (props) => {
   const { friend, setNewMembers } = props;
@@ -51,7 +52,9 @@ const DialogMain = (props) => {
             {
               message: {
                 isForward: true,
+                _id: uuid4(),
                 content: forward.message.content,
+                files: forward.message.files,
                 messageDate: new Date(Date.now()),
                 senderId: user,
                 reply: null,
@@ -69,7 +72,9 @@ const DialogMain = (props) => {
             {
               message: {
                 isForward: true,
+                _id: uuid4(),
                 content: forward.message.content,
+                files: forward.message.files,
                 messageDate: new Date(Date.now()),
                 senderId: user,
                 reply: null,

@@ -11,7 +11,9 @@ const Attachments = (props) => {
         </div>
         <div className="attachment-body">
           <h6 className="file-text">
-            <a href={props.url}>{props.fileName}</a>
+            <a href={props.url} download={props.fileName}>
+              {props.fileName}
+            </a>
           </h6>
           <div className="payload">
             <span>{props.size}</span>

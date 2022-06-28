@@ -227,10 +227,10 @@ export const arrangePhoneTime = (array) => {
   return copyArray;
 };
 
-export const searchUser = (user, searchName) => {
+export const searchToDisplay = (name, searchName) => {
   if (
     searchName === "" ||
-    user.name.toLowerCase().indexOf(searchName.toLowerCase()) !== -1
+    name.toLowerCase().indexOf(searchName.toLowerCase()) !== -1
   ) {
     return true;
   }
