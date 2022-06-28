@@ -39,6 +39,14 @@ exports.deleteMessage = async (req, _res, _next) => {
   try {
     console.log("deleteMessage", req.body.message);
 
+    // Conversation.findOne({
+    //   messages: {
+    //     reply: {
+    //
+    //     }
+    //   }
+    // }).select
+
     Conversation.findByIdAndUpdate(
       req.body.conversationId,
       {

@@ -1,4 +1,5 @@
 const { uploadFilesInConversation } = require("../controllers/messages");
+const Reply = require("../models/reply");
 
 const Conversation = module.require("../models/conversation");
 
@@ -9,8 +10,9 @@ exports = module.exports = (socket, type, io = null) => {
       socket.on(type, async (room, callback) => {
         try {
           const conv = await Conversation.findOne({ _id: room }).populate({
-            path: "members.userId messages.senderId messages.files",
+            path: "members.userId messages.senderId messages.files messages.reply",
           });
+          console.log(conv);
 
           callback(conv.messages);
 
@@ -61,6 +63,11 @@ exports = module.exports = (socket, type, io = null) => {
 
           const newFiles = await uploadFilesInConversation(files);
 
+          let newReply = null;
+          if (reply) {
+            newReply = await new Reply({ ...reply }).save();
+          }
+
           await Conversation.findOneAndUpdate(
             { _id: room },
             {
@@ -71,7 +78,7 @@ exports = module.exports = (socket, type, io = null) => {
                   files: newFiles._id,
                   messageDate: messageDate,
                   senderId: senderId._id,
-                  reply: reply,
+                  reply: newReply === null ? null : newReply._id,
                 },
               },
             }

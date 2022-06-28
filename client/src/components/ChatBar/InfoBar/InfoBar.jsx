@@ -68,10 +68,15 @@ const InfoBar = (props) => {
     });
   }, [chatSocket, dispatch]);
 
-  const sendMessage = (e, replyContent = "", message, files) => {
+  const sendMessage = (e, replyContent, message, files) => {
     try {
       e.preventDefault();
       if (message || files.images.length !== 0) {
+        if (replyContent) {
+          replyContent = { ...replyContent };
+          delete replyContent.isClick;
+        }
+
         const newMesage = {
           _id: uuid4(),
           content: message,

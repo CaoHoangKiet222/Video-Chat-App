@@ -47,12 +47,12 @@ const ChatFooter = (props) => {
 
   useEffect(() => {
     if (!closeRepForm) {
-      if (reply.message.senderId._id === user._id) {
+      if (reply.senderId._id === user._id) {
         nameRef.current.innerText = "myself";
       } else {
-        nameRef.current.innerText = reply.message?.senderId.name;
+        nameRef.current.innerText = reply?.senderId.name;
       }
-      textRef.current.innerText = reply.message?.content;
+      textRef.current.innerText = reply?.content;
     }
   }, [reply, props, closeRepForm, user]);
 

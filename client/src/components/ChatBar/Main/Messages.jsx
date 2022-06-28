@@ -81,7 +81,13 @@ const Messages = (props) => {
       replyActions.setReply({
         reply: {
           isClick: true,
-          message: props.message,
+          message_id: props.message._id,
+          content: props.message.content,
+          files: {
+            haveImgs: props.message.files.images.length > 0,
+            haveAttachments: props.message.files.attachments.length > 0,
+          },
+          senderId: props.message.senderId,
         },
       })
     );
@@ -110,25 +116,39 @@ const Messages = (props) => {
             <div className="role">
               <BsReplyAllFill />
               <span>
-                {props.message.reply.message.senderId._id ===
+                {props.message.reply?.senderId._id ===
                 props.message.senderId._id
                   ? props.isRight
                     ? "You replied to yourself"
                     : props.message.senderId.name + " replied to themself"
                   : props.isRight
-                  ? "You replyed to " +
-                    props.message.reply.message.senderId.name
-                  : props.message.reply.message.senderId._id === user._id
+                  ? "You replyed to " + props.message.reply.senderId.name
+                  : props.message.reply.senderId._id === user._id
                   ? props.message.senderId.name + " replyed to you"
                   : props.message.senderId.name +
                     " replyed to " +
-                    props.message.reply.message.senderId.name}
+                    props.message.reply.senderId.name}
+                {/* {props.message.reply.message.senderId._id === */}
+                {/* props.message.senderId._id */}
+                {/*   ? props.isRight */}
+                {/*     ? "You replied to yourself" */}
+                {/*     : props.message.senderId.name + " replied to themself" */}
+                {/*   : props.isRight */}
+                {/*   ? "You replyed to " + */}
+                {/*     props.message.reply.message.senderId.name */}
+                {/*   : props.message.reply.message.senderId._id === user._id */}
+                {/*   ? props.message.senderId.name + " replyed to you" */}
+                {/*   : props.message.senderId.name + */}
+                {/*     " replyed to " + */}
+                {/*     props.message.reply.message.senderId.name} */}
               </span>
             </div>
           </ReplyHeader>
           <ReplyContent isRight={props.isRight}>
             <div className="content">
-              <span>{props.message.reply.message.content}</span>
+              <a href={`#${props.message.reply.message_id}`}>
+                <span>{props.message.reply.content}</span>
+              </a>
             </div>
           </ReplyContent>
         </>
@@ -142,7 +162,7 @@ const Messages = (props) => {
         </ForwardHeader>
       )}
       <MessageWrap>
-        <Content isRight={props.isRight}>
+        <Content isRight={props.isRight} id={props._id}>
           {!props.isRight && props.isGroup && (
             <h6>{props.message.senderId.name}</h6>
           )}
