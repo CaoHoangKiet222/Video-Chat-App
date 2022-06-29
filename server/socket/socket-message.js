@@ -1,18 +1,19 @@
-const { uploadFilesInConversation } = require("../controllers/messages");
+const {
+  uploadFilesInConversation,
+  deleteMessage,
+} = require("../controllers/messages");
 const Reply = require("../models/reply");
 
 const Conversation = module.require("../models/conversation");
 
 exports = module.exports = (socket, type, io = null) => {
   switch (type) {
-    // Use for chat
     case "joinRoom":
       socket.on(type, async (room, callback) => {
         try {
           const conv = await Conversation.findOne({ _id: room }).populate({
             path: "members.userId messages.senderId messages.files messages.reply",
           });
-          console.log(conv);
 
           callback(conv.messages);
 
@@ -202,6 +203,7 @@ exports = module.exports = (socket, type, io = null) => {
         console.log("deleteMessage", message);
         socket.broadcast.to(conversationId).emit("deleteMessage", message);
         callback();
+        deleteMessage(message, conversationId);
       });
       break;
     case "disconnect":

@@ -46,10 +46,19 @@ const ChatGroup = (props) => {
   useEffect(() => {
     chatSocket.on("deleteMessage", (message) => {
       console.log(message);
-      setMessages((prepMess) => {
-        const index = prepMess.findIndex((mess) => mess._id === message._id);
-        index !== -1 && prepMess.splice(index, 1);
-        return [...prepMess];
+      setMessages((preMess) => {
+        const index = preMess.findIndex((mess) => mess._id === message._id);
+        index !== -1 && preMess.splice(index, 1);
+        if (message.reply) {
+          preMess.forEach((mess) => {
+            // console.log(mess);
+            // mess.reply && console.log(mess.reply.message_id, message._id);
+            if (mess.reply !== null && mess.reply.message_id === message._id) {
+              mess.reply = null;
+            }
+          });
+        }
+        return [...preMess];
       });
       dispatch(fetchConversation());
     });
@@ -69,10 +78,18 @@ const ChatGroup = (props) => {
     });
   }, [chatSocket, dispatch]);
 
-  const sendMessage = (e, replyContent = "", message, files) => {
+  const sendMessage = (e, replyContent, message, files) => {
     try {
       e.preventDefault();
-      if (message || files.images.length !== 0) {
+      if (
+        message ||
+        files.images.length !== 0 ||
+        files.attachments.length !== 0
+      ) {
+        if (replyContent) {
+          replyContent = { ...replyContent };
+          delete replyContent.isClick;
+        }
         const newMesage = {
           _id: uuid4(),
           content: message,

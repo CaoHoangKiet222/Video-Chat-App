@@ -15,7 +15,6 @@ import { beforeStartVideo } from "../../../store/video-creator";
 import { errorActions } from "../../../store/error-slice";
 
 const ChatHeader = (props) => {
-  const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
   const { member } = props;
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
@@ -41,7 +40,7 @@ const ChatHeader = (props) => {
     <HeaderBar>
       <Media>
         <Avatar header="Chats" isLoggined={member.isLoggined}>
-          <img src={`${ENDPOINT_CLIENT}/${member.avata}`} alt="" />
+          <img src={`${member.avatar.url}`} alt="" />
         </Avatar>
         <MediaContent>
           <MediaInfo>

@@ -9,9 +9,20 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-  address: {
+  password: {
     type: String,
-    default: "HCM city",
+    required: true,
+  },
+  avatar: {
+    url: {
+      type: String,
+      default:
+        "https://res.cloudinary.com/dv7uhlgru/image/upload/v1656512818/image-profile/user_ifpemd.jpg",
+    },
+    public_id: {
+      type: String,
+      default: "",
+    },
   },
   birth: {
     type: String,
@@ -25,12 +36,25 @@ const userSchema = new Schema({
     type: String,
     default: "Unknow",
   },
-  password: {
+  website: {
     type: String,
-    required: true,
+    default: "Unknow",
   },
-  avata: {
+  facebook: {
     type: String,
+    default: "Unknow",
+  },
+  twitter: {
+    type: String,
+    default: "Unknow",
+  },
+  instagram: {
+    type: String,
+    default: "Unknow",
+  },
+  linkedin: {
+    type: String,
+    default: "Unknow",
   },
   isLoggined: {
     type: Boolean,

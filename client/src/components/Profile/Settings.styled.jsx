@@ -63,7 +63,7 @@ export const Col = styled.div`
   padding: 0 15px;
 `;
 
-export const Card = styled.div`
+export const Card = styled.form`
   background-color: #383f44;
   border: 1px solid #2b2b2f;
   border-radius: 0.25rem;
@@ -176,7 +176,7 @@ export const CardBody = styled.div`
 
 export const FormGroup = styled.div`
   padding: 0 15px;
-  width: ${({ isAddress }) => (isAddress ? "100%" : "50%")};
+  width: 50%;
 
   div {
     width: 100%;

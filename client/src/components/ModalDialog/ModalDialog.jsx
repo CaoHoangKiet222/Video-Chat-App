@@ -41,11 +41,10 @@ const ModalDialog = (props) => {
 
   const handleFile = (e) => {
     // console.log(e.target.files[0]);
-    profilePicture.current = e.target.files[0];
+    // profilePicture.current = e.target.files[0];
     const fReader = new FileReader();
     fReader.readAsDataURL(e.target.files[0]);
     fReader.onload = (event) => {
-      // console.log(event.target.result);
       profilePicture.current = event.target.result;
     };
   };

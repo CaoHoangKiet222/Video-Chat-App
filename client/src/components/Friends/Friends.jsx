@@ -33,8 +33,7 @@ import { beforeStartVideo } from "../../store/video-creator";
 import { errorActions } from "../../store/error-slice";
 
 const Friends = (props) => {
-  const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
-  const { avata, name, _id, isLoggined } = props.friend;
+  const { avatar, name, _id, isLoggined } = props.friend;
   const user = useSelector((state) => state.user.user);
   const error = useRef(null);
   const navigate = useNavigate();
@@ -78,7 +77,7 @@ const Friends = (props) => {
             <Col>
               <Body>
                 <Avatar>
-                  <img src={`${ENDPOINT_CLIENT}/${avata}`} alt="" />
+                  <img src={`${avatar.url}`} alt="" />
                 </Avatar>
                 <Item>
                   <h5>{name}</h5>

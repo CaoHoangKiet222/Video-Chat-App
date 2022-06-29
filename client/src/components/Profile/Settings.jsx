@@ -14,6 +14,9 @@ import {
 import { v4 as uuid4 } from "uuid";
 import { BsFillCircleFill } from "react-icons/bs";
 import { TiTick } from "react-icons/ti";
+import { postData } from "../../utilities/utilities";
+import { useDispatch, useSelector } from "react-redux";
+import { errorActions } from "../../store/error-slice";
 
 const formDisplay = [
   {
@@ -21,21 +24,17 @@ const formDisplay = [
     p: "Update personal & contact information",
     input: [
       {
-        label: "First Name",
+        label: "Name",
         type: "text",
-        placeholder: "Type your first name",
-        required: true,
-      },
-      {
-        label: "Last Name",
-        type: "text",
-        placeholder: "Type your last name",
+        placeholder: "Type your name",
         required: true,
       },
       {
         label: "Phone number",
         type: "tel",
         placeholder: "Type your phone number",
+        pattern: "[0-9]{10}",
+        title: "Ten digits code",
         required: true,
       },
       {
@@ -44,17 +43,19 @@ const formDisplay = [
         placeholder: "mm/dd/yyyy",
         required: true,
       },
-      {
-        label: "Another email address",
-        type: "email",
-        placeholder: "Another email address",
-      },
       { label: "Website", type: "text", placeholder: "Type your website" },
+      {
+        label: "Choose your image",
+        type: "file",
+        accept: "image/*",
+        required: true,
+      },
       {
         label: "Address",
         type: "text",
         placeholder: "Type your address",
         isAddress: true,
+        required: true,
       },
     ],
   },
@@ -92,24 +93,81 @@ const formDisplay = [
         label: "Current Password",
         type: "password",
         placeholder: "Current Password",
+        required: true,
       },
       {
         label: "New Password",
         type: "password",
         placeholder: "New Password",
+        required: true,
       },
       {
         label: "Confirm Password",
         type: "password",
         placeholder: "Confirm Password",
+        required: true,
       },
     ],
   },
 ];
 
 const Settings = () => {
+  const user = useSelector((state) => state.user.user);
   const authRef = useRef(null);
   const alertRef = useRef(null);
+  const accountRef = useRef({});
+  const dispatch = useDispatch();
+
+  const handleInput = (e, label) => {
+    switch (label) {
+      case "Name":
+        accountRef.current.name = e.target.value;
+        break;
+      case "Phone number":
+        accountRef.current.phone = e.target.value;
+        break;
+      case "Birth date":
+        accountRef.current.birth = e.target.value.split("-").join("/");
+        break;
+      case "Website":
+        accountRef.current.website = e.target.value;
+        break;
+      case "Choose your image": {
+        const fReader = new FileReader();
+        fReader.readAsDataURL(e.target.files[0]);
+        fReader.onload = (event) => {
+          accountRef.current.avatar = event.target.result;
+        };
+        break;
+      }
+      case "Address":
+        accountRef.current.address = e.target.value;
+        break;
+      default:
+        break;
+    }
+    console.log(accountRef.current);
+  };
+
+  const handleSaveChange = async (e, h6) => {
+    console.log("sssssssssssssssss", e.target, h6);
+    e.preventDefault();
+    switch (h6) {
+      case "Account":
+        const response = await postData(
+          `${process.env.REACT_APP_ENDPOINT_SERVER}/update-user/account`,
+          "post",
+          { ...accountRef.current, userId: user._id }
+        );
+        dispatch(
+          errorActions.setError({ error: true, message: response.update })
+        );
+        break;
+
+      default:
+        break;
+    }
+  };
 
   return (
     <Setting>
@@ -124,7 +182,7 @@ const Settings = () => {
           <Col>
             {formDisplay.map(({ h6, p, input }) => {
               return (
-                <Card key={uuid4()}>
+                <Card key={uuid4()} onSubmit={(e) => handleSaveChange(e, h6)}>
                   <CardHeader>
                     <h6>{h6}</h6>
                     <p>{p}</p>
@@ -133,13 +191,19 @@ const Settings = () => {
                     <Row>
                       {input.map((item) => {
                         return (
-                          <FormGroup key={uuid4()} isAddress={item.isAddress}>
+                          <FormGroup key={uuid4()}>
                             <div>
                               <label>{item.label}</label>
                               <input
                                 type={item.type}
                                 placeholder={item.placeholder}
                                 required={item.required}
+                                title={item.title}
+                                pattern={item.pattern}
+                                accept={item.accept}
+                                onChange={(e) => {
+                                  handleInput(e, item.label);
+                                }}
                               />
                             </div>
                           </FormGroup>

@@ -19,7 +19,6 @@ import { errorActions } from "../../store/error-slice";
 const Meeting = () => {
   console.log("Meeting running");
   const params = useParams();
-  const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
   const { isReceiving, callee, caller } = useSelector(
     (state) => state.video.call
   );
@@ -134,9 +133,7 @@ const Meeting = () => {
             <ImgWrapper>
               <Avatar>
                 <img
-                  src={`${ENDPOINT_CLIENT}/${
-                    isReceiving ? callee.avata : caller.avata
-                  }`}
+                  src={`${isReceiving ? callee.avatar.url : caller.avatar.url}`}
                   alt=""
                 />
               </Avatar>

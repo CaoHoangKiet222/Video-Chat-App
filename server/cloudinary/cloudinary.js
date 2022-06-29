@@ -7,53 +7,44 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
-const uploadImgs = (data, folder) => {
-  try {
-    return new Promise((resolve, reject) => {
-      cloudinary.uploader.upload(
-        data,
-        { upload_preset: folder, resource_type: "auto" },
-        (error, result) => {
-          if (error) {
-            return reject(error.message);
-          }
-          console.log(result);
-          resolve({ url: result.url, public_id: result.public_id });
+const uploadImgs = (url, folder) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload(
+      url,
+      { upload_preset: folder, resource_type: "auto" },
+      (error, result) => {
+        if (error) {
+          return reject(error.message);
         }
-      );
-    });
-  } catch (error) {
-    console.log(error);
-  }
+        resolve({ url: result.url, public_id: result.public_id });
+      }
+    );
+  });
 };
 
 const uploadAttachments = ({ url, fileName }, folder) => {
-  try {
-    return new Promise((resolve, reject) => {
-      cloudinary.uploader.upload(
-        url,
-        {
-          upload_preset: folder,
-          resource_type: "auto",
-          public_id: uuidv4() + "_" + fileName,
-        },
-        (error, result) => {
-          if (error) {
-            return reject(error.message);
-          }
-
-          resolve({
-            url: result.url,
-            fileName,
-            public_id: result.public_id,
-            size: (result.bytes / 1024).toFixed(2) + "KB",
-          });
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload(
+      url,
+      {
+        upload_preset: folder,
+        resource_type: "auto",
+        public_id: uuidv4() + "_" + fileName,
+      },
+      (error, result) => {
+        if (error) {
+          return reject(error.message);
         }
-      );
-    });
-  } catch (error) {
-    console.log(error);
-  }
+
+        resolve({
+          url: result.url,
+          fileName,
+          public_id: result.public_id,
+          size: (result.bytes / 1024).toFixed(2) + "KB",
+        });
+      }
+    );
+  });
 };
 
 const destroyAsset = (public_id, resource_type) => {

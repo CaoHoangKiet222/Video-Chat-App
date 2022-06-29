@@ -17,7 +17,6 @@ import { RiPhoneLine } from "react-icons/ri";
 const ChatItems = (props) => {
   console.log("ChatItems running");
   const member = props.member;
-  const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
 
   let pathname;
@@ -48,7 +47,7 @@ const ChatItems = (props) => {
       <ChatItem>
         <Link to={pathname}>
           <Avatar header={props.header} isLoggined={member.isLoggined}>
-            <img src={`${ENDPOINT_CLIENT}/${member.avata}`} alt="" />
+            <img src={`${member.avatar.url}`} alt="" />
           </Avatar>
           <ChatContent>
             <ChatInfo>

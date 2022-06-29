@@ -27,7 +27,6 @@ const Main = (props) => {
           return (
             <Messages
               key={uuidv4()}
-              _id={message._id}
               message={message}
               time={message.messageDate}
               timeChange={timeChange.current}
@@ -41,7 +40,6 @@ const Main = (props) => {
         return (
           <Messages
             key={uuidv4()}
-            _id={message._id}
             message={message}
             time={message.messageDate}
             timeChange={timeChange.current}

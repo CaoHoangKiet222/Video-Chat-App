@@ -26,4 +26,6 @@ router.post(
   userController.postUserSignUp
 );
 
+router.post("/update-user/account", userController.updateUserAccount);
+
 module.exports = router;

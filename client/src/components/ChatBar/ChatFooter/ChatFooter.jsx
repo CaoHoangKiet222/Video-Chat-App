@@ -14,7 +14,6 @@ import { FilesContent, InputForm, ReplyForm } from "./ChatFooter.styled";
 import { AiFillFileText } from "react-icons/ai";
 import { BsFiles } from "react-icons/bs";
 import { errorActions } from "../../../store/error-slice";
-import { v4 as uuid4 } from "uuid";
 
 const ChatFooter = (props) => {
   const inputValue = useRef("");
@@ -52,7 +51,12 @@ const ChatFooter = (props) => {
       } else {
         nameRef.current.innerText = reply?.senderId.name;
       }
-      textRef.current.innerText = reply?.content;
+      textRef.current.innerText =
+        reply.content === ""
+          ? reply.files.haveImgs
+            ? "Images"
+            : "Attachment"
+          : reply.content;
     }
   }, [reply, props, closeRepForm, user]);
 

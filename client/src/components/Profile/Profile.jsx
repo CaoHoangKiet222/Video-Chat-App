@@ -13,6 +13,7 @@ import { MdAccessTime } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { userLogout } from "../../store/user-creator";
+import { formatDate } from "../../utilities/utilities";
 import {
   ProfileOptions,
   ProfileAvatar,
@@ -32,6 +33,7 @@ const Profile = () => {
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  console.log(user);
 
   const logoutHandler = () => {
     dispatch(
@@ -50,10 +52,7 @@ const Profile = () => {
           <ProfileCol>
             <ProfileBody>
               <ProfileAvatar>
-                <img
-                  src={`${process.env.REACT_APP_ENDPOINT_CLIENT}/${user?.avata}`}
-                  alt=""
-                />
+                <img src={`${user?.avatar.url}`} alt="" />
               </ProfileAvatar>
               <ProfileItem>
                 <h5>{user?.name}</h5>
@@ -76,28 +75,28 @@ const Profile = () => {
               <ProfileListItem>
                 <div>
                   <p>Local Time</p>
-                  <p>asdfasdfas</p>
+                  <p>{formatDate(Date.now())}</p>
                 </div>
                 <MdAccessTime />
               </ProfileListItem>
               <ProfileListItem>
                 <div>
                   <p>BirthDate</p>
-                  <p>sdfasdfsdf</p>
+                  <p>{user?.birth}</p>
                 </div>
                 <AiOutlineCalendar />
               </ProfileListItem>
               <ProfileListItem>
                 <div>
                   <p>Phone</p>
-                  <p>0982402349</p>
+                  <p>{user?.phone}</p>
                 </div>
                 <IoCallOutline />
               </ProfileListItem>
               <ProfileListItem>
                 <div>
                   <p>Email</p>
-                  <p>caotuankietc3a@gmail.com</p>
+                  <p>{user?.email}</p>
                 </div>
                 <AiOutlineMail />
               </ProfileListItem>
@@ -111,7 +110,7 @@ const Profile = () => {
               <ProfileListItem>
                 <div>
                   <p>Address</p>
-                  <p>34/8/4 No Trang Long</p>
+                  <p>{user?.address}</p>
                 </div>
                 <AiOutlineHome />
               </ProfileListItem>
@@ -129,21 +128,21 @@ const Profile = () => {
               <ProfileListItem>
                 <div>
                   <p>Twitter</p>
-                  <a href="">@kiet.caotuan</a>
+                  <a href="#">@kiet.caotuan</a>
                 </div>
                 <FiTwitter />
               </ProfileListItem>
               <ProfileListItem>
                 <div>
                   <p>Instagram</p>
-                  <a href="">@kiet.caotuan</a>
+                  <a href="#">@kiet.caotuan</a>
                 </div>
                 <FiInstagram />
               </ProfileListItem>
               <ProfileListItem>
                 <div>
                   <p>Linkedin</p>
-                  <a href="">@kiet.caotuan</a>
+                  <a href="#">@kiet.caotuan</a>
                 </div>
                 <FiLinkedin />
               </ProfileListItem>

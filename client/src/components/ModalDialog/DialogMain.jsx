@@ -19,7 +19,6 @@ import { v4 as uuid4 } from "uuid";
 
 const DialogMain = (props) => {
   const { friend, setNewMembers } = props;
-  const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
   const dispatch = useDispatch();
   const { forward } = useSelector((state) => state.forward);
   const chatSocket = useSelector((state) => state.socket.chatSocket);
@@ -163,11 +162,7 @@ const DialogMain = (props) => {
           <>
             <Avatar isLoggined={friend?.isLoggined} header="Chats">
               <img
-                src={
-                  props.groupImg
-                    ? props.groupImg
-                    : `${ENDPOINT_CLIENT}/${friend.avata}`
-                }
+                src={props.groupImg ? props.groupImg : `${friend.avatar.url}`}
                 alt=""
               />
             </Avatar>

@@ -38,7 +38,6 @@ const Chat = () => {
   const [showModalDialog, setShowModalDialog] = useState(false);
   const { notifySocket, meetingSocket } = useSelector((state) => state.socket);
   const navigate = useNavigate();
-  const CLIENT_ENDPOINT = process.env.REACT_APP_ENDPOINT_CLIENT;
 
   useEffect(() => {
     dispatch(fetchConversation());
@@ -53,7 +52,7 @@ const Chat = () => {
   }, [forward]);
 
   useEffect(() => {
-    if (user?.name || user?.avata) {
+    if (user?.name || user?.avatar) {
       setTimeout(() => {
         setIsLoading(false);
       }, 500);
@@ -260,7 +259,7 @@ const Chat = () => {
                   ) : (
                     <>
                       <div className="avatar">
-                        <img src={`${CLIENT_ENDPOINT}/${user?.avata}`} alt="" />
+                        <img src={`${user?.avatar.url}`} alt="" />
                       </div>
                       <h5>Welcome, {user?.name}!</h5>
                       <p>Please select a chat to start messaging.</p>

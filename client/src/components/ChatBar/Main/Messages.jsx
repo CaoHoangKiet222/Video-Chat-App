@@ -25,7 +25,11 @@ import {
   IoReturnUpBack,
 } from "react-icons/io5";
 import { AiOutlineStar } from "react-icons/ai";
-import { RiDeleteBinLine, RiShareForwardFill } from "react-icons/ri";
+import {
+  RiAttachment2,
+  RiDeleteBinLine,
+  RiShareForwardFill,
+} from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { replyActions } from "../../../store/reply-slice";
@@ -34,13 +38,14 @@ import { forwardActions } from "../../../store/forward-slice";
 import { fetchConversation } from "../../../store/conversations-creator";
 import ImagesPreview from "./ImagesPreview";
 import Attachments from "./Attachments";
+import { ImImages } from "react-icons/im";
 
 const Messages = (props) => {
   const [showMenu, setShowMenu] = useState(false);
   const chatSocket = useSelector((state) => state.socket.chatSocket);
   const { user } = useSelector((state) => state.user);
-  const ENDPOINT_SERVER = process.env.REACT_APP_ENDPOINT_SERVER;
   const dispatch = useDispatch();
+  // console.log(props.message);
 
   useEffect(() => {
     return closeComponent(showMenu, setShowMenu);
@@ -51,6 +56,7 @@ const Messages = (props) => {
   };
 
   const deleteHandler = async () => {
+    console.log(props.message);
     chatSocket.emit(
       "deleteMessage",
       {
@@ -58,22 +64,36 @@ const Messages = (props) => {
         conversationId: props.conversationId,
       },
       () => {
-        props.setMessages((prepMess) => {
-          prepMess.splice(
-            prepMess.findIndex((mess) => mess._id === props.message._id),
+        props.setMessages((preMess) => {
+          preMess.splice(
+            preMess.findIndex((mess) => mess._id === props.message._id),
             1
           );
-          return [...prepMess];
+          preMess.forEach((mess) => {
+            console.log(mess);
+            mess.reply && console.log(mess.reply.message_id, props.message._id);
+            if (
+              mess.reply !== null &&
+              mess.reply.message_id === props.message._id
+            ) {
+              mess.reply = null;
+            }
+          });
+          return [...preMess];
         });
 
         dispatch(fetchConversation());
       }
     );
 
-    await postData(`${ENDPOINT_SERVER}/delete-message`, "delete", {
-      message: props.message,
-      conversationId: props.conversationId,
-    });
+    // await postData(
+    //   `${process.env.REACT_APP_ENDPOINT_SERVER}/delete-message`,
+    //   "delete",
+    //   {
+    //     message: props.message,
+    //     conversationId: props.conversationId,
+    //   }
+    // );
   };
 
   const replyHandler = () => {
@@ -106,7 +126,7 @@ const Messages = (props) => {
   };
 
   return (
-    <Message isRight={props.isRight}>
+    <Message isRight={props.isRight} id={props.message._id}>
       {props.timeChange && (
         <Divider data-label={formatDate(props.time)}></Divider>
       )}
@@ -128,26 +148,25 @@ const Messages = (props) => {
                   : props.message.senderId.name +
                     " replyed to " +
                     props.message.reply.senderId.name}
-                {/* {props.message.reply.message.senderId._id === */}
-                {/* props.message.senderId._id */}
-                {/*   ? props.isRight */}
-                {/*     ? "You replied to yourself" */}
-                {/*     : props.message.senderId.name + " replied to themself" */}
-                {/*   : props.isRight */}
-                {/*   ? "You replyed to " + */}
-                {/*     props.message.reply.message.senderId.name */}
-                {/*   : props.message.reply.message.senderId._id === user._id */}
-                {/*   ? props.message.senderId.name + " replyed to you" */}
-                {/*   : props.message.senderId.name + */}
-                {/*     " replyed to " + */}
-                {/*     props.message.reply.message.senderId.name} */}
               </span>
             </div>
           </ReplyHeader>
           <ReplyContent isRight={props.isRight}>
             <div className="content">
               <a href={`#${props.message.reply.message_id}`}>
-                <span>{props.message.reply.content}</span>
+                {props.message.reply.content !== "" ? (
+                  <span>{props.message.reply.content}</span>
+                ) : props.message.reply.files.haveImgs ? (
+                  <span>
+                    Images
+                    <ImImages />
+                  </span>
+                ) : (
+                  <span>
+                    Attachment
+                    <RiAttachment2 />
+                  </span>
+                )}
               </a>
             </div>
           </ReplyContent>
@@ -162,7 +181,7 @@ const Messages = (props) => {
         </ForwardHeader>
       )}
       <MessageWrap>
-        <Content isRight={props.isRight} id={props._id}>
+        <Content isRight={props.isRight}>
           {!props.isRight && props.isGroup && (
             <h6>{props.message.senderId.name}</h6>
           )}

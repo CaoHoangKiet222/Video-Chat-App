@@ -15,8 +15,7 @@ import { CallLogs, Calls, Container, Main } from "./CallDetails.styled";
 import CallItem from "./CallItem";
 
 const CallDetails = (props) => {
-  const ENDPOINT_CLIENT = process.env.REACT_APP_ENDPOINT_CLIENT;
-  const { avata, name, phone } = props.contactMem;
+  const { avatar, name, phone } = props.contactMem;
   // console.log(arrangePhoneTime(props.calls));
 
   return (
@@ -27,7 +26,7 @@ const CallDetails = (props) => {
             <Col>
               <Body>
                 <Avatar>
-                  <img src={`${ENDPOINT_CLIENT}/${avata}`} alt="" />
+                  <img src={`${avatar.url}`} alt="" />
                 </Avatar>
                 <Item>
                   <h5>{name}</h5>

@@ -3,6 +3,7 @@ const Conversation = require("../models/conversation");
 const bcryptjs = require("bcryptjs");
 const { validationResult } = require("express-validator");
 const { sortName } = require("../utilities/utilities");
+const { uploadImgs, destroyAsset } = require("../cloudinary/cloudinary");
 
 exports.getCall = async (req, res, _next) => {
   try {
@@ -136,7 +137,7 @@ exports.postUserLogin = async (req, res, _next) => {
       (_error, user) => {
         req.session.user = user;
         req.session.isLoggined = true;
-        req.session.isRemember = req.body.rememberToLogin;
+        // req.session.isRemember = req.body.rememberToLogin;
         req.session.save((err) => {
           if (err) {
             return console.log(err);
@@ -187,7 +188,7 @@ exports.postUserSignUp = async (req, res, _next) => {
       name: req.body.email.split("@")[0],
       email: req.body.email,
       password: hashedPassword,
-      avata: "images/user.jpg",
+      avatar: "images/user.jpg",
       lastOnline: new Date(Date.now()),
     });
 
@@ -210,5 +211,44 @@ exports.checkAuthUser = (req, res, _next) => {
     res.json({ isAuth: true });
   } catch (error) {
     res.send({ error: error.message });
+  }
+};
+
+exports.updateUserAccount = async (req, res, _next) => {
+  try {
+    let { name, avatar, birth, phone, website, userId } = req.body;
+
+    if (avatar) {
+      avatar = await uploadImgs(avatar, "image-profile");
+      console.log(avatar);
+    }
+
+    const user = await User.findById(userId).select("avatar");
+    console.log(user);
+    destroyAsset(user.avatar.public_id, "image");
+
+    User.findOneAndUpdate(
+      { _id: userId },
+      {
+        name,
+        avatar,
+        birth,
+        phone,
+        website,
+      },
+      { new: true },
+      (error, newUser) => {
+        if (error) {
+          return new Error("Update user account fail!!!");
+        }
+        console.log(newUser);
+        req.session.user = newUser;
+        req.session.isLoggined = true;
+        req.session.reload((error) => console.log(error));
+      }
+    );
+    res.json({ update: "Update done. You need to login again!!!" });
+  } catch (err) {
+    console.log(err);
   }
 };

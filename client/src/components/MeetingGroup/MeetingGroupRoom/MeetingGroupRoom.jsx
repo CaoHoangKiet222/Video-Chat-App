@@ -74,7 +74,7 @@ const MeetingGroupRoom = () => {
   const calleeInfo = useMemo(() => {
     return {
       name: "kkkkkkkkkkkk",
-      avata: "/images/user.jpg",
+      avatar: "/images/user.jpg",
     };
   }, []);
 
@@ -313,7 +313,7 @@ const MeetingGroupRoom = () => {
               </PanelControl>
               <Peers showTop={showTop}>
                 {streams.map(({ stream, peerId }, index) => {
-                  const { name, showVideo, avata, muteSound, isShare } =
+                  const { name, showVideo, avatar, muteSound, isShare } =
                     peers.find((peer) => peer.peerId === peerId);
                   return (
                     <VideoTopDisplay
@@ -323,7 +323,7 @@ const MeetingGroupRoom = () => {
                       muteSound={muteSound}
                       showVideo={showVideo}
                       name={name}
-                      avata={avata}
+                      avatar={avatar}
                       isShare={isShare}
                     />
                   );
@@ -348,7 +348,7 @@ const MeetingGroupRoom = () => {
         </MeetingTopControls>
         <Streams isGroup={true} changeScale={changeScale} showTop={showTop}>
           {streams.map(({ stream, peerId }, index) => {
-            const { name, showVideo, avata, muteSound, isShare } = peers.find(
+            const { name, showVideo, avatar, muteSound, isShare } = peers.find(
               (peer) => peer.peerId === peerId
             );
             console.log(isShare);
@@ -362,7 +362,7 @@ const MeetingGroupRoom = () => {
                     muteSound={muteSound}
                     showVideo={showVideo}
                     name={name}
-                    avata={avata}
+                    avatar={avatar}
                     isShare={isShare}
                   />
                 </VideoStyle>

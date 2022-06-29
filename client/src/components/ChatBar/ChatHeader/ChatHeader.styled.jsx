@@ -7,7 +7,7 @@ export const HeaderBar = styled.header`
   width: 100%;
 
   // check here
-  height: 89px;
+  height: 99px;
   min-height: 4vh;
   z-index: 1;
 

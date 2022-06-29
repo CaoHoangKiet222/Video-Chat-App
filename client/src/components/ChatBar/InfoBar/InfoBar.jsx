@@ -46,10 +46,18 @@ const InfoBar = (props) => {
 
   useEffect(() => {
     chatSocket.on("deleteMessage", (message) => {
-      setMessages((prepMess) => {
-        const index = prepMess.findIndex((mess) => mess._id === message._id);
-        index !== -1 && prepMess.splice(index, 1);
-        return [...prepMess];
+      console.log(message);
+      setMessages((preMess) => {
+        const index = preMess.findIndex((mess) => mess._id === message._id);
+        index !== -1 && preMess.splice(index, 1);
+        preMess.forEach((mess) => {
+          console.log(mess);
+          mess.reply && console.log(mess.reply.message_id, message._id);
+          if (mess.reply !== null && mess.reply.message_id === message._id) {
+            mess.reply = null;
+          }
+        });
+        return [...preMess];
       });
       dispatch(fetchConversation());
     });
@@ -71,7 +79,11 @@ const InfoBar = (props) => {
   const sendMessage = (e, replyContent, message, files) => {
     try {
       e.preventDefault();
-      if (message || files.images.length !== 0) {
+      if (
+        message ||
+        files.images.length !== 0 ||
+        files.attachments.length !== 0
+      ) {
         if (replyContent) {
           replyContent = { ...replyContent };
           delete replyContent.isClick;

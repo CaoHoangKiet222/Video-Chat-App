@@ -130,6 +130,7 @@ const Login = (props) => {
                     name="email"
                     placeholder="Email Address"
                     value={email}
+                    required
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </FormGroup>
@@ -139,6 +140,7 @@ const Login = (props) => {
                     name="password"
                     placeholder="Password"
                     value={password}
+                    required
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </FormGroup>
@@ -149,6 +151,7 @@ const Login = (props) => {
                       name="confirmPassword"
                       placeholder="Confirm Password"
                       value={confirmPass}
+                      required
                       onChange={(e) => setConfirmPass(e.target.value)}
                     />
                   </FormGroup>

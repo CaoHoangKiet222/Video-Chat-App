@@ -4,7 +4,7 @@ import CommonPeer from "../../Friends/MeetingRoom/CommonPeer";
 
 const VideoDisplay = ({
   name,
-  avata,
+  avatar,
   showTop,
   showVideo,
   stream,
@@ -40,7 +40,7 @@ const VideoDisplay = ({
             width="120px"
             type="video-container"
             name={name}
-            avata={avata}
+            avatar={avatar}
             displayText={
               !muteSound
                 ? !showVideo

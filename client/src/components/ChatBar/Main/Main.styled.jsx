@@ -6,7 +6,8 @@ export const MessageContainer = styled(ScrollToBottom)`
   padding: 0.75rem;
   width: 100%;
   max-width: 1320px;
-  margin: 0 auto;
+  /* margin: 0 auto; */
+  margin: 3rem auto 24px auto;
   // max-height: 84vh;
 
   & > div {
@@ -20,7 +21,7 @@ export const MessageContainer = styled(ScrollToBottom)`
   }
 
   @media (max-width: 1200px) {
-    margin-top: 15px;
+    margin-top: 3rem;
   }
 
   @media (min-width: 1200px) {
@@ -232,6 +233,7 @@ export const ReplyContent = styled.div`
     align-items: center;
 
     span {
+      font-style: italic;
       position: relative;
       height: auto;
       background-color: #4e4f5030;
@@ -245,6 +247,12 @@ export const ReplyContent = styled.div`
       max-width: 25rem;
       left: ${(props) => (props.isRight ? "42px" : "-23px")};
       bottom: -8px;
+
+      svg {
+        margin-left: 8px;
+        position: relative;
+        top: 2px;
+      }
     }
   }
 `;

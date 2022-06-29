@@ -4,7 +4,7 @@ import CommonPeer from "../../Friends/MeetingRoom/CommonPeer";
 
 const VideoTopDisplay = ({
   name,
-  avata,
+  avatar,
   showTop,
   showVideo,
   stream,
@@ -12,7 +12,7 @@ const VideoTopDisplay = ({
   isShare,
 }) => {
   const userVideo = useRef(null);
-  console.log(name, avata, showVideo);
+  console.log(name, avatar, showVideo);
 
   useEffect(() => {
     if (showVideo || stream) {
@@ -41,7 +41,7 @@ const VideoTopDisplay = ({
             width="40px"
             type="peer-info"
             name={name}
-            avata={avata}
+            avatar={avatar}
             className="main-peer"
             displayText={muteSound ? "Spectator!" : "Audio Only!"}
           />
