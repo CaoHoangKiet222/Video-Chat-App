@@ -33,7 +33,21 @@ import { beforeStartVideo } from "../../store/video-creator";
 import { errorActions } from "../../store/error-slice";
 
 const Friends = (props) => {
-  const { avatar, name, _id, isLoggined } = props.friend;
+  const {
+    avatar,
+    name,
+    _id,
+    isLoggined,
+    birth,
+    phone,
+    email,
+    website,
+    facebook,
+    address,
+    twitter,
+    instagram,
+    linkedin,
+  } = props.friend;
   const user = useSelector((state) => state.user.user);
   const error = useRef(null);
   const navigate = useNavigate();
@@ -109,35 +123,35 @@ const Friends = (props) => {
                 <ListItem>
                   <div>
                     <p>BirthDate</p>
-                    <p>{}</p>
+                    <p>{birth}</p>
                   </div>
                   <AiOutlineCalendar />
                 </ListItem>
                 <ListItem>
                   <div>
                     <p>Phone</p>
-                    <p>0982402349</p>
+                    <p>{phone}</p>
                   </div>
                   <IoCallOutline />
                 </ListItem>
                 <ListItem>
                   <div>
                     <p>Email</p>
-                    <p>caotuankietc3a@gmail.com</p>
+                    <p>{email}</p>
                   </div>
                   <AiOutlineMail />
                 </ListItem>
                 <ListItem>
                   <div>
                     <p>Website</p>
-                    <p>www.caotuankiet.com</p>
+                    <p>{website}</p>
                   </div>
                   <HiOutlineGlobe />
                 </ListItem>
                 <ListItem>
                   <div>
                     <p>Address</p>
-                    <p>34/8/4 No Trang Long</p>
+                    <p>{address}</p>
                   </div>
                   <AiOutlineHome />
                 </ListItem>
@@ -146,30 +160,28 @@ const Friends = (props) => {
                 <ListItem>
                   <div>
                     <p>Facebook</p>
-                    <a href="https://www.facebook.com/kiet.caohoang.35">
-                      @kiet.caotuan
-                    </a>
+                    <a href={facebook}>{facebook.split("/").splice(-1)[0]}</a>
                   </div>
                   <FiFacebook />
                 </ListItem>
                 <ListItem>
                   <div>
                     <p>Twitter</p>
-                    <a href="">@kiet.caotuan</a>
+                    <a href={twitter}>{twitter.split("/").splice(-1)[0]}</a>
                   </div>
                   <FiTwitter />
                 </ListItem>
                 <ListItem>
                   <div>
                     <p>Instagram</p>
-                    <a href="">@kiet.caotuan</a>
+                    <a href={instagram}>{instagram.split("/").splice(-1)[0]}</a>
                   </div>
                   <FiInstagram />
                 </ListItem>
                 <ListItem>
                   <div>
                     <p>Linkedin</p>
-                    <a href="">@kiet.caotuan</a>
+                    <a href={linkedin}>{linkedin.split("/").splice(-1)[0]}</a>
                   </div>
                   <FiLinkedin />
                 </ListItem>

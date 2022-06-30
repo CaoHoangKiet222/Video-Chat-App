@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   Card,
   CardBody,
@@ -15,8 +15,8 @@ import { v4 as uuid4 } from "uuid";
 import { BsFillCircleFill } from "react-icons/bs";
 import { TiTick } from "react-icons/ti";
 import { postData } from "../../utilities/utilities";
-import { useDispatch, useSelector } from "react-redux";
-import { errorActions } from "../../store/error-slice";
+import { useSelector } from "react-redux";
+import FormDisplay from "./FormDisplay";
 
 const formDisplay = [
   {
@@ -27,7 +27,6 @@ const formDisplay = [
         label: "Name",
         type: "text",
         placeholder: "Type your name",
-        required: true,
       },
       {
         label: "Phone number",
@@ -35,27 +34,23 @@ const formDisplay = [
         placeholder: "Type your phone number",
         pattern: "[0-9]{10}",
         title: "Ten digits code",
-        required: true,
       },
       {
         label: "Birth date",
         type: "date",
         placeholder: "mm/dd/yyyy",
-        required: true,
       },
       { label: "Website", type: "text", placeholder: "Type your website" },
       {
         label: "Choose your image",
         type: "file",
         accept: "image/*",
-        required: true,
       },
       {
         label: "Address",
         type: "text",
         placeholder: "Type your address",
         isAddress: true,
-        required: true,
       },
     ],
   },
@@ -65,23 +60,27 @@ const formDisplay = [
     input: [
       {
         label: "Facebook",
-        type: "text",
-        placeholder: "Type your link here",
+        type: "url",
+        placeholder: "https://www.example.com",
+        pattern: "https://.*",
       },
       {
         label: "Twitter",
-        type: "text",
-        placeholder: "Type your link here",
+        type: "url",
+        placeholder: "https://www.example.com",
+        pattern: "https://.*",
       },
       {
         label: "Instagram",
-        type: "text",
-        placeholder: "Type your link here",
+        type: "url",
+        placeholder: "https://www.example.com",
+        pattern: "https://.*",
       },
       {
         label: "Linkedin",
-        type: "text",
-        placeholder: "Type your link here",
+        type: "url",
+        placeholder: "https://www.example.com",
+        pattern: "https://.*",
       },
     ],
   },
@@ -93,19 +92,16 @@ const formDisplay = [
         label: "Current Password",
         type: "password",
         placeholder: "Current Password",
-        required: true,
       },
       {
         label: "New Password",
         type: "password",
         placeholder: "New Password",
-        required: true,
       },
       {
         label: "Confirm Password",
         type: "password",
         placeholder: "Confirm Password",
-        required: true,
       },
     ],
   },
@@ -115,8 +111,9 @@ const Settings = () => {
   const user = useSelector((state) => state.user.user);
   const authRef = useRef(null);
   const alertRef = useRef(null);
-  const accountRef = useRef({});
-  const dispatch = useDispatch();
+  const accountRef = useRef({}),
+    socialRef = useRef({}),
+    passRef = useRef({});
 
   const handleInput = (e, label) => {
     switch (label) {
@@ -143,29 +140,54 @@ const Settings = () => {
       case "Address":
         accountRef.current.address = e.target.value;
         break;
+      case "Facebook":
+        socialRef.current.facebook = e.target.value;
+        break;
+      case "Twitter":
+        socialRef.current.twitter = e.target.value;
+        break;
+      case "Instagram":
+        socialRef.current.instagram = e.target.value;
+        break;
+      case "Linkedin":
+        socialRef.current.linkedin = e.target.value;
+        break;
+      case "Current Password":
+        passRef.current.currentPass = e.target.value;
+        break;
+      case "New Password":
+        passRef.current.newPass = e.target.value;
+        break;
+      case "Confirm Password":
+        passRef.current.confirmPass = e.target.value;
+        break;
       default:
         break;
     }
-    console.log(accountRef.current);
+    console.log(passRef.current);
   };
 
   const handleSaveChange = async (e, h6) => {
-    console.log("sssssssssssssssss", e.target, h6);
     e.preventDefault();
     switch (h6) {
       case "Account":
-        const response = await postData(
+        return await postData(
           `${process.env.REACT_APP_ENDPOINT_SERVER}/update-user/account`,
           "post",
           { ...accountRef.current, userId: user._id }
         );
-        dispatch(
-          errorActions.setError({ error: true, message: response.update })
+      case "Social network profiles":
+        return await postData(
+          `${process.env.REACT_APP_ENDPOINT_SERVER}/update-user/social-network`,
+          "post",
+          { ...socialRef.current, userId: user._id }
         );
-        break;
-
       default:
-        break;
+        return await postData(
+          `${process.env.REACT_APP_ENDPOINT_SERVER}/update-user/password`,
+          "post",
+          { ...passRef.current, userId: user._id }
+        );
     }
   };
 
@@ -182,43 +204,19 @@ const Settings = () => {
           <Col>
             {formDisplay.map(({ h6, p, input }) => {
               return (
-                <Card key={uuid4()} onSubmit={(e) => handleSaveChange(e, h6)}>
-                  <CardHeader>
-                    <h6>{h6}</h6>
-                    <p>{p}</p>
-                  </CardHeader>
-                  <CardBody>
-                    <Row>
-                      {input.map((item) => {
-                        return (
-                          <FormGroup key={uuid4()}>
-                            <div>
-                              <label>{item.label}</label>
-                              <input
-                                type={item.type}
-                                placeholder={item.placeholder}
-                                required={item.required}
-                                title={item.title}
-                                pattern={item.pattern}
-                                accept={item.accept}
-                                onChange={(e) => {
-                                  handleInput(e, item.label);
-                                }}
-                              />
-                            </div>
-                          </FormGroup>
-                        );
-                      })}
-                    </Row>
-                  </CardBody>
-                  <CardFooter>
-                    <button>Reset</button>
-                    <button>Save Changes</button>
-                  </CardFooter>
-                </Card>
+                <FormDisplay
+                  key={uuid4()}
+                  h6={h6}
+                  p={p}
+                  input={input}
+                  handleSaveChange={handleSaveChange}
+                  handleInput={handleInput}
+                  accountRef={accountRef}
+                  socialRef={socialRef}
+                  passRef={passRef}
+                ></FormDisplay>
               );
             })}
-
             <Card>
               <CardHeader>
                 <h6>Security</h6>

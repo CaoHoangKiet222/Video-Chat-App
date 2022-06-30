@@ -21,6 +21,9 @@ export const userSlice = createSlice({
     setIsFetch(state, action) {
       state.isFetch = action.payload.isFetch;
     },
+    setUser(state, action) {
+      state.user = action.payload.user;
+    },
   },
 });
 

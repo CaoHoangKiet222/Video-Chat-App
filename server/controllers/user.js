@@ -4,6 +4,7 @@ const bcryptjs = require("bcryptjs");
 const { validationResult } = require("express-validator");
 const { sortName } = require("../utilities/utilities");
 const { uploadImgs, destroyAsset } = require("../cloudinary/cloudinary");
+const { mailerMain } = require("../mailer/mailer");
 
 exports.getCall = async (req, res, _next) => {
   try {
@@ -216,7 +217,7 @@ exports.checkAuthUser = (req, res, _next) => {
 
 exports.updateUserAccount = async (req, res, _next) => {
   try {
-    let { name, avatar, birth, phone, website, userId } = req.body;
+    let { name, avatar, address, birth, phone, website, userId } = req.body;
 
     if (avatar) {
       avatar = await uploadImgs(avatar, "image-profile");
@@ -235,6 +236,7 @@ exports.updateUserAccount = async (req, res, _next) => {
         birth,
         phone,
         website,
+        address,
       },
       { new: true },
       (error, newUser) => {
@@ -244,11 +246,85 @@ exports.updateUserAccount = async (req, res, _next) => {
         console.log(newUser);
         req.session.user = newUser;
         req.session.isLoggined = true;
-        req.session.reload((error) => console.log(error));
+        req.session.regenerate((error) => console.log(error));
+        res.json({
+          update: "Update social network done. Enjoy our page!!!",
+          user: newUser,
+        });
       }
     );
-    res.json({ update: "Update done. You need to login again!!!" });
   } catch (err) {
-    console.log(err);
+    res.send({ error: err.message });
+  }
+};
+
+exports.updateUserSocialNetwork = async (req, res, _next) => {
+  try {
+    const { facebook, twitter, instagram, linkedin, userId } = req.body;
+    console.log(req.body);
+    User.findOneAndUpdate(
+      { _id: userId },
+      {
+        facebook,
+        twitter,
+        instagram,
+        linkedin,
+      },
+      { new: true },
+      (error, newUser) => {
+        if (error) {
+          return new Error("Update user account fail!!!");
+        }
+        console.log(newUser);
+        req.session.user = newUser;
+        req.session.isLoggined = true;
+        req.session.regenerate((error) => console.log(error));
+        res.json({
+          update: "Update social network done. Enjoy our page!!!",
+          user: newUser,
+        });
+      }
+    );
+  } catch (err) {
+    res.send({ error: err.message });
+  }
+};
+exports.updateUserPassword = async (req, res, _next) => {
+  try {
+    const errors = validationResult(req);
+    console.log(errors);
+
+    if (!errors.isEmpty()) {
+      return res.send({ error: errors.array()[0].msg });
+    }
+
+    const { newPass, userId } = req.body;
+    console.log(req.body);
+
+    mailerMain();
+    // const hashedPassword = await bcryptjs.hash(newPass, 12);
+    //
+    // User.findOneAndUpdate(
+    //   { _id: userId },
+    //   {
+    //     password: hashedPassword,
+    //   },
+    //   { new: true },
+    //   (error, newUser) => {
+    //     if (error) {
+    //       return res.send({ error: "Update user account fail!!!" });
+    //     }
+    //     console.log(newUser);
+    //     req.session.user = newUser;
+    //     req.session.isLoggined = true;
+    //     req.session.regenerate((error) => console.log(error));
+    //     res.json({
+    //       update: "Update password done. Enjoy our page!!!",
+    //       user: newUser,
+    //     });
+    //   }
+    // );
+  } catch (err) {
+    res.send({ error: err.message });
   }
 };

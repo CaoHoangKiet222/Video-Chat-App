@@ -33,7 +33,6 @@ const Profile = () => {
   const user = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  console.log(user);
 
   const logoutHandler = () => {
     dispatch(
@@ -103,7 +102,7 @@ const Profile = () => {
               <ProfileListItem>
                 <div>
                   <p>Website</p>
-                  <p>www.caotuankiet.com</p>
+                  <p>{user?.website}</p>
                 </div>
                 <HiOutlineGlobe />
               </ProfileListItem>
@@ -119,8 +118,8 @@ const Profile = () => {
               <ProfileListItem>
                 <div>
                   <p>Facebook</p>
-                  <a href="https://www.facebook.com/kiet.caohoang.35">
-                    @kiet.caotuan
+                  <a href={user?.facebook}>
+                    {user?.facebook.split("/").splice(-1)[0]}
                   </a>
                 </div>
                 <FiFacebook />
@@ -128,21 +127,27 @@ const Profile = () => {
               <ProfileListItem>
                 <div>
                   <p>Twitter</p>
-                  <a href="#">@kiet.caotuan</a>
+                  <a href={user?.twitter}>
+                    {user?.twitter.split("/").splice(-1)[0]}
+                  </a>
                 </div>
                 <FiTwitter />
               </ProfileListItem>
               <ProfileListItem>
                 <div>
                   <p>Instagram</p>
-                  <a href="#">@kiet.caotuan</a>
+                  <a href={user?.instagram}>
+                    {user?.instagram.split("/").splice(-1)[0]}
+                  </a>
                 </div>
                 <FiInstagram />
               </ProfileListItem>
               <ProfileListItem>
                 <div>
                   <p>Linkedin</p>
-                  <a href="#">@kiet.caotuan</a>
+                  <a href={user?.linkedin}>
+                    {user?.linkedin.split("/").splice(-1)[0]}
+                  </a>
                 </div>
                 <FiLinkedin />
               </ProfileListItem>

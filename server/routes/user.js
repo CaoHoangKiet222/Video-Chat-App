@@ -28,4 +28,15 @@ router.post(
 
 router.post("/update-user/account", userController.updateUserAccount);
 
+router.post(
+  "/update-user/social-network",
+  userController.updateUserSocialNetwork
+);
+
+router.post(
+  "/update-user/password",
+  checkValidation("update-password"),
+  userController.updateUserPassword
+);
+
 module.exports = router;

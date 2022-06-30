@@ -2,13 +2,19 @@ import styled from "styled-components";
 
 export const LoadingSpinner = styled.div`
   display: inline-block;
-  ${({ newGroup }) =>
+  ${({ newGroup, settings }) =>
     newGroup
       ? `
   width: 50px;
   height: 10px;
   padding-left: 12px;
   padding-bottom: 20px;
+  `
+      : settings
+      ? `
+  width: 35px;
+  height: 35px;
+  padding-bottom: 4px;
   `
       : `
   width: 80px;
@@ -22,13 +28,20 @@ export const LoadingSpinner = styled.div`
   &:after {
     content: " ";
     display: block;
-    ${({ newGroup }) =>
+    ${({ newGroup, settings }) =>
       newGroup
         ? `
     width: 20px;
     height: 20px;
     margin-top: -2px;
     margin-right: 1px;
+  `
+        : settings
+        ? `
+    width: 20px;
+    height: 20px;
+    margin-top: 4.3px;
+    margin-left: 4px;
   `
         : `
     width: 30px;
