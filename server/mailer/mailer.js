@@ -10,7 +10,6 @@ const mailer = nodemailer.createTransport(
 );
 
 exports.mailerMain = () => {
-  // send mail with defined transport object
   mailer.sendMail(
     {
       from: "kiet.caohoang@hcmut.edu.vn",
@@ -25,7 +24,7 @@ exports.mailerMain = () => {
       if (err) {
         console.log(err);
       }
-      console.log(res);
+      console.log("mailer", res);
     }
   );
 };

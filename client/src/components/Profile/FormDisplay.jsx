@@ -1,9 +1,7 @@
-import React, { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { v4 as uuid4 } from "uuid";
-import { errorActions } from "../../store/error-slice";
 import { userActions } from "../../store/user-slice";
-import { postData } from "../../utilities/utilities";
 import { LoadingSpinner } from "../UI/Loading";
 import {
   Card,
@@ -13,6 +11,7 @@ import {
   FormGroup,
   Row,
 } from "./Settings.styled";
+import Swal from "sweetalert2";
 
 const FormDisplay = (props) => {
   const [isFetch, setIsFetch] = useState(false);
@@ -31,16 +30,24 @@ const FormDisplay = (props) => {
         } else {
           props.passRef.current = {};
         }
-        dispatch(userActions.setUser({ user: response.user }));
+
         if (response.error) {
-          return dispatch(
-            errorActions.setError({ error: true, message: response.error })
-          );
+          return Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: response.error,
+            showConfirmButton: false,
+            timer: 3500,
+          });
         }
 
-        dispatch(
-          errorActions.setError({ error: true, message: response.update })
-        );
+        dispatch(userActions.setUser({ user: response.user }));
+        Swal.fire({
+          icon: "success",
+          title: response.update,
+          showConfirmButton: false,
+          timer: 3500,
+        });
       }}
     >
       <CardHeader>
@@ -72,7 +79,7 @@ const FormDisplay = (props) => {
         </Row>
       </CardBody>
       <CardFooter>
-        <button>Reset</button>
+        <div>Reset</div>
         <button>
           {isFetch ? <LoadingSpinner settings={true} /> : "Save Changes"}
         </button>

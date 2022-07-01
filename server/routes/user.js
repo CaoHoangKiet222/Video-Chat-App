@@ -39,4 +39,8 @@ router.post(
   userController.updateUserPassword
 );
 
+router.post("/update-user/enable-2fa", userController.postEnable2FAPage);
+
+router.post("/verify-2fa", userController.postVerify2FA);
+
 module.exports = router;

@@ -28,6 +28,7 @@ function App() {
       console.log(data);
 
       if (!data.isAuth) {
+        dispatch(authActions.setAuth({ auth: false }));
         return navigate("/login");
       }
 

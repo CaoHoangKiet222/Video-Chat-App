@@ -31,7 +31,7 @@ const CallDetails = (props) => {
                 <Item>
                   <h5>{name}</h5>
                   <Icons>
-                    <p>{phone === "Unknown" ? phone + " Phone" : phone}</p>
+                    <p>{phone}</p>
                   </Icons>
                 </Item>
               </Body>

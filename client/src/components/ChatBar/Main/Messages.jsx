@@ -17,7 +17,6 @@ import {
   closeComponent,
   formatDate,
   formatHour,
-  postData,
 } from "../../../utilities/utilities";
 import {
   IoCopyOutline,
@@ -39,6 +38,7 @@ import { fetchConversation } from "../../../store/conversations-creator";
 import ImagesPreview from "./ImagesPreview";
 import Attachments from "./Attachments";
 import { ImImages } from "react-icons/im";
+import Swal from "sweetalert2";
 
 const Messages = (props) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -57,43 +57,48 @@ const Messages = (props) => {
 
   const deleteHandler = async () => {
     console.log(props.message);
-    chatSocket.emit(
-      "deleteMessage",
-      {
-        message: props.message,
-        conversationId: props.conversationId,
-      },
-      () => {
-        props.setMessages((preMess) => {
-          preMess.splice(
-            preMess.findIndex((mess) => mess._id === props.message._id),
-            1
-          );
-          preMess.forEach((mess) => {
-            console.log(mess);
-            mess.reply && console.log(mess.reply.message_id, props.message._id);
-            if (
-              mess.reply !== null &&
-              mess.reply.message_id === props.message._id
-            ) {
-              mess.reply = null;
-            }
-          });
-          return [...preMess];
-        });
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire("Deleted!", "Your file has been deleted.", "success");
+        chatSocket.emit(
+          "deleteMessage",
+          {
+            message: props.message,
+            conversationId: props.conversationId,
+          },
+          () => {
+            props.setMessages((preMess) => {
+              preMess.splice(
+                preMess.findIndex((mess) => mess._id === props.message._id),
+                1
+              );
+              preMess.forEach((mess) => {
+                console.log(mess);
+                mess.reply &&
+                  console.log(mess.reply.message_id, props.message._id);
+                if (
+                  mess.reply !== null &&
+                  mess.reply.message_id === props.message._id
+                ) {
+                  mess.reply = null;
+                }
+              });
+              return [...preMess];
+            });
 
-        dispatch(fetchConversation());
+            dispatch(fetchConversation());
+          }
+        );
       }
-    );
-
-    // await postData(
-    //   `${process.env.REACT_APP_ENDPOINT_SERVER}/delete-message`,
-    //   "delete",
-    //   {
-    //     message: props.message,
-    //     conversationId: props.conversationId,
-    //   }
-    // );
+    });
   };
 
   const replyHandler = () => {

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Card,
   CardBody,
@@ -15,8 +15,11 @@ import { v4 as uuid4 } from "uuid";
 import { BsFillCircleFill } from "react-icons/bs";
 import { TiTick } from "react-icons/ti";
 import { postData } from "../../utilities/utilities";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import FormDisplay from "./FormDisplay";
+import { LoadingSpinner } from "../UI/Loading";
+import Swal from "sweetalert2";
+import { userActions } from "../../store/user-slice";
 
 const formDisplay = [
   {
@@ -114,6 +117,14 @@ const Settings = () => {
   const accountRef = useRef({}),
     socialRef = useRef({}),
     passRef = useRef({});
+  const [isFetch, setIsFetch] = useState(false);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (user?.twoFA.is2FAEnabled) {
+      authRef.current.classList.add("active");
+    }
+  }, [user]);
 
   const handleInput = (e, label) => {
     switch (label) {
@@ -182,12 +193,41 @@ const Settings = () => {
           "post",
           { ...socialRef.current, userId: user._id }
         );
-      default:
+      case "Password":
         return await postData(
           `${process.env.REACT_APP_ENDPOINT_SERVER}/update-user/password`,
           "post",
           { ...passRef.current, userId: user._id }
         );
+      case "2FA":
+        setIsFetch(true);
+        const response = await postData(
+          `${process.env.REACT_APP_ENDPOINT_SERVER}/update-user/enable-2fa`,
+          "post",
+          {
+            is2FAEnabled: authRef.current.classList.contains("active"),
+            userId: user._id,
+          }
+        );
+        if (response.update) {
+          Swal.fire({
+            icon: "success",
+            title: response.update,
+            showConfirmButton: false,
+            timer: 5000,
+          });
+        } else if (response.QRCodeImage) {
+          Swal.fire({
+            html: "<strong>Enable two factor authentication!!</strong>",
+            width: 500,
+            imageUrl: response.QRCodeImage,
+          });
+        }
+
+        dispatch(userActions.setUser({ user: response.user }));
+        return setIsFetch(false);
+      default:
+        break;
     }
   };
 
@@ -217,7 +257,11 @@ const Settings = () => {
                 ></FormDisplay>
               );
             })}
-            <Card>
+            <Card
+              onSubmit={(e) => {
+                handleSaveChange(e, "2FA");
+              }}
+            >
               <CardHeader>
                 <h6>Security</h6>
                 <p>
@@ -280,8 +324,14 @@ const Settings = () => {
                 </div>
               </CardBody>
               <CardFooter>
-                <button>Reset</button>
-                <button>Save Changes</button>
+                <div>Reset</div>
+                <button>
+                  {isFetch ? (
+                    <LoadingSpinner settings={true} />
+                  ) : (
+                    "Save Changes"
+                  )}
+                </button>
               </CardFooter>
             </Card>
           </Col>

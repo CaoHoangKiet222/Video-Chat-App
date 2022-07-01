@@ -14,6 +14,7 @@ export const Container = styled.div`
   text-align: center;
   padding: 30px 0;
   min-height: 100vh;
+  min-width: 100vw;
   z-index: 999;
 `;
 
@@ -304,7 +305,8 @@ export const List = styled.li`
   margin: 0 3.5px;
   position: relative;
 
-  a {
+  a,
+  div {
     display: inline-block;
     font-size: 14px;
     font-weight: 400;

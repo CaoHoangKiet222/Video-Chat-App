@@ -133,7 +133,7 @@ const Meeting = () => {
             <ImgWrapper>
               <Avatar>
                 <img
-                  src={`${isReceiving ? callee.avatar.url : caller.avatar.url}`}
+                  src={`${isReceiving ? caller.avatar.url : callee.avatar.url}`}
                   alt=""
                 />
               </Avatar>

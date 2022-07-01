@@ -137,8 +137,8 @@ const DialogMain = (props) => {
             friend._id,
             friend.name,
             navigate,
-            props.setShowModalDialog,
-            setIsFetch
+            setIsFetch,
+            props.setShowModalDialog
           )
         );
       }

@@ -22,6 +22,16 @@ export const Container = styled.div`
   width: 100vw;
   height: 100vh;
   transition: opacity 0.15s linear;
+  transform: translateY(0%);
+  animation: 0.8s show;
+  @keyframes show {
+    from {
+      transform: translateY(-10%);
+    }
+    to {
+      transform: translateY(0%);
+    }
+  }
 `;
 
 export const Document = styled.div`

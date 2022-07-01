@@ -23,7 +23,8 @@ import { FiFacebook, FiTwitter } from "react-icons/fi";
 import { IoLogoGoogle } from "react-icons/io5";
 import { fetchLogin } from "../../store/user-creator";
 import { Fade, Flip } from "react-awesome-reveal";
-import Error from "../UI/Error";
+import Swal from "sweetalert2";
+import { userActions } from "../../store/user-slice";
 
 const Login = (props) => {
   console.log("Login running");
@@ -32,17 +33,27 @@ const Login = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
-  const [clearErr, setClearErr] = useState(false);
   const [isRemember, setIsRemember] = useState(false);
   const [isTermsService, setIsTermService] = useState(false);
   const { auth } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
+  // const handleCredentialResponse = (response) => {
+  //   console.log(response.credential);
+  // };
+  //
   // useEffect(() => {
-  //   dispatch(
-  //     fetchSession(`${process.env.REACT_APP_ENDPOINT_SERVER}/session`, navigate)
+  //   console.log(window.google);
+  //   window.google?.accounts.id.initialize({
+  //     client_id:
+  //       "989782942339-0peqjbst2eaik1cl6vnhaulkcdjlp4na.apps.googleusercontent.com",
+  //     callback: handleCredentialResponse,
+  //   });
+  //   window.google?.accounts.id.renderButton(
+  //     document.getElementById("signInAnchor"),
+  //     { theme: "outline", size: "large" }
   //   );
-  // }, [dispatch, navigate]);
+  // }, []);
 
   useEffect(() => {
     if (!props.isSignUp) {
@@ -63,16 +74,26 @@ const Login = (props) => {
     setEmail("");
     setPassword("");
     setConfirmPass("");
-    setClearErr(true);
     setIsRemember(false);
     setIsTermService(false);
   }, [props.isSignUp, navigate, dispatch, props.signupRef]);
 
   useEffect(() => {
-    if (!userState.error) {
-      setClearErr(false);
-    }
-  }, [userState.error]);
+    userState.error &&
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: userState.error,
+      }).then(() => {
+        dispatch(
+          userActions.login({
+            user: null,
+            isFetch: false,
+            error: null,
+          })
+        );
+      });
+  }, [userState.error, dispatch]);
 
   const submitHandle = (e) => {
     e.preventDefault();
@@ -96,9 +117,7 @@ const Login = (props) => {
   return (
     <Container>
       <Content>
-        {!clearErr && userState.error ? (
-          <Error error={userState.error} onClearErr={setClearErr} />
-        ) : (
+        {!userState.error && (
           <FormContainer>
             <FormSection>
               <Circle />
@@ -201,11 +220,11 @@ const Login = (props) => {
                       <span>Twitter</span>
                     </a>
                   </List>
-                  <List isGoogle={true}>
-                    <a href="#">
+                  <List isGoogle={true} className="g-signin2">
+                    <div href="#" id="signInAnchor">
                       <IoLogoGoogle />
                       <span>Google</span>
-                    </a>
+                    </div>
                   </List>
                 </SocialList>
               </Form>

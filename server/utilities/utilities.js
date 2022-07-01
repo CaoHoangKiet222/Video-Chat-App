@@ -85,3 +85,13 @@ exports.getUserCalls = (type = "", userCall = [], array = []) => {
   }
   return array;
 };
+
+exports.setSession = (req, user, isLoggined) => {
+  req.session.user = user;
+  req.session.isLoggined = isLoggined;
+  req.session.save((err) => {
+    if (err) {
+      return console.log(err);
+    }
+  });
+};

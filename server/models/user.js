@@ -56,6 +56,16 @@ const userSchema = new Schema({
     type: String,
     default: "Unknow",
   },
+  twoFA: {
+    is2FAEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    secret: {
+      type: String,
+      default: "",
+    },
+  },
   isLoggined: {
     type: Boolean,
     default: false,

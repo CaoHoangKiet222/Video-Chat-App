@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Avatar } from "../Chat/ChatItems.styled";
 import {
   Body,

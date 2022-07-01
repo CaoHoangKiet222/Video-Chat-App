@@ -206,6 +206,9 @@ export const FormGroup = styled.div`
         color: #adb5bd;
       }
     }
+    input[type="file"] {
+      background-color: red;
+    }
   }
 `;
 
@@ -214,8 +217,10 @@ export const CardFooter = styled.div`
   background-color: #2a2a2a;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
 
-  & > button {
+  & > button,
+  & > div {
     cursor: pointer;
     font-weight: 400;
     text-decoration: none;
@@ -224,6 +229,7 @@ export const CardFooter = styled.div`
     background-color: transparent;
     border: 1px solid transparent;
     border-radius: 0.25rem;
+    font-size: 15px;
 
     &:first-child {
       color: #adb5bd;

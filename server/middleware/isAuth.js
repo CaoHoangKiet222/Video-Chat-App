@@ -7,7 +7,7 @@ exports.checkValidation = (type) => {
     case "login":
       return check("email")
         .isEmail()
-        .withMessage("Invalid email!!")
+        .withMessage("Invalid email. Please enter the right one!!!")
         .normalizeEmail()
         .custom(async (value, { req }) => {
           const user = await User.findOne({ email: value });
@@ -19,7 +19,9 @@ exports.checkValidation = (type) => {
               user.password
             );
             if (!matchPassword) {
-              return Promise.reject("Invalid password!!");
+              return Promise.reject(
+                "Invalid password. Please enter the right one!!!"
+              );
             }
           }
         });
@@ -47,7 +49,9 @@ exports.checkValidation = (type) => {
           .trim()
           .custom((value, { req }) => {
             if (value !== req.body.password) {
-              throw new Error("Password confirmation does not match password");
+              throw new Error(
+                "Password confirmation does not match with password"
+              );
             }
             return true;
           }),
@@ -85,12 +89,15 @@ exports.checkValidation = (type) => {
                 "Please choose password which doesn't match with the old one!!!"
               );
             }
+            return true;
           }),
         body("confirmPass")
           .trim()
           .custom((value, { req }) => {
             if (value !== req.body.newPass) {
-              throw new Error("Password confirmation does not match password");
+              throw new Error(
+                "Password confirmation does not match with password"
+              );
             }
             return true;
           }),

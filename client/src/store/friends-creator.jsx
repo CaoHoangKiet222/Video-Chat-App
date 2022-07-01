@@ -29,21 +29,22 @@ export const postAddFriend = (
   id,
   name,
   navigate,
-  setShowModalDialog,
-  setIsFetch
+  setIsFetch = () => {},
+  setShowModalDialog = () => {}
 ) => {
   return async (dispatch, getState) => {
     const { notifySocket } = getState().socket;
     setIsFetch(true);
+    const conversation = await postData(
+      `${process.env.REACT_APP_ENDPOINT_SERVER}/add-friend`,
+      "post",
+      {
+        friendId: id,
+      }
+    );
     dispatch(
       conversationActions.setConversation({
-        conversation: await postData(
-          `${process.env.REACT_APP_ENDPOINT_SERVER}/add-friend`,
-          "post",
-          {
-            friendId: id,
-          }
-        ),
+        conversation,
       })
     );
     notifySocket.emit("notifyingUserAddFriend");
