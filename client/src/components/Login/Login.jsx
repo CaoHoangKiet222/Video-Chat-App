@@ -21,10 +21,29 @@ import { useDispatch, useSelector } from "react-redux";
 import { LoadingSpinner } from "../UI/Loading";
 import { FiFacebook, FiTwitter } from "react-icons/fi";
 import { IoLogoGoogle } from "react-icons/io5";
-import { fetchLogin } from "../../store/user-creator";
+import {
+  fetchLogin,
+  fetchLoginByFacebook,
+  fetchLoginByFirebase,
+  fetchLoginByGoogle,
+} from "../../store/user-creator";
 import { Fade, Flip } from "react-awesome-reveal";
 import Swal from "sweetalert2";
+import jwt_decode from "jwt-decode";
 import { userActions } from "../../store/user-slice";
+import {
+  deleteUser,
+  FacebookAuthProvider,
+  linkWithPopup,
+  signInWithPopup,
+} from "firebase/auth";
+import {
+  authFirebase,
+  googleProvider,
+  facebookProvider,
+  githubProvider,
+} from "../../utilities/firebase";
+import { VscGithubInverted } from "react-icons/vsc";
 
 const Login = (props) => {
   console.log("Login running");
@@ -37,23 +56,6 @@ const Login = (props) => {
   const [isTermsService, setIsTermService] = useState(false);
   const { auth } = useSelector((state) => state.auth);
   const navigate = useNavigate();
-
-  // const handleCredentialResponse = (response) => {
-  //   console.log(response.credential);
-  // };
-  //
-  // useEffect(() => {
-  //   console.log(window.google);
-  //   window.google?.accounts.id.initialize({
-  //     client_id:
-  //       "989782942339-0peqjbst2eaik1cl6vnhaulkcdjlp4na.apps.googleusercontent.com",
-  //     callback: handleCredentialResponse,
-  //   });
-  //   window.google?.accounts.id.renderButton(
-  //     document.getElementById("signInAnchor"),
-  //     { theme: "outline", size: "large" }
-  //   );
-  // }, []);
 
   useEffect(() => {
     if (!props.isSignUp) {
@@ -112,6 +114,54 @@ const Login = (props) => {
         props.signupRef
       )
     );
+  };
+
+  const loginWithGoogle = async () => {
+    try {
+      const { user } = await signInWithPopup(authFirebase, googleProvider);
+      console.log(user);
+      dispatch(
+        fetchLoginByFirebase(
+          `${process.env.REACT_APP_ENDPOINT_SERVER}/login-by-firebase`,
+          user,
+          "google"
+        )
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const loginWithGithub = async () => {
+    try {
+      const { user } = await signInWithPopup(authFirebase, githubProvider);
+      console.log(user);
+      // dispatch(
+      //   fetchLoginByFirebase(
+      //     `${process.env.REACT_APP_ENDPOINT_SERVER}/login-by-firebase`,
+      //     user.providerData[0],
+      //     "facebook"
+      //   )
+      // );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const loginWithFacebook = async () => {
+    try {
+      const { user } = await signInWithPopup(authFirebase, facebookProvider);
+      console.log(user);
+      dispatch(
+        fetchLoginByFirebase(
+          `${process.env.REACT_APP_ENDPOINT_SERVER}/login-by-firebase`,
+          user.providerData[0],
+          "facebook"
+        )
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -208,20 +258,20 @@ const Login = (props) => {
                   <span>Or Login With</span>
                 </ExtraLogin>
                 <SocialList>
-                  <List isFb={true}>
-                    <a href="#">
+                  <List isFb={true} onClick={loginWithFacebook}>
+                    <div>
                       <FiFacebook />
                       <span>Facebook</span>
-                    </a>
+                    </div>
                   </List>
-                  <List isTwitter={true}>
-                    <a href="#">
-                      <FiTwitter />
-                      <span>Twitter</span>
-                    </a>
+                  <List isGithub={true} onClick={loginWithGithub}>
+                    <div>
+                      <VscGithubInverted />
+                      <span>Github</span>
+                    </div>
                   </List>
-                  <List isGoogle={true} className="g-signin2">
-                    <div href="#" id="signInAnchor">
+                  <List isGoogle={true} onClick={loginWithGoogle}>
+                    <div>
                       <IoLogoGoogle />
                       <span>Google</span>
                     </div>

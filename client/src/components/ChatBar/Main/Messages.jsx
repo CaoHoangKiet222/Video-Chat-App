@@ -67,7 +67,7 @@ const Messages = (props) => {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire("Deleted!", "Your file has been deleted.", "success");
+        Swal.fire("Deleted!", "Your message has been deleted.", "success");
         chatSocket.emit(
           "deleteMessage",
           {

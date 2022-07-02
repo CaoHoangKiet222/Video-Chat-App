@@ -16,7 +16,7 @@ exports.getCall = async (req, res, _next) => {
   try {
     const { members } = await Conversation.findOne({
       _id: req.params.conversationId,
-    }).populate({ path: "members.userId" });
+    }).populate({ path: "members.userId", select: "-password" });
 
     const friend = members.find(
       (member) =>
@@ -35,7 +35,7 @@ exports.getListFriends = async (req, res, _next) => {
       _id: {
         $ne: req.session.user._id.toString(),
       },
-    });
+    }).select("-password");
 
     const sortedName = sortName(listFriends);
 
@@ -55,12 +55,13 @@ exports.getConversation = (req, res, _next) => {
         if (_err) {
           throw new Error("Conversation not found!!");
         }
+        console.log("getConversation", req.session.user);
         return res.status(200).json({
           conv: convTest,
           user: req.session.user,
         });
       }
-    ).populate({ path: "members.userId" });
+    ).populate({ path: "members.userId", select: "-password" });
   } catch (err) {
     console.log(err);
     res.send({ error: err.message });
@@ -84,7 +85,6 @@ exports.getSession = (req, res, _next) => {
       () => {
         req.session.destroy((error) => console.log(error));
 
-        // res.json({ error: null });
         res.json({
           isRemember: false,
           error: null,
@@ -139,7 +139,10 @@ exports.postUserLogin = async (req, res, _next) => {
     }
 
     console.log("login", req.body);
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({
+      email: req.body.email,
+      loginByGoogle: false,
+    }).select("-password");
 
     if (user.twoFA.is2FAEnabled) {
       setSession(req, user, false);
@@ -155,7 +158,55 @@ exports.postUserLogin = async (req, res, _next) => {
 
         return res.send(updatedUser);
       }
-    );
+    ).select("-password");
+  } catch (err) {
+    console.log(err);
+  }
+};
+exports.postUserLoginByFirebase = async (req, res, _next) => {
+  try {
+    console.log("loginbygoogle", req.body);
+    const user = await User.findOne({
+      email: req.body.email,
+      loginByFirebase: req.body.provider,
+    }).select("-password");
+
+    console.log(user);
+    if (!user) {
+      const newUser = await User.create({
+        email: req.body.email,
+        name: req.body.name,
+        password: await bcryptjs.hash(req.body.password, 12),
+        loginByFirebase: req.body.provider,
+        avatar: {
+          url: req.body.photoURL,
+          public_id: "",
+        },
+        phone: req.body.phone,
+        isLoggined: true,
+      }).then(async (user) => {
+        return await User.findById(user._id).select("-password");
+      });
+      console.log(newUser);
+      setSession(req, newUser, true);
+      return res.send(newUser);
+    }
+
+    if (user.twoFA.is2FAEnabled) {
+      setSession(req, user, false);
+      return res.send(user);
+    }
+
+    User.findOneAndUpdate(
+      { email: req.body.email, loginByFirebase: req.body.provider },
+      { isLoggined: true },
+      { new: true },
+      (_error, updatedUser) => {
+        setSession(req, updatedUser, true);
+
+        return res.send(updatedUser);
+      }
+    ).select("-password");
   } catch (err) {
     console.log(err);
   }
@@ -190,15 +241,13 @@ exports.postUserSignUp = async (req, res, _next) => {
       return res.send({ error: errors.array()[0].msg });
     }
 
-    const hashedPassword = await bcryptjs.hash(req.body.password, 12);
-
-    const user = await new User({
+    const user = await User.create({
       name: req.body.email.split("@")[0],
       email: req.body.email,
-      password: hashedPassword,
-      avatar: "images/user.jpg",
-      lastOnline: new Date(Date.now()),
-    }).save;
+      password: await bcryptjs.hash(req.body.password, 12),
+    }).then(async (user) => {
+      return await User.findById(user._id).select("-password");
+    });
 
     res.send(user);
   } catch (err) {
@@ -229,7 +278,7 @@ exports.updateUserAccount = async (req, res, _next) => {
       console.log(avatar);
     }
 
-    const user = await User.findById(userId).select("avatar");
+    const user = await User.findById(userId).select("avatar -password");
     console.log(user);
     destroyAsset(user.avatar.public_id, "image");
 
@@ -255,7 +304,7 @@ exports.updateUserAccount = async (req, res, _next) => {
           user: updatedUser,
         });
       }
-    );
+    ).select("-password");
   } catch (err) {
     res.send({ error: err.message });
   }
@@ -285,7 +334,7 @@ exports.updateUserSocialNetwork = async (req, res, _next) => {
           user: updatedUser,
         });
       }
-    );
+    ).select("-password");
   } catch (err) {
     res.send({ error: err.message });
   }
@@ -303,12 +352,11 @@ exports.updateUserPassword = async (req, res, _next) => {
     console.log(req.body);
 
     // mailerMain();
-    const hashedPassword = await bcryptjs.hash(newPass, 12);
 
     User.findOneAndUpdate(
       { _id: userId },
       {
-        password: hashedPassword,
+        password: await bcryptjs.hash(newPass, 12),
       },
       { new: true },
       (error, updatedUser) => {
@@ -322,7 +370,7 @@ exports.updateUserPassword = async (req, res, _next) => {
           user: updatedUser,
         });
       }
-    );
+    ).select("-password");
   } catch (err) {
     res.send({ error: err.message });
   }
@@ -359,7 +407,7 @@ exports.postEnable2FAPage = (req, res, _next) => {
 
           return res.status(200).json({ QRCodeImage, user: updatedUser });
         }
-      );
+      ).select("-password");
     } else {
       User.findByIdAndUpdate(
         userId,
@@ -376,14 +424,13 @@ exports.postEnable2FAPage = (req, res, _next) => {
           }
           console.log(updatedUser);
           setSession(req, updatedUser, true);
-          console.log("sssssssssssss", req.session);
 
           return res.status(200).json({
             update: "Disable two authentication done!!!",
             user: updatedUser,
           });
         }
-      );
+      ).select("-password");
     }
   } catch (err) {
     res.send({ error: err.message });
@@ -392,9 +439,22 @@ exports.postEnable2FAPage = (req, res, _next) => {
 
 exports.postVerify2FA = (req, res, _next) => {
   try {
-    res.json({
-      isValid: verifyOTPToken(req.body.otpToken, req.body.userSecret),
-    });
+    const isValid = verifyOTPToken(req.body.otpToken, req.body.userSecret);
+    if (isValid) {
+      User.findByIdAndUpdate(
+        req.body.userId,
+        { isLoggined: true },
+        { new: true },
+        (err, updatedUser) => {
+          if (err) {
+            return console.log(err);
+          }
+          console.log(updatedUser);
+          setSession(req, updatedUser, true);
+        }
+      );
+    }
+    res.json({ isValid });
   } catch (err) {
     res.send({ error: err.message });
   }

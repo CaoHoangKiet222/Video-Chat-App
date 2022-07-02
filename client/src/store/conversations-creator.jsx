@@ -33,5 +33,3 @@ export const fetchConversation = () => {
     }
   };
 };
-
-export const addFriend = () => {};

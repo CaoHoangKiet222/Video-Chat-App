@@ -18,6 +18,8 @@ router.post("/add-friend", userController.postAddFriend);
 
 router.post("/login", checkValidation("login"), userController.postUserLogin);
 
+router.post("/login-by-firebase", userController.postUserLoginByFirebase);
+
 router.post("/logout", userController.postUserLogout);
 
 router.post(

@@ -13,6 +13,7 @@ exports = module.exports = (socket, type, io = null) => {
         try {
           const conv = await Conversation.findOne({ _id: room }).populate({
             path: "members.userId messages.senderId messages.files messages.reply",
+            select: "-password",
           });
 
           callback(conv.messages);
@@ -144,7 +145,10 @@ exports = module.exports = (socket, type, io = null) => {
               }
               callback();
             }
-          ).populate("messages.senderId messages.files");
+          ).populate({
+            path: "messages.senderId messages.files",
+            select: "-password",
+          });
         } catch (err) {
           console.log(err);
         }
@@ -192,7 +196,10 @@ exports = module.exports = (socket, type, io = null) => {
               );
               callback();
             }
-          ).populate("messages.senderId messages.files");
+          ).populate({
+            path: "messages.senderId messages.files",
+            select: "-password",
+          });
         } catch (err) {
           console.log(err);
         }

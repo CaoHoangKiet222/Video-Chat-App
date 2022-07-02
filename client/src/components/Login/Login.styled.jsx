@@ -298,6 +298,12 @@ export const SocialList = styled.ul`
   display: block;
   width: 450px;
   height: 50px;
+  position: relative;
+
+  #signInGoogle {
+    position: absolute;
+    top: 0px;
+  }
 `;
 
 export const List = styled.li`
@@ -305,10 +311,10 @@ export const List = styled.li`
   margin: 0 3.5px;
   position: relative;
 
-  a,
   div {
+    cursor: pointer;
     display: inline-block;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 400;
     width: 130px;
     height: 40px;
@@ -322,16 +328,16 @@ export const List = styled.li`
     color: ${(props) =>
       props.isFb
         ? "#4867aa"
-        : props.isTwitter
-        ? "#33CCFF"
+        : props.isGithub
+        ? "black"
         : props.isGoogle && "#DB4437"};
 
     svg {
-      width: 20px;
-      height: 20px;
+      width: 28px;
+      height: 28px;
       position: absolute;
-      left: 12px;
-      top: 12px;
+      left: 9px;
+      top: 8px;
       background-color: #fff;
     }
 
