@@ -17,6 +17,13 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  resetPass: {
+    token: {
+      type: String,
+      default: "",
+    },
+    expireToken: Date,
+  },
   avatar: {
     url: {
       type: String,

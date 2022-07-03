@@ -19,24 +19,13 @@ import {
 } from "./Login.styled";
 import { useDispatch, useSelector } from "react-redux";
 import { LoadingSpinner } from "../UI/Loading";
-import { FiFacebook, FiTwitter } from "react-icons/fi";
+import { FiFacebook } from "react-icons/fi";
 import { IoLogoGoogle } from "react-icons/io5";
-import {
-  fetchLogin,
-  fetchLoginByFacebook,
-  fetchLoginByFirebase,
-  fetchLoginByGoogle,
-} from "../../store/user-creator";
+import { fetchLogin, fetchLoginByFirebase } from "../../store/user-creator";
 import { Fade, Flip } from "react-awesome-reveal";
 import Swal from "sweetalert2";
-import jwt_decode from "jwt-decode";
 import { userActions } from "../../store/user-slice";
-import {
-  deleteUser,
-  FacebookAuthProvider,
-  linkWithPopup,
-  signInWithPopup,
-} from "firebase/auth";
+import { deleteUser, signInWithPopup } from "firebase/auth";
 import {
   authFirebase,
   googleProvider,
@@ -73,12 +62,25 @@ const Login = (props) => {
     } else {
       props.signupRef.current = false;
     }
+
+    if (props.isResetPass) {
+      props.passResetRef.current = true;
+    } else {
+      props.passResetRef.current = false;
+    }
     setEmail("");
     setPassword("");
     setConfirmPass("");
     setIsRemember(false);
     setIsTermService(false);
-  }, [props.isSignUp, navigate, dispatch, props.signupRef]);
+  }, [
+    props.isSignUp,
+    navigate,
+    dispatch,
+    props.signupRef,
+    props.passResetRef,
+    props.isResetPass,
+  ]);
 
   useEffect(() => {
     userState.error &&
@@ -136,13 +138,18 @@ const Login = (props) => {
     try {
       const { user } = await signInWithPopup(authFirebase, githubProvider);
       console.log(user);
-      // dispatch(
-      //   fetchLoginByFirebase(
-      //     `${process.env.REACT_APP_ENDPOINT_SERVER}/login-by-firebase`,
-      //     user.providerData[0],
-      //     "facebook"
-      //   )
-      // );
+      dispatch(
+        fetchLoginByFirebase(
+          `${process.env.REACT_APP_ENDPOINT_SERVER}/login-by-firebase`,
+          {
+            displayName: user.reloadUserInfo.displayName,
+            email: user.reloadUserInfo.screenName + "@gmail.com",
+            photoURL: user.reloadUserInfo.photoUrl,
+            phoneNumber: user.phoneNumber,
+          },
+          "github"
+        )
+      );
     } catch (error) {
       console.log(error);
     }
@@ -187,7 +194,11 @@ const Login = (props) => {
                   </h3>
                 </Fade>
               </MainTitle>
-              <Form isSignup={props.isSignUp} onSubmit={submitHandle}>
+              <Form
+                isSignup={props.isSignUp}
+                isResetPass={props.isResetPass}
+                onSubmit={submitHandle}
+              >
                 <input
                   type="hidden"
                   name="clientHome"
@@ -203,16 +214,18 @@ const Login = (props) => {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </FormGroup>
-                <FormGroup>
-                  <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={password}
-                    required
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </FormGroup>
+                {!props.isResetPass && (
+                  <FormGroup>
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Password"
+                      value={password}
+                      required
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </FormGroup>
+                )}
                 {props.isSignUp && (
                   <FormGroup>
                     <input
@@ -225,28 +238,30 @@ const Login = (props) => {
                     />
                   </FormGroup>
                 )}
-                <CheckBox>
-                  <FormCheck>
-                    {props.isSignUp ? (
-                      <input
-                        type="checkbox"
-                        checked={isTermsService}
-                        onChange={(e) => setIsTermService(e.target.checked)}
-                        required
-                      />
-                    ) : (
-                      <input
-                        type="checkbox"
-                        checked={isRemember}
-                        onChange={(e) => setIsRemember(e.target.checked)}
-                      />
+                {!props.isResetPass && (
+                  <CheckBox>
+                    <FormCheck>
+                      {props.isSignUp ? (
+                        <input
+                          type="checkbox"
+                          checked={isTermsService}
+                          onChange={(e) => setIsTermService(e.target.checked)}
+                          required
+                        />
+                      ) : (
+                        <input
+                          type="checkbox"
+                          checked={isRemember}
+                          onChange={(e) => setIsRemember(e.target.checked)}
+                        />
+                      )}
+                      <label>{props.formCheck}</label>
+                    </FormCheck>
+                    {!props.isSignUp && (
+                      <Link to="/reset-password">Forgot your password?</Link>
                     )}
-                    <label>{props.formCheck}</label>
-                  </FormCheck>
-                  {!props.isSignUp && (
-                    <Link to="/reset-password">Forgot your password?</Link>
-                  )}
-                </CheckBox>
+                  </CheckBox>
+                )}
                 <LoginButton>
                   {userState.isFetch ? (
                     <LoadingSpinner />

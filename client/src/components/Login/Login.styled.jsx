@@ -52,7 +52,7 @@ export const Circle = styled.div`
   &:nth-child(2) {
     bottom: -25px;
     right: -25px;
-    animation-nane: move-down;
+    animation-name: move-down;
   }
 
   @keyframes move-up {
@@ -130,7 +130,8 @@ export const MainTitle = styled.div`
 `;
 export const Form = styled.form`
   width: 450px;
-  height: ${(props) => (props.isSignup ? "455px" : "370px")};
+  height: ${(props) =>
+    props.isSignup ? "455px" : props.isResetPass ? "250px" : "370px"};
 `;
 
 export const FormGroup = styled.div`
@@ -331,6 +332,24 @@ export const List = styled.li`
         : props.isGithub
         ? "black"
         : props.isGoogle && "#DB4437"};
+
+    &:hover {
+      ${(props) =>
+        props.isFb
+          ? `background-color: #4867aa;`
+          : props.isGithub
+          ? `background-color: black;`
+          : props.isGoogle && `background-color: #DB4437;`}
+      color: #fff;
+      svg {
+        ${(props) =>
+          props.isFb
+            ? `background-color: #4867aa;`
+            : props.isGithub
+            ? `background-color: black;`
+            : props.isGoogle && `background-color: #DB4437;`}
+      }
+    }
 
     svg {
       width: 28px;

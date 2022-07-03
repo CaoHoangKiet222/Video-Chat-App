@@ -28,6 +28,10 @@ router.post(
   userController.postUserSignUp
 );
 
+router.post("/reset-password", userController.postReset);
+
+router.post("/reset/new-password", userController.postNewPassword);
+
 router.post("/update-user/account", userController.updateUserAccount);
 
 router.post(
@@ -41,7 +45,7 @@ router.post(
   userController.updateUserPassword
 );
 
-router.post("/update-user/enable-2fa", userController.postEnable2FAPage);
+router.post("/update-user/enable-2fa", userController.postEnable2FA);
 
 router.post("/verify-2fa", userController.postVerify2FA);
 

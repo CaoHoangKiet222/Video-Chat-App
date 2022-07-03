@@ -206,8 +206,9 @@ export const FormGroup = styled.div`
         color: #adb5bd;
       }
     }
+
     input[type="file"] {
-      background-color: red;
+      padding-top: 10px;
     }
   }
 `;

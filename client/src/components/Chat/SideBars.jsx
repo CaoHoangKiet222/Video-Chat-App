@@ -250,7 +250,8 @@ const SideBars = (props) => {
                   .map((friend, index) => {
                     if (
                       index === 0 ||
-                      friends[index - 1].name[0] !== friend.name[0]
+                      friends[index - 1].name[0].toLowerCase() !==
+                        friend.name[0].toLowerCase()
                     ) {
                       isDiff.current = true;
                     } else isDiff.current = false;

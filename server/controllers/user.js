@@ -4,13 +4,15 @@ const bcryptjs = require("bcryptjs");
 const { validationResult } = require("express-validator");
 const { sortName, setSession } = require("../utilities/utilities");
 const { uploadImgs, destroyAsset } = require("../cloudinary/cloudinary");
-const { mailerMain } = require("../mailer/mailer");
+const { mailer } = require("../mailer/mailer");
 const {
   generateUniqueSecret,
   generateOTPToken,
   generateQRCode,
   verifyOTPToken,
 } = require("../2FA/2fa");
+const crypto = require("crypto");
+const url = require("url");
 
 exports.getCall = async (req, res, _next) => {
   try {
@@ -141,7 +143,7 @@ exports.postUserLogin = async (req, res, _next) => {
     console.log("login", req.body);
     const user = await User.findOne({
       email: req.body.email,
-      loginByGoogle: false,
+      loginByFirebase: "",
     }).select("-password");
 
     if (user.twoFA.is2FAEnabled) {
@@ -256,6 +258,63 @@ exports.postUserSignUp = async (req, res, _next) => {
   }
 };
 
+exports.postReset = (req, res, _next) => {
+  try {
+    crypto.randomBytes(32, (err, buffer) => {
+      if (err) {
+        return res.send({ error: err.message });
+      }
+      console.log(
+        `${buffer.length} bytes of random data: ${buffer.toString("hex")}`
+      );
+      const token = buffer.toString("hex");
+      User.findOneAndUpdate(
+        { email: req.body.email, loginByFirebase: "" },
+        {
+          resetPass: {
+            token,
+            // Date.now() in milliseconds
+            expireToken: Date.now() + 3600000,
+          },
+        },
+        { new: true },
+        async (_err, user) => {
+          if (!user) {
+            return res.send({ error: "No found that email!!" });
+          }
+
+          const getUrl = url.format({
+            protocol: req.protocol,
+            host: req.get("host"),
+          });
+          console.log(getUrl);
+
+          mailer.sendMail({
+            from: "caohoangkiet1720@gmail.com",
+            to: "kiet.caohoang@hcmut.edu.vn",
+            subject: "Password Reset",
+            html: `
+              <p>You requested a password reset</p>
+              <p>Click <a href="${getUrl}/reset/${token}">this</a> to reset password </p>
+           `,
+          });
+
+          res.send({ message: "Check your email" });
+        }
+      );
+    });
+  } catch (err) {
+    res.send({ error: err.message });
+  }
+};
+
+exports.postNewPassword = (req, res, _next) => {
+  try {
+  } catch (err) {
+    res.send({ error: err.message });
+  }
+};
+
 exports.checkAuthUser = (req, res, _next) => {
   try {
     console.log("checkAuthUser", req.session);
@@ -265,7 +324,7 @@ exports.checkAuthUser = (req, res, _next) => {
 
     res.json({ isAuth: true });
   } catch (error) {
-    res.send({ error: error.message });
+    res.json({ error: error.message });
   }
 };
 
@@ -376,7 +435,7 @@ exports.updateUserPassword = async (req, res, _next) => {
   }
 };
 
-exports.postEnable2FAPage = (req, res, _next) => {
+exports.postEnable2FA = (req, res, _next) => {
   try {
     console.log(req.body);
     const { is2FAEnabled, userId } = req.body;

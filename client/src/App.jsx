@@ -12,30 +12,34 @@ function App() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const signupRef = useRef(false);
+  const passResetRef = useRef(false);
 
   useEffect(() => {
-    if (signupRef.current) {
-      return;
-    }
-
-    const isAuth = async () => {
-      const response = await fetch(
-        `${process.env.REACT_APP_ENDPOINT_SERVER}/isAuth`,
-        { credentials: "include" }
-      );
-
-      const data = await response.json();
-      console.log(data);
-
-      if (!data.isAuth) {
-        dispatch(authActions.setAuth({ auth: false }));
-        return navigate("/login");
+    try {
+      if (signupRef.current || passResetRef.current) {
+        return;
       }
 
-      dispatch(authActions.setAuth({ auth: true }));
-    };
+      const isAuth = async () => {
+        const response = await fetch(
+          `${process.env.REACT_APP_ENDPOINT_SERVER}/isAuth`,
+          { credentials: "include" }
+        );
 
-    isAuth();
+        const data = await response.json();
+        console.log(data);
+
+        if (!data.isAuth) {
+          dispatch(authActions.setAuth({ auth: false }));
+          return navigate("/login");
+        }
+
+        dispatch(authActions.setAuth({ auth: true }));
+      };
+      isAuth();
+    } catch (error) {
+      console.log(error);
+    }
   }, [navigate, dispatch]);
 
   return (
@@ -48,12 +52,14 @@ function App() {
             title="Sign Into "
             formType="login"
             isSignUp={false}
+            isResetPass={false}
             formCheck="Remember me"
             button="Login"
             paraph="Don't have an account? "
             link="Register here"
             linkTo="signup"
             signupRef={signupRef}
+            passResetRef={passResetRef}
           />
         }
       />
@@ -64,12 +70,32 @@ function App() {
             title="Sign Up "
             formType="signup"
             isSignUp={true}
+            isResetPass={false}
             formCheck="I agree to the terms of service"
             button="Register"
             paraph="Already a member? "
             link="Login here"
             linkTo="login"
             signupRef={signupRef}
+            passResetRef={passResetRef}
+          />
+        }
+      />
+      <Route
+        path="/reset-password"
+        element={
+          <Login
+            title="Email To Reset "
+            formType="password-reset"
+            isSignUp={false}
+            isResetPass={true}
+            formCheck="I agree to the terms of service"
+            button="Send Reset Link"
+            paraph="Already a member? "
+            link="Login here"
+            linkTo="login"
+            signupRef={signupRef}
+            passResetRef={passResetRef}
           />
         }
       />

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { Avatar } from "../Chat/ChatItems.styled";
 import {
   Body,
@@ -74,10 +74,6 @@ const Friends = (props) => {
       })
     );
   };
-
-  // const buttonHandle = () => {
-  //    dispatch(answerCall(socket, userVideo, connectionRef));
-  // }
 
   const messageHandle = async () => {
     dispatch(postAddFriend(_id, name, navigate));

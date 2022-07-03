@@ -9,7 +9,7 @@ const mailer = nodemailer.createTransport(
   })
 );
 
-exports.mailerMain = () => {
+const mailerMain = () => {
   mailer.sendMail(
     {
       from: "kiet.caohoang@hcmut.edu.vn",
@@ -27,4 +27,9 @@ exports.mailerMain = () => {
       console.log("mailer", res);
     }
   );
+};
+
+module.exports = {
+  mailerMain,
+  mailer,
 };

@@ -20,11 +20,6 @@ app.use(express.urlencoded({ limit: "50mb", extended: false })); // Allow us to 
 
 const MongoDBStore = require("connect-mongodb-session")(session);
 
-const store = new MongoDBStore({
-  uri: process.env.MONGODB_URI,
-  collection: "mySessions",
-});
-
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -36,10 +31,16 @@ app.use(
 // session to save data across requests in memory not in browser
 app.use(
   session({
-    secret: "my secret",
+    secret: "secret",
     resave: false,
     saveUninitialized: false,
-    store: store,
+    store: new MongoDBStore({
+      uri: process.env.MONGODB_URI,
+      collection: "session",
+    }),
+    cookie: {
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 2),
+    },
   })
 );
 
