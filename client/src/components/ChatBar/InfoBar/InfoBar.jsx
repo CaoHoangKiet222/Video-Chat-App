@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import InfoBarLoading from "./InfoBarLoading";
 import { fetchConversation } from "../../../store/conversations-creator";
 import { v4 as uuid4 } from "uuid";
+import SearchBox from "../ChatHeader/SearchBox";
 let timer;
 
 const InfoBar = (props) => {
@@ -15,6 +16,8 @@ const InfoBar = (props) => {
   const [error, setError] = useState("");
   const [messages, setMessages] = useState([]);
   const [isSendMess, setIsSendMess] = useState(false);
+  const [showSearchBox, setShowSearchBox] = useState(false);
+  const [searchName, setSearchName] = useState("");
   const [isFetch, setIsFetch] = useState(false);
   const dispatch = useDispatch();
   const chatSocket = useSelector((state) => state.socket.chatSocket);
@@ -119,10 +122,22 @@ const InfoBar = (props) => {
     }
   };
 
+  const handleSearchBox = () => {
+    setShowSearchBox(!showSearchBox);
+  };
+
   return (
     <Card>
-      <Msger>
-        <ChatHeader member={props.member} room={props.room} />
+      <Msger showSearchBox={showSearchBox}>
+        <ChatHeader
+          handleSearchBox={handleSearchBox}
+          member={props.member}
+          room={props.room}
+        />
+        <SearchBox
+          showSearchBox={showSearchBox}
+          setSearchName={setSearchName}
+        />
         {!isFetch && !isSendMess ? (
           <InfoBarLoading />
         ) : (
@@ -130,6 +145,8 @@ const InfoBar = (props) => {
             <Main
               messages={messages}
               setMessages={setMessages}
+              showSearchBox={showSearchBox}
+              searchName={searchName}
               room={props.room}
             />
           </Body>

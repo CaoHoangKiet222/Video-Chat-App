@@ -102,7 +102,6 @@ exports.getSession = (req, res, _next) => {
 
 exports.postAddFriend = async (req, res, _next) => {
   try {
-    console.log("sssssssssssssssssssss", req.body);
     const convExist = await Conversation.findOne({
       $and: [
         { "members.userId": req.body.friendId },

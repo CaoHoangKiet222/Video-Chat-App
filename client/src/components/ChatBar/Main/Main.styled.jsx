@@ -6,8 +6,8 @@ export const MessageContainer = styled(ScrollToBottom)`
   padding: 0.75rem;
   width: 100%;
   max-width: 1320px;
-  /* margin: 0 auto; */
-  margin: 3rem auto 24px auto;
+  transition: height 0.35s ease-in-out;
+  margin: 0px auto 24px auto;
   // max-height: 84vh;
 
   & > div {

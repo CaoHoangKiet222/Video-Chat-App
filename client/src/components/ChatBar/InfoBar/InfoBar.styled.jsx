@@ -7,14 +7,13 @@ export const Card = styled.div`
 `;
 
 export const Msger = styled.section`
-  // check here
   height: 100%;
   display: grid;
-  grid-template-rows: 7vh 86vh 7vh;
+  transition: all 0.1s ease-in-out;
+  grid-template-rows: ${({ showSearchBox }) =>
+    !showSearchBox
+      ? "7vh 0vh 86vh 7vh"
+      : "99px 69px calc(93vh - 99px - 69px) 7vh"};
   border-radius: 5px;
   color: #fff;
-
-  @media (min-width: 1200px) {
-    grid-template-rows: 5vh 90vh 5vh;
-  }
 `;

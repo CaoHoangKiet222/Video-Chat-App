@@ -50,7 +50,7 @@ const ChatHeader = (props) => {
         </MediaContent>
       </Media>
       <MediaNav>
-        <li>
+        <li onClick={props.handleSearchBox}>
           <Link to="">
             <BsSearch />
           </Link>
