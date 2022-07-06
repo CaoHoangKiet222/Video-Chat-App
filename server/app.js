@@ -39,7 +39,7 @@ app.use(
       collection: "session",
     }),
     cookie: {
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 2),
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 1),
     },
   })
 );

@@ -39,13 +39,25 @@ import ImagesPreview from "./ImagesPreview";
 import Attachments from "./Attachments";
 import { ImImages } from "react-icons/im";
 import Swal from "sweetalert2";
+import Mark from "mark.js";
 
 const Messages = (props) => {
   const [showMenu, setShowMenu] = useState(false);
   const chatSocket = useSelector((state) => state.socket.chatSocket);
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  // console.log(props.message);
+
+  useEffect(() => {
+    const instance = new Mark(
+      document.querySelectorAll(["span.hightlight", "h6.file-text"])
+    );
+
+    instance.unmark({
+      done: () => {
+        instance.mark(props.searchName);
+      },
+    });
+  }, [props.searchName]);
 
   useEffect(() => {
     return closeComponent(showMenu, setShowMenu);
@@ -190,7 +202,9 @@ const Messages = (props) => {
           {!props.isRight && props.isGroup && (
             <h6>{props.message.senderId.name}</h6>
           )}
-          {props.message.content && <span>{props.message.content}</span>}
+          {props.message.content && (
+            <span className="hightlight">{props.message.content}</span>
+          )}
 
           {props.message.files?.images.length !== 0 && (
             <div className="images-row">

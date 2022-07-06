@@ -10,6 +10,7 @@
     "@testing-library/user-event": "^13.5.0",
     "emoji-mart": "^5.1.0",
     "firebase": "^9.8.4",
+    "mark.js": "^8.11.1",
     "react": "^17.0.2",
     "react-awesome-reveal": "^3.8.1",
     "react-cookie": "^4.1.1",

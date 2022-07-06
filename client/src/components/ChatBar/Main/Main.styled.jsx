@@ -95,6 +95,11 @@ export const Message = styled.div`
       right: ${(props) => (props.isRight ? "22px" : "17px")};
     }
   }
+
+  mark {
+    background-color: #fcf8e3;
+    color: black;
+  }
 `;
 
 export const Divider = styled.div`
@@ -191,6 +196,7 @@ export const DropDownContent = styled.div`
       height: 1.125rem;
       width: 1.125rem;
       margin-right: 0.75rem;
+      line-height: 1.2;
     }
 
     &:hover {
@@ -200,6 +206,9 @@ export const DropDownContent = styled.div`
 
     &.text-danger {
       color: #ff337c !important;
+      & > svg {
+        color: #ff337c !important;
+      }
     }
   }
 `;

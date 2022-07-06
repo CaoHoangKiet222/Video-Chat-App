@@ -9,6 +9,7 @@ import InfoBarLoading from "./InfoBarLoading";
 import { fetchConversation } from "../../../store/conversations-creator";
 import { v4 as uuid4 } from "uuid";
 import SearchBox from "../ChatHeader/SearchBox";
+import ChatDetail from "./ChatDetail";
 let timer;
 
 const InfoBar = (props) => {
@@ -153,6 +154,7 @@ const InfoBar = (props) => {
         )}
         <ChatFooter member={props.member} onSendMessage={sendMessage} />
       </Msger>
+      <ChatDetail />
     </Card>
   );
 };

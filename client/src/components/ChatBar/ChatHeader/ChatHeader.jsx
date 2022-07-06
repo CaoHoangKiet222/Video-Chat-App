@@ -1,6 +1,12 @@
-import React, { useRef } from "react";
-import { BiDotsVerticalRounded } from "react-icons/bi";
-import { BsSearch, BsTelephone } from "react-icons/bs";
+import React, { useEffect, useRef, useState } from "react";
+import { BiBlock, BiDotsVerticalRounded } from "react-icons/bi";
+import {
+  BsArchive,
+  BsInfoCircle,
+  BsSearch,
+  BsTelephone,
+  BsVolumeMute,
+} from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { Avatar } from "../../Chat/ChatItems.styled";
 import {
@@ -13,13 +19,23 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { beforeStartVideo } from "../../../store/video-creator";
 import { errorActions } from "../../../store/error-slice";
+import { DropDown, DropDownContent } from "../Main/Main.styled";
+import { RiDeleteBinLine } from "react-icons/ri";
+import { VscMute } from "react-icons/vsc";
+import { MdOutlineWallpaper } from "react-icons/md";
+import { closeComponent } from "../../../utilities/utilities";
 
 const ChatHeader = (props) => {
   const { member } = props;
   const user = useSelector((state) => state.user.user);
+  const [showDropDown, setShowDropDown] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const error = useRef(null);
+
+  useEffect(() => {
+    return closeComponent(showDropDown, setShowDropDown);
+  }, [showDropDown]);
 
   const callHandler = () => {
     if (member.isLoggined) {
@@ -34,6 +50,10 @@ const ChatHeader = (props) => {
         message: "Can't call user because user is offline",
       })
     );
+  };
+
+  const handleDropDown = () => {
+    setShowDropDown(!showDropDown);
   };
 
   return (
@@ -60,15 +80,45 @@ const ChatHeader = (props) => {
             <BsTelephone />
           </Link>
         </li>
-        <li>
-          <Link
-            to=""
-            onClick={(e) => {
-              e.target.style.color = "#d5d5e5";
-            }}
-          >
+        <li onClick={handleDropDown}>
+          <Link to="">
             <BiDotsVerticalRounded />
           </Link>
+
+          {showDropDown && (
+            <DropDown>
+              <DropDownContent translate="translate(-200px, -10px)">
+                <a href="#" onClick={props.handleSearchBox}>
+                  <BsSearch />
+                  <span>Search</span>
+                </a>
+                <a href="#">
+                  <BsInfoCircle />
+                  <span>View Info</span>
+                </a>
+                <a href="#">
+                  <VscMute />
+                  <span>Mute Notifications</span>
+                </a>
+                <a href="#">
+                  <MdOutlineWallpaper />
+                  <span>Wallpaper</span>
+                </a>
+                <a href="#">
+                  <BsArchive />
+                  <span>Archive</span>
+                </a>
+                <a href="#">
+                  <BiBlock />
+                  <span>Block</span>
+                </a>
+                <a href="#" className="text-danger">
+                  <RiDeleteBinLine />
+                  <span>Delete</span>
+                </a>
+              </DropDownContent>
+            </DropDown>
+          )}
         </li>
       </MediaNav>
     </HeaderBar>

@@ -1,12 +1,19 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { BsSearch } from "react-icons/bs";
 import styled from "styled-components";
 import { ChatsSubHeader } from "../../Chat/SideBars.styled";
 
 const SearchBox = (props) => {
+  const focusInput = useRef(null);
   const inputHandler = (e) => {
     props.setSearchName(e.target.value);
   };
+
+  useEffect(() => {
+    if (props.showSearchBox === true) {
+      focusInput.current.focus();
+    }
+  }, [props.showSearchBox]);
 
   return (
     <Container showSearchBox={props.showSearchBox}>
@@ -17,6 +24,7 @@ const SearchBox = (props) => {
               type="text"
               placeholder="Search..."
               onChange={inputHandler}
+              ref={focusInput}
             ></input>
             <div>
               <div>
@@ -36,9 +44,10 @@ const Container = styled.div`
   display: flex;
   background-color: #323333;
   padding: 0 1.5rem;
-  border-bottom: 1px solid #2b2b2b;
+  border-bottom: ${({ showSearchBox }) => showSearchBox && "1px solid #2b2b2b"};
   width: 100%;
-  animation: ${({ showSearchBox }) => (showSearchBox ? "show" : "close")} 0.5s;
+  animation: ${({ showSearchBox }) =>
+    showSearchBox ? "show 0.5s" : "close .2s"};
   height: ${({ showSearchBox }) => (showSearchBox ? "69px" : "0px")};
   overflow: hidden;
 
@@ -67,16 +76,6 @@ const Content = styled.div`
   align-items: center;
   padding: 0.75rem 1.5rem;
   width: 100%;
-  animation: show 0.75s ease-in-out;
-
-  @keyframes show {
-    from {
-      height: 0;
-    }
-    to {
-      height: 69px;
-    }
-  }
 `;
 
 const InputGroup = styled(ChatsSubHeader)`

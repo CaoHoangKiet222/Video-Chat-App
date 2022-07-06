@@ -14,7 +14,6 @@ const Main = (props) => {
     conversation &&
     props.messages
       ?.filter((message) => {
-        console.log(message);
         if (message.content) {
           return searchToDisplay(message.content, props.searchName);
         }
@@ -47,6 +46,7 @@ const Main = (props) => {
                 setMessages={props.setMessages}
                 conversationId={props.room}
                 isGroup={props.isGroup}
+                searchName={props.searchName}
               />
             );
           }
@@ -59,6 +59,7 @@ const Main = (props) => {
               setMessages={props.setMessages}
               conversationId={props.room}
               isGroup={props.isGroup}
+              searchName={props.searchName}
             />
           );
         }
