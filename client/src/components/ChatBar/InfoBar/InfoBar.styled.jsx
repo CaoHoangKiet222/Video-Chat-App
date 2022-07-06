@@ -14,8 +14,8 @@ export const Msger = styled.section`
   transition: all 0.1s ease-in-out;
   grid-template-rows: ${({ showSearchBox }) =>
     !showSearchBox
-      ? "7vh 0vh 86vh 7vh"
-      : "99px 69px calc(93vh - 99px - 69px) 7vh"};
+      ? "7vh 0px calc(93vh - 89px) 89px"
+      : "99px 69px calc(100vh - 99px - 69px - 89px) 89px"};
   border-radius: 5px;
   color: #fff;
 `;

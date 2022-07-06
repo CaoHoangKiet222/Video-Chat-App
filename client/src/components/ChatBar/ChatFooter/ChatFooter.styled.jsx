@@ -2,17 +2,17 @@ import styled from "styled-components";
 
 export const InputForm = styled.form`
   display: flex;
-  /* flex-direction: column; */
+  justify-content: center;
+  align-items: center;
   background: #323333;
   padding: 0.75rem 2.25rem;
   border-top: 1px solid #2b2b2f;
 
   // check here
-  width: calc(100vw - 4.375rem - 472px);
-  position: fixed;
-  bottom: 0;
-  height: 89px;
-  min-height: 4vh;
+  /* width: calc(100vw - 4.375rem - 472px); */
+  /* position: fixed; */
+  /* bottom: 0; */
+  height: 100%;
   @media (max-width: 1200px) {
     width: 100%;
   }
@@ -60,15 +60,25 @@ export const InputForm = styled.form`
       }
     }
 
-    input {
+    .input {
+      padding: 0 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       width: 100%;
       height: 100%;
-      padding: 6px 12px;
-      background: #2a2a2a;
-      color: #fff;
-      border: none;
-      font-size: 1.175rem;
-      outline: none;
+
+      input {
+        width: 100%;
+        height: 100%;
+        min-height: 40px;
+        padding: 6px 12px;
+        background: #2a2a2a;
+        color: #fff;
+        border: none;
+        font-size: 1.175rem;
+        outline: none;
+      }
     }
 
     button {

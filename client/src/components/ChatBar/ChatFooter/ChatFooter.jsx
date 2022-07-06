@@ -275,13 +275,15 @@ const ChatFooter = (props) => {
             onChange={(e) => handleMultipleFiles(e, "attachments")}
           />
         </div>
-        <input
-          type={props.type}
-          placeholder="Enter your message..."
-          ref={inputValue}
-          onChange={inputChangeHanle}
-          multiple
-        />
+        <div className="input">
+          <input
+            type={props.type}
+            placeholder="Enter your message..."
+            ref={inputValue}
+            onChange={inputChangeHanle}
+            multiple
+          />
+        </div>
         <button type="submit">
           <RiMailSendLine />
         </button>
