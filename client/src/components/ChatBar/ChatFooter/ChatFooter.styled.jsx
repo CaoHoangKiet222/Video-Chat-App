@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 export const InputForm = styled.form`
   display: flex;
+  position: relative;
   justify-content: center;
   align-items: center;
   background: #323333;
@@ -9,9 +10,6 @@ export const InputForm = styled.form`
   border-top: 1px solid #2b2b2f;
 
   // check here
-  /* width: calc(100vw - 4.375rem - 472px); */
-  /* position: fixed; */
-  /* bottom: 0; */
   height: 100%;
   @media (max-width: 1200px) {
     width: 100%;
@@ -107,7 +105,6 @@ export const ReplyForm = styled.div`
   position: absolute;
   background-color: #323333;
   width: 100%;
-  max-width: calc(100vw - 4.375rem - 472px);
   height: 100%;
   padding: 10px 3rem 3px 15px;
   font-size: 0.9375rem;
@@ -157,13 +154,12 @@ export const FilesContent = styled.div`
   position: absolute;
   background-color: #323333;
   width: 100%;
-  max-width: calc(100vw - 4.375rem - 472px);
   height: 100%;
   padding: 10px 3rem 3px 15px;
   font-size: 0.9375rem;
   border-top: 1px solid #2b2b2f;
-  top: -89px;
-  left: 0;
+  bottom: 89px;
+  right: 0;
 
   .container {
     .content {

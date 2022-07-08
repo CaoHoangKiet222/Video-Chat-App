@@ -7,6 +7,9 @@ import Main from "../ChatBar/Main/Main";
 import { CardGroup, CardMsger } from "./ChatGroup.styled";
 import ChatGroupHeader from "./ChatGroupHeader/ChatGroupHeader";
 import { v4 as uuid4 } from "uuid";
+import ChatDetail from "../ChatBar/InfoBar/ChatDetail";
+import { Card, Msger } from "../ChatBar/InfoBar/InfoBar.styled";
+import SearchBox from "../ChatBar/ChatHeader/SearchBox";
 let timer;
 
 const ChatGroup = (props) => {
@@ -14,6 +17,9 @@ const ChatGroup = (props) => {
   const [error, setError] = useState("");
   const [messages, setMessages] = useState([]);
   const [isSendMess, setIsSendMess] = useState(false);
+  const [showSearchBox, setShowSearchBox] = useState(false);
+  const [showViewInfo, setShowViewInfo] = useState(false);
+  const [searchName, setSearchName] = useState("");
   const [isFetch, setIsFetch] = useState(false);
   const dispatch = useDispatch();
   const chatSocket = useSelector((state) => state.socket.chatSocket);
@@ -120,15 +126,29 @@ const ChatGroup = (props) => {
     }
   };
 
+  const handleSearchBox = () => {
+    setShowSearchBox(!showSearchBox);
+  };
+
+  const handleViewInfo = () => {
+    setShowViewInfo(!showViewInfo);
+  };
+
   return (
-    <CardGroup>
-      <CardMsger>
+    <Card>
+      <Msger showSearchBox={showSearchBox}>
         <ChatGroupHeader
+          handleSearchBox={handleSearchBox}
+          handleViewInfo={handleViewInfo}
           groupImg={props.groupImg}
           groupName={props.groupName}
           numsPeople={props.members.length + 1}
           members={props.members}
           room={props.room}
+        />
+        <SearchBox
+          showSearchBox={showSearchBox}
+          setSearchName={setSearchName}
         />
         {!isFetch && !isSendMess ? (
           <InfoBarLoading />
@@ -136,13 +156,25 @@ const ChatGroup = (props) => {
           <Main
             messages={messages}
             setMessages={setMessages}
+            showSearchBox={showSearchBox}
             room={props.room}
+            searchName={searchName}
             isGroup={props.groupName !== "" ? true : false}
           />
         )}
         <ChatFooter members={props.members} onSendMessage={sendMessage} />
-      </CardMsger>
-    </CardGroup>
+      </Msger>
+      <ChatDetail
+        handleViewInfo={handleViewInfo}
+        showViewInfo={showViewInfo}
+        messages={messages}
+        members={props.members}
+        isGroup={true}
+        groupImg={props.groupImg}
+        groupName={props.groupName}
+        numsPeople={props.members.length + 1}
+      />
+    </Card>
   );
 };
 

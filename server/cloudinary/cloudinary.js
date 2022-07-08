@@ -7,22 +7,7 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
-const uploadImgs = (url, folder) => {
-  return new Promise((resolve, reject) => {
-    cloudinary.uploader.upload(
-      url,
-      { upload_preset: folder, resource_type: "auto" },
-      (error, result) => {
-        if (error) {
-          return reject(error.message);
-        }
-        resolve({ url: result.url, public_id: result.public_id });
-      }
-    );
-  });
-};
-
-const uploadAttachments = ({ url, fileName }, folder) => {
+const upload = ({ url, fileName }, folder) => {
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload(
       url,
@@ -40,7 +25,7 @@ const uploadAttachments = ({ url, fileName }, folder) => {
           url: result.url,
           fileName,
           public_id: result.public_id,
-          size: (result.bytes / 1024).toFixed(2) + "KB",
+          size: (result.bytes / 1024).toFixed(2) + " KB",
         });
       }
     );
@@ -66,7 +51,6 @@ const destroyAsset = (public_id, resource_type) => {
 
 module.exports = {
   cloudinary,
-  uploadImgs,
-  uploadAttachments,
+  upload,
   destroyAsset,
 };

@@ -46,9 +46,8 @@ const Container = styled.div`
   padding: 0 1.5rem;
   border-bottom: ${({ showSearchBox }) => showSearchBox && "1px solid #2b2b2b"};
   width: 100%;
-  animation: ${({ showSearchBox }) =>
-    showSearchBox ? "show 0.5s" : "close .2s"};
   height: ${({ showSearchBox }) => (showSearchBox ? "69px" : "0px")};
+  animation: ${({ showSearchBox }) => showSearchBox && "show 0.5s"};
   overflow: hidden;
 
   @keyframes show {
@@ -57,15 +56,6 @@ const Container = styled.div`
     }
     to {
       height: 69px;
-    }
-  }
-
-  @keyframes close {
-    from {
-      height: 69px;
-    }
-    to {
-      height: 0;
     }
   }
 `;

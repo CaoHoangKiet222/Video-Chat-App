@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 const ImagesPreview = ({ url, isRight }) => {
+  console.log(url);
   return (
     <FormImg isRight={isRight}>
       <div className="column">

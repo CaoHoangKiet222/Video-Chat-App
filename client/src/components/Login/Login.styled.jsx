@@ -131,7 +131,13 @@ export const MainTitle = styled.div`
 export const Form = styled.form`
   width: 450px;
   height: ${(props) =>
-    props.isSignup ? "455px" : props.isResetPass ? "250px" : "370px"};
+    props.isSignup
+      ? "455px"
+      : props.isResetPass
+      ? !(props.formType === "new-password")
+        ? "250px"
+        : "320px"
+      : "370px"};
 `;
 
 export const FormGroup = styled.div`

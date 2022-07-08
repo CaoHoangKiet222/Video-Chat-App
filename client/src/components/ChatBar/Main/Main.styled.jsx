@@ -7,7 +7,7 @@ export const MessageContainer = styled(ScrollToBottom)`
   width: 100%;
   max-width: 1320px;
   transition: height 0.35s ease-in-out;
-  margin: 0px auto 24px auto;
+  margin: 0px auto;
   // max-height: 84vh;
 
   & > div {
@@ -22,10 +22,6 @@ export const MessageContainer = styled(ScrollToBottom)`
 
   @media (max-width: 1200px) {
     margin-top: 3rem;
-  }
-
-  @media (min-width: 1200px) {
-    margin-bottom: 25px;
   }
 `;
 

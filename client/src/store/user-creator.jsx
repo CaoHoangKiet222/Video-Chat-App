@@ -7,7 +7,15 @@ import { errorActions } from "./error-slice";
 import { socketActions } from "./socket-slice";
 import { userActions } from "./user-slice";
 
-export const fetchLogin = (url, user, type, navigate, signupRef) => {
+export const fetchLogin = (
+  url,
+  user,
+  type,
+  navigate,
+  signupRef,
+  passResetRef,
+  resetAllUseState
+) => {
   return async (dispatch, getState) => {
     dispatch(userActions.login({ user: null, isFetch: true, error: null }));
 
@@ -24,12 +32,37 @@ export const fetchLogin = (url, user, type, navigate, signupRef) => {
 
       console.log(data);
 
-      if (type === "signup") {
+      if (type !== "login") {
+        if (type === "password-reset" || type === "new-password") {
+          passResetRef.current = false;
+        } else if (type === "signup") {
+          signupRef.current = false;
+        }
         dispatch(
           userActions.login({ user: null, isFetch: false, error: null })
         );
-        signupRef.current = false;
-        navigate("/login");
+
+        if (data.error) {
+          return Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            html: data.error,
+            showConfirmButton: false,
+            timer: 5000,
+          });
+        }
+
+        Swal.fire({
+          icon: "success",
+          html: data.message,
+          showConfirmButton: true,
+          allowOutsideClick: false,
+        }).then(() => {
+          if (type === "signup") {
+            navigate("/login");
+          }
+          resetAllUseState();
+        });
       } else {
         handleTwoFA(data, dispatch, getState);
       }
@@ -87,8 +120,8 @@ export const userLogout = (url, userId, navigate) => {
       console.log(response);
 
       if (!response.error) {
-        dispatch(authActions.setAuth({ auth: false }));
         dispatch(userActions.logout());
+        dispatch(authActions.setAuth({ auth: false }));
         await signOut(authFirebase);
 
         navigate("/login");
@@ -124,6 +157,7 @@ const handleTwoFA = (data, dispatch, getState) => {
             showCancelButton: true,
             confirmButtonText: "Submit",
             showLoaderOnConfirm: true,
+            allowOutsideClick: false,
             backdrop: true,
             preConfirm: (otpToken) => {
               return postData(
@@ -138,7 +172,6 @@ const handleTwoFA = (data, dispatch, getState) => {
                 Swal.showValidationMessage(`Request failed: ${error}`);
               });
             },
-            allowOutsideClick: () => !Swal.isLoading(),
           });
           if (result.isDismissed) {
             break;

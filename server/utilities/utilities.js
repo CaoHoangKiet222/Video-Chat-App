@@ -86,9 +86,15 @@ exports.getUserCalls = (type = "", userCall = [], array = []) => {
   return array;
 };
 
-exports.setSession = (req, user, isLoggined) => {
+exports.setSession = (
+  req,
+  user,
+  isLoggined,
+  cookieExpiration = Date.now() + 1000 * 60 * 60 * 2
+) => {
   req.session.user = user;
   req.session.isLoggined = isLoggined;
+  req.session.cookieExpiration = cookieExpiration;
   req.session.save((err) => {
     if (err) {
       return console.log(err);

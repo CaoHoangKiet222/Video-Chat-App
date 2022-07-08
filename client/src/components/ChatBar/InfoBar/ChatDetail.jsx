@@ -20,23 +20,31 @@ import {
 } from "react-icons/bs";
 import { CgAttachment } from "react-icons/cg";
 import { FiUsers } from "react-icons/fi";
+import { formatDate } from "../../../utilities/utilities";
 
-const ChatDetail = () => {
+const ChatDetail = (props) => {
   const [showAboutUser, setShowAboutUser] = useState(false);
   const [showMembers, setShowMembers] = useState(false);
   const [showMedia, setShowMedia] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
 
+  const closeAllComponents = () => {
+    setShowAboutUser(false);
+    setShowMembers(false);
+    setShowMedia(false);
+    setShowAttachments(false);
+  };
+
   return (
-    <InfoDetail showMembers={showMembers}>
+    <InfoDetail showMembers={showMembers} showViewInfo={props.showViewInfo}>
       <div className="container">
         <div className="header">
           <div className="header-body">
             <ul>
               <li>
-                <h5>Profile Details</h5>
+                <h5>{props.isGroup ? "Group Details" : "Profile Details"}</h5>
               </li>
-              <li>
+              <li onClick={props.handleViewInfo}>
                 <AiOutlineClose />
               </li>
             </ul>
@@ -46,14 +54,20 @@ const ChatDetail = () => {
           <div className="body-info">
             <div className="avatar">
               <img
-                src={`${process.env.REACT_APP_ENDPOINT_CLIENT}/images/user.jpg`}
+                src={props.isGroup ? props.groupImg : props.member.avatar.url}
                 alt=""
               />
             </div>
-            <h5 className="name">caohoangkiet</h5>
+            <h5 className="name">
+              {props.isGroup ? props.groupName : props.member.name}
+            </h5>
             <p className="address">
               <FaMapMarkerAlt />
-              <span>address</span>
+              <span>
+                {props.isGroup
+                  ? props.numsPeople + " participants"
+                  : props.member.address}
+              </span>
             </p>
             <div className="icons">
               <div className="item">
@@ -72,11 +86,14 @@ const ChatDetail = () => {
             <div className="about-user">
               <div
                 className="card-header"
-                onClick={() => setShowAboutUser(!showAboutUser)}
+                onClick={() => {
+                  closeAllComponents();
+                  setShowAboutUser(!showAboutUser);
+                }}
               >
                 <div>
                   <FaUserAlt />
-                  <span>About</span>
+                  <span>About {props.isGroup ? "Group" : "User"}</span>
                 </div>
                 <div>
                   {!showAboutUser ? <BsChevronRight /> : <BsChevronUp />}
@@ -87,60 +104,74 @@ const ChatDetail = () => {
                 <div className="card-body">
                   <div className="name">
                     <p>Name</p>
-                    <h5>caohoangkiet</h5>
+                    <h5>
+                      {props.isGroup ? props.groupName : props.member.name}
+                    </h5>
                   </div>
                   <div className="email">
                     <p>Email</p>
-                    <h5>caohoangkiet@gmail.com</h5>
+                    <h5>{props.member?.email}</h5>
                   </div>
                   <div className="time">
                     <p>Time</p>
-                    <h5>11:40Am</h5>
+                    <h5>{formatDate(Date.now())}</h5>
                   </div>
                   <div className="location">
                     <p>Location</p>
-                    <h5>No trang long</h5>
+                    <h5>{props.member?.address}</h5>
                   </div>
                 </div>
               </Collapse>
             </div>
-            <div className="group-members">
-              <div
-                className="card-header"
-                onClick={() => setShowMembers(!showMembers)}
-              >
-                <div>
-                  <FiUsers />
-                  <span>Members</span>
+            {props.isGroup && (
+              <div className="group-members">
+                <div
+                  className="card-header"
+                  onClick={() => {
+                    closeAllComponents();
+                    setShowMembers(!showMembers);
+                  }}
+                >
+                  <div>
+                    <FiUsers />
+                    <span>Members</span>
+                  </div>
+                  <div>
+                    {!showMembers ? <BsChevronRight /> : <BsChevronUp />}
+                  </div>
                 </div>
-                <div>{!showMembers ? <BsChevronRight /> : <BsChevronUp />}</div>
-              </div>
 
-              <Collapse showMembers={showMembers}>
-                <div className="card-body">
-                  <div className="group-content">
-                    <div>
-                      <div className="avatar">
-                        <img
-                          src={`${process.env.REACT_APP_ENDPOINT_CLIENT}/images/user.jpg`}
-                          alt=""
-                        />
+                <Collapse showMembers={showMembers}>
+                  {props.members.map(({ userId: member }) => {
+                    console.log(member);
+                    return (
+                      <div className="card-body">
+                        <div className="group-content">
+                          <div>
+                            <div className="avatar">
+                              <img src={member.avatar.url} alt="" />
+                            </div>
+                            <div className="member-name">
+                              <h5>
+                                {member.name}
+                                <span>Admin</span>
+                              </h5>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="member-name">
-                        <h5>
-                          caohoangkiet
-                          <span>Admin</span>
-                        </h5>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Collapse>
-            </div>
+                    );
+                  })}
+                </Collapse>
+              </div>
+            )}
             <div className="files-imgs">
               <div
                 className="card-header"
-                onClick={() => setShowMedia(!showMedia)}
+                onClick={() => {
+                  closeAllComponents();
+                  setShowMedia(!showMedia);
+                }}
               >
                 <div>
                   <BsImages />
@@ -150,35 +181,51 @@ const ChatDetail = () => {
               </div>
 
               <Collapse showMedia={showMedia}>
-                <div className="card-body">
-                  <div className="card-content">
-                    <div className="item">
-                      <div className="avatar">
-                        <BsCardImage />
+                {props.messages.map((message) => {
+                  return message.files.images.map((image, index) => {
+                    console.log(image);
+                    return (
+                      <div className="card-body" key={index}>
+                        <div className="card-content">
+                          <div className="item">
+                            <div className="avatar">
+                              <BsCardImage />
+                            </div>
+                          </div>
+                          <div className="item">
+                            <h5>{image.fileName}</h5>
+                            <p>{image.size}</p>
+                          </div>
+                          <div className="item">
+                            <ul className="actions">
+                              <li>
+                                <a
+                                  href={image.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <BsDownload />
+                                </a>
+                              </li>
+                              <li>
+                                <BsThreeDots />
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="item">
-                      <h5>ddddddddddddddddddddAdmin-A.zip</h5>
-                      <p>12.5Mb</p>
-                    </div>
-                    <div className="item">
-                      <ul className="actions">
-                        <li>
-                          <BsDownload />
-                        </li>
-                        <li>
-                          <BsThreeDots />
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+                    );
+                  });
+                })}
               </Collapse>
             </div>
             <div className="files-attachments">
               <div
                 className="card-header"
-                onClick={() => setShowAttachments(!showAttachments)}
+                onClick={() => {
+                  closeAllComponents();
+                  setShowAttachments(!showAttachments);
+                }}
               >
                 <div>
                   <CgAttachment />
@@ -190,29 +237,40 @@ const ChatDetail = () => {
               </div>
 
               <Collapse showAttachments={showAttachments}>
-                <div className="card-body">
-                  <div className="card-content">
-                    <div className="item">
-                      <div className="avatar">
-                        <BsFillFileEarmarkTextFill />
+                {props.messages.map((message) => {
+                  return message.files.attachments.map((attachment, index) => {
+                    return (
+                      <div className="card-body" key={index}>
+                        <div className="card-content">
+                          <div className="item">
+                            <div className="avatar">
+                              <BsFillFileEarmarkTextFill />
+                            </div>
+                          </div>
+                          <div className="item">
+                            <h5>{attachment.fileName}</h5>
+                            <p>{attachment.size}</p>
+                          </div>
+                          <div className="item">
+                            <ul className="actions">
+                              <li>
+                                <a
+                                  href={attachment.url}
+                                  download={attachment.fileName}
+                                >
+                                  <BsDownload />
+                                </a>
+                              </li>
+                              <li>
+                                <BsThreeDots />
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="item">
-                      <h5>ddddddddddddddddddddAdmin-A.zip</h5>
-                      <p>12.5Mb</p>
-                    </div>
-                    <div className="item">
-                      <ul className="actions">
-                        <li>
-                          <BsDownload />
-                        </li>
-                        <li>
-                          <BsThreeDots />
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
+                    );
+                  });
+                })}
               </Collapse>
             </div>
           </div>
@@ -224,11 +282,21 @@ const ChatDetail = () => {
 
 export default ChatDetail;
 
-export const InfoDetail = styled.div`
-  min-width: 29.875rem;
-  width: 29.875rem;
+const InfoDetail = styled.div`
+  width: ${({ showViewInfo }) => (showViewInfo ? "29.875rem" : "0")};
   background-color: #383f44;
   border-left: 1px solid #2b2b2f;
+  transition: width 0.2s ease-in-out;
+
+  @media screen and (max-width: 1200px) {
+    position: fixed;
+    z-index: 100;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: ${({ showViewInfo }) => (showViewInfo ? "100%" : "0")};
+    overflow: hidden;
+  }
 
   .container {
     display: flex;
@@ -370,7 +438,7 @@ export const InfoDetail = styled.div`
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 99px;
+      height: 99px;
       padding: 0 0.75rem;
 
       .header-body {
@@ -480,6 +548,7 @@ const Collapse = styled.div`
             height: 100%;
             width: 100%;
             border-radius: 50%;
+            object-fit: cover;
           }
         }
       }
@@ -490,6 +559,11 @@ const Collapse = styled.div`
       margin-bottom: 0.5rem;
       padding: 0.5rem;
       border: 1px solid #4b4b60;
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        border-color: #665dfe;
+      }
 
       .item {
         height: 3rem;
@@ -528,7 +602,7 @@ const Collapse = styled.div`
           }
 
           p {
-            font-size: 16px;
+            font-size: 14px;
             margin: 0;
             color: #9aa1b9;
           }
@@ -553,9 +627,15 @@ const Collapse = styled.div`
               color: #9aa1b9;
               display: flex;
               justify-content: center;
+              & > a {
+                color: #9aa1b9 !important;
+              }
 
               &:hover {
                 color: #fff;
+                & > a {
+                  color: #fff !important;
+                }
               }
             }
           }

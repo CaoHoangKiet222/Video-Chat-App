@@ -18,10 +18,7 @@ const userSchema = new Schema({
     required: true,
   },
   resetPass: {
-    token: {
-      type: String,
-      default: "",
-    },
+    token: String,
     expireToken: Date,
   },
   avatar: {

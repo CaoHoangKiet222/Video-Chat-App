@@ -56,6 +56,27 @@ exports.checkValidation = (type) => {
             return true;
           }),
       ];
+    case "new-password":
+      return [
+        body(
+          "password",
+          // second argument is default error
+          "The password must be 5+ chars long and must contain number or text!!"
+        )
+          .isLength({ min: 5 })
+          .trim()
+          .isAlphanumeric(),
+        body("confirmPassword")
+          .trim()
+          .custom((value, { req }) => {
+            if (value !== req.body.password) {
+              throw new Error(
+                "Password confirmation does not match with password"
+              );
+            }
+            return true;
+          }),
+      ];
     case "update-password":
       return [
         body("currentPass")

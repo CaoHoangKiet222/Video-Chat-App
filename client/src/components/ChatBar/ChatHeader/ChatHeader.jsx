@@ -92,7 +92,7 @@ const ChatHeader = (props) => {
                   <BsSearch />
                   <span>Search</span>
                 </a>
-                <a href="#">
+                <a href="#" onClick={props.handleViewInfo}>
                   <BsInfoCircle />
                   <span>View Info</span>
                 </a>

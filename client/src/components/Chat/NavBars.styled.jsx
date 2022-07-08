@@ -51,7 +51,7 @@ export const MainNav = styled.ul`
     font-size: 26px;
     padding-bottom: 1.5rem;
     padding-top: 1.5rem;
-    color: #6c757d;
+    color: #0d090898;
     &.active > svg {
       color: #d5d5e3;
     }

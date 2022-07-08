@@ -1,10 +1,16 @@
-import React from "react";
-import { BiDotsVerticalRounded } from "react-icons/bi";
-import { BsSearch, BsTelephone } from "react-icons/bs";
+import React, { useEffect, useState } from "react";
+import { BiBlock, BiDotsVerticalRounded } from "react-icons/bi";
+import { BsArchive, BsInfoCircle, BsSearch, BsTelephone } from "react-icons/bs";
+import { MdOutlineWallpaper } from "react-icons/md";
+import { RiDeleteBinLine } from "react-icons/ri";
+import { VscMute } from "react-icons/vsc";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { errorActions } from "../../../store/error-slice";
-import { getMembersInGroupOnline } from "../../../utilities/utilities";
+import {
+  closeComponent,
+  getMembersInGroupOnline,
+} from "../../../utilities/utilities";
 import { ChatGroupAvatar } from "../../Chat/ChatGroupItems.styled";
 import {
   HeaderBar,
@@ -13,6 +19,7 @@ import {
   MediaInfo,
   MediaNav,
 } from "../../ChatBar/ChatHeader/ChatHeader.styled";
+import { DropDown, DropDownContent } from "../../ChatBar/Main/Main.styled";
 
 const ChatGroupHeader = ({
   groupImg,
@@ -20,11 +27,18 @@ const ChatGroupHeader = ({
   numsPeople,
   members,
   room,
+  handleViewInfo,
+  handleSearchBox,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
   const user = useSelector((state) => state.user.user);
+  const [showDropDown, setShowDropDown] = useState(false);
+
+  useEffect(() => {
+    return closeComponent(showDropDown, setShowDropDown);
+  }, [showDropDown]);
 
   const callGroupHandler = () => {
     const onlineMems = getMembersInGroupOnline(members);
@@ -47,6 +61,10 @@ const ChatGroupHeader = ({
     );
   };
 
+  const handleDropDown = () => {
+    setShowDropDown(!showDropDown);
+  };
+
   return (
     <HeaderBar>
       <Media>
@@ -61,7 +79,7 @@ const ChatGroupHeader = ({
         </MediaContent>
       </Media>
       <MediaNav>
-        <li>
+        <li onClick={handleSearchBox}>
           <Link to="">
             <BsSearch />
           </Link>
@@ -72,14 +90,44 @@ const ChatGroupHeader = ({
           </Link>
         </li>
         <li>
-          <Link
-            to=""
-            onClick={(e) => {
-              e.target.style.color = "#d5d5e5";
-            }}
-          >
+          <Link to="" onClick={handleDropDown}>
             <BiDotsVerticalRounded />
           </Link>
+
+          {showDropDown && (
+            <DropDown>
+              <DropDownContent translate="translate(-200px, -10px)">
+                <a href="#" onClick={handleSearchBox}>
+                  <BsSearch />
+                  <span>Search</span>
+                </a>
+                <a href="#" onClick={handleViewInfo}>
+                  <BsInfoCircle />
+                  <span>View Info</span>
+                </a>
+                <a href="#">
+                  <VscMute />
+                  <span>Mute Notifications</span>
+                </a>
+                <a href="#">
+                  <MdOutlineWallpaper />
+                  <span>Wallpaper</span>
+                </a>
+                <a href="#">
+                  <BsArchive />
+                  <span>Archive</span>
+                </a>
+                <a href="#">
+                  <BiBlock />
+                  <span>Block</span>
+                </a>
+                <a href="#" className="text-danger">
+                  <RiDeleteBinLine />
+                  <span>Delete</span>
+                </a>
+              </DropDownContent>
+            </DropDown>
+          )}
         </li>
       </MediaNav>
     </HeaderBar>

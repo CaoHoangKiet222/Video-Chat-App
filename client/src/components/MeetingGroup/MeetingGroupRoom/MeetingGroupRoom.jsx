@@ -71,14 +71,14 @@ const MeetingGroupRoom = () => {
   const { error, message } = useSelector((state) => state.error);
   // const timeCall = useSelector((state) => state.timeCall.timeCall);
 
-  const calleeInfo = useMemo(() => {
-    return {
-      name: "kkkkkkkkkkkk",
-      avatar: "/images/user.jpg",
-    };
-  }, []);
+  // const calleeInfo = useMemo(() => {
+  //   return {
+  //     name: "kkkkkkkkkkkk",
+  //     avatar: "/images/user.jpg",
+  //   };
+  // }, []);
 
-  // const { user: calleeInfo } = useSelector((state) => state.user);
+  const { user: calleeInfo } = useSelector((state) => state.user);
 
   console.log(peers);
   console.log(peersRef);

@@ -22,7 +22,7 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.ENDPOINT_CLIENT,
     optionsSuccessStatus: 200,
     credentials: true,
   })
@@ -38,9 +38,6 @@ app.use(
       uri: process.env.MONGODB_URI,
       collection: "session",
     }),
-    cookie: {
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 1),
-    },
   })
 );
 

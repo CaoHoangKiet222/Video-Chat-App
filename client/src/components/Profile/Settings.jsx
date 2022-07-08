@@ -217,7 +217,10 @@ const Settings = () => {
           });
         } else if (response.QRCodeImage) {
           Swal.fire({
-            html: "<strong>Enable two factor authentication!!</strong>",
+            html: `
+              <strong>Enable two factor authentication!!</strong><br/><br/>
+              <span>Using Google Authenticator App to access code!!!</span>
+            `,
             width: 500,
             imageUrl: response.QRCodeImage,
           });

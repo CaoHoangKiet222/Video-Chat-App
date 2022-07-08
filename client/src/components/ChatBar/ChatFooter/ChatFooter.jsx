@@ -105,6 +105,8 @@ const ChatFooter = (props) => {
             ...preImgs,
             {
               url: event.target.result,
+              fileName: file.name,
+              size: (file.size / 1024).toFixed(2) + " KB",
             },
           ]);
         } else if (type === "attachments") {
@@ -113,7 +115,7 @@ const ChatFooter = (props) => {
             {
               url: event.target.result,
               fileName: file.name,
-              size: (file.size / 1024).toFixed(2) + "KB",
+              size: (file.size / 1024).toFixed(2) + " KB",
             },
           ]);
         }

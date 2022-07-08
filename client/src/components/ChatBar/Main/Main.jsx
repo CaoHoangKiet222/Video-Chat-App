@@ -10,21 +10,30 @@ const Main = (props) => {
   const { conversation } = useSelector((state) => state.conversation);
   const preTime = useRef(null);
   const timeChange = useRef(true);
+  console.log(props.messages);
   const messages =
     conversation &&
     props.messages
       ?.filter((message) => {
+        console.log(message);
         if (message.content) {
           return searchToDisplay(message.content, props.searchName);
+        } else if (message.files.images.length > 0) {
+          return (
+            message.files.images.findIndex(({ fileName }) => {
+              return searchToDisplay(fileName, props.searchName);
+            }) !== -1
+          );
+        } else {
+          return (
+            message.files.attachments.findIndex(({ fileName }) => {
+              return searchToDisplay(fileName, props.searchName);
+            }) !== -1
+          );
         }
-
-        return (
-          message.files.attachments.findIndex(({ fileName }) => {
-            return searchToDisplay(fileName, props.searchName);
-          }) !== -1
-        );
       })
       .map((message, index) => {
+        console.log(message);
         if (message) {
           if (
             !checkSameDate(preTime.current, message.messageDate) ||

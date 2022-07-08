@@ -10,7 +10,6 @@ import { fetchConversation } from "../../../store/conversations-creator";
 import { v4 as uuid4 } from "uuid";
 import SearchBox from "../ChatHeader/SearchBox";
 import ChatDetail from "./ChatDetail";
-let timer;
 
 const InfoBar = (props) => {
   console.log("InfoBar running");
@@ -18,6 +17,7 @@ const InfoBar = (props) => {
   const [messages, setMessages] = useState([]);
   const [isSendMess, setIsSendMess] = useState(false);
   const [showSearchBox, setShowSearchBox] = useState(false);
+  const [showViewInfo, setShowViewInfo] = useState(false);
   const [searchName, setSearchName] = useState("");
   const [isFetch, setIsFetch] = useState(false);
   const dispatch = useDispatch();
@@ -30,15 +30,12 @@ const InfoBar = (props) => {
       }
       setMessages(messages);
 
-      timer = setTimeout(() => {
-        setIsFetch(true);
-      }, 50);
+      setIsFetch(true);
     });
 
     return () => {
       chatSocket.emit("leaveRoom", props.room);
       setIsFetch(false);
-      clearTimeout(timer);
     };
   }, [props.room, chatSocket]);
 
@@ -55,7 +52,6 @@ const InfoBar = (props) => {
         const index = preMess.findIndex((mess) => mess._id === message._id);
         index !== -1 && preMess.splice(index, 1);
         preMess.forEach((mess) => {
-          console.log(mess);
           mess.reply && console.log(mess.reply.message_id, message._id);
           if (mess.reply !== null && mess.reply.message_id === message._id) {
             mess.reply = null;
@@ -127,11 +123,16 @@ const InfoBar = (props) => {
     setShowSearchBox(!showSearchBox);
   };
 
+  const handleViewInfo = () => {
+    setShowViewInfo(!showViewInfo);
+  };
+
   return (
     <Card>
       <Msger showSearchBox={showSearchBox}>
         <ChatHeader
           handleSearchBox={handleSearchBox}
+          handleViewInfo={handleViewInfo}
           member={props.member}
           room={props.room}
         />
@@ -154,7 +155,12 @@ const InfoBar = (props) => {
         )}
         <ChatFooter member={props.member} onSendMessage={sendMessage} />
       </Msger>
-      <ChatDetail />
+      <ChatDetail
+        handleViewInfo={handleViewInfo}
+        showViewInfo={showViewInfo}
+        member={props.member}
+        messages={messages}
+      />
     </Card>
   );
 };

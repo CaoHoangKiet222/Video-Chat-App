@@ -68,49 +68,60 @@ const Messages = (props) => {
   };
 
   const deleteHandler = async () => {
-    console.log(props.message);
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire("Deleted!", "Your message has been deleted.", "success");
-        chatSocket.emit(
-          "deleteMessage",
-          {
-            message: props.message,
-            conversationId: props.conversationId,
-          },
-          () => {
-            props.setMessages((preMess) => {
-              preMess.splice(
-                preMess.findIndex((mess) => mess._id === props.message._id),
-                1
-              );
-              preMess.forEach((mess) => {
-                console.log(mess);
-                mess.reply &&
-                  console.log(mess.reply.message_id, props.message._id);
-                if (
-                  mess.reply !== null &&
-                  mess.reply.message_id === props.message._id
-                ) {
-                  mess.reply = null;
-                }
+    console.log(props);
+    if (props.isRight) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        allowOutsideClick: false,
+        confirmButtonText: "Yes, delete it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire("Deleted!", "Your message has been deleted.", "success");
+          chatSocket.emit(
+            "deleteMessage",
+            {
+              message: props.message,
+              conversationId: props.conversationId,
+            },
+            () => {
+              props.setMessages((preMess) => {
+                preMess.splice(
+                  preMess.findIndex((mess) => mess._id === props.message._id),
+                  1
+                );
+                preMess.forEach((mess) => {
+                  console.log(mess);
+                  mess.reply &&
+                    console.log(mess.reply.message_id, props.message._id);
+                  if (
+                    mess.reply !== null &&
+                    mess.reply.message_id === props.message._id
+                  ) {
+                    mess.reply = null;
+                  }
+                });
+                return [...preMess];
               });
-              return [...preMess];
-            });
 
-            dispatch(fetchConversation());
-          }
-        );
-      }
-    });
+              dispatch(fetchConversation());
+            }
+          );
+        }
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        html: "You don't have any permission to delete user's message",
+        showConfirmButton: false,
+        timer: 5000,
+      });
+    }
   };
 
   const replyHandler = () => {
@@ -141,6 +152,7 @@ const Messages = (props) => {
       })
     );
   };
+  console.log(props.message);
 
   return (
     <Message isRight={props.isRight} id={props.message._id}>
@@ -209,6 +221,7 @@ const Messages = (props) => {
           {props.message.files?.images.length !== 0 && (
             <div className="images-row">
               {props.message.files?.images.map(({ url }, index) => {
+                console.log(url);
                 return (
                   <ImagesPreview
                     url={url}
@@ -235,7 +248,7 @@ const Messages = (props) => {
       </MessageWrap>
       <MessageOptions>
         <Avatar>
-          <img src="/images/user.jpg" alt="" />
+          <img src={props.message.senderId.avatar.url} alt="" />
         </Avatar>
         <span>{formatHour(props.time)}</span>
         <DropDown onClick={dropDownHandle}>

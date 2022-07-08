@@ -70,36 +70,6 @@ exports.getConversation = (req, res, _next) => {
   }
 };
 
-exports.getSession = (req, res, _next) => {
-  try {
-    if (req.session.isRemember) {
-      return res.send({
-        isRemember: req.session.isRemember,
-      });
-    }
-
-    User.findByIdAndUpdate(
-      req.session.user._id,
-      {
-        isLoggined: false,
-      },
-      { new: true },
-      () => {
-        req.session.destroy((error) => console.log(error));
-
-        res.json({
-          isRemember: false,
-          error: null,
-        });
-      }
-    );
-
-    // req.session.destroy((error) => console.log(error));
-  } catch (error) {
-    res.send({ error: error.message });
-  }
-};
-
 exports.postAddFriend = async (req, res, _next) => {
   try {
     const convExist = await Conversation.findOne({
@@ -242,15 +212,15 @@ exports.postUserSignUp = async (req, res, _next) => {
       return res.send({ error: errors.array()[0].msg });
     }
 
-    const user = await User.create({
+    await User.create({
       name: req.body.email.split("@")[0],
       email: req.body.email,
       password: await bcryptjs.hash(req.body.password, 12),
-    }).then(async (user) => {
-      return await User.findById(user._id).select("-password");
     });
 
-    res.send(user);
+    res.send({
+      message: "Creating account successfully, have fun with our page!!!",
+    });
   } catch (err) {
     console.log(err);
     res.send({ error: err.message });
@@ -282,23 +252,27 @@ exports.postReset = (req, res, _next) => {
             return res.send({ error: "No found that email!!" });
           }
 
-          const getUrl = url.format({
-            protocol: req.protocol,
-            host: req.get("host"),
-          });
-          console.log(getUrl);
-
-          mailer.sendMail({
-            from: "caohoangkiet1720@gmail.com",
-            to: "kiet.caohoang@hcmut.edu.vn",
-            subject: "Password Reset",
-            html: `
+          mailer.sendMail(
+            {
+              from: "caohoangkiet1720@gmail.com",
+              to: user.email,
+              subject: "Password Reset",
+              html: `
               <p>You requested a password reset</p>
-              <p>Click <a href="${getUrl}/reset/${token}">this</a> to reset password </p>
+              <p>Click <a href="${process.env.ENDPOINT_CLIENT}/reset-password/new-pass?token=${token}">this</a> to reset password </p>
            `,
-          });
-
-          res.send({ message: "Check your email" });
+            },
+            (err, result) => {
+              console.log("mailer", result);
+              if (err) {
+                return res.send({ error: "Something went wrong!!!" });
+              }
+              res.send({
+                message:
+                  "Confirm successfully, please check email to reset your password!!!",
+              });
+            }
+          );
         }
       );
     });
@@ -307,21 +281,68 @@ exports.postReset = (req, res, _next) => {
   }
 };
 
-exports.postNewPassword = (req, res, _next) => {
+exports.postNewPassword = async (req, res, _next) => {
   try {
+    const errors = validationResult(req);
+    console.log(errors);
+
+    if (!errors.isEmpty()) {
+      return res.send({ error: errors.array()[0].msg });
+    }
+
+    User.findOne(
+      {
+        $and: [
+          { "resetPass.token": req.params.token },
+          { "resetPass.expireToken": { $gt: Date.now() } },
+        ],
+      },
+      async (err, user) => {
+        if (err) {
+          return res.send({ error: err.message });
+        }
+
+        if (!user) {
+          return res.send({ error: "Your reset token had been expired!!!" });
+        }
+
+        user.password = await bcryptjs.hash(req.body.password, 12);
+        user.resetPass.token = null;
+        user.resetPass.expireToken = null;
+        await user.save();
+
+        res.send({
+          message: "We have resetted your password, please login!!!",
+        });
+      }
+    );
   } catch (err) {
     res.send({ error: err.message });
   }
 };
 
-exports.checkAuthUser = (req, res, _next) => {
+exports.checkCookieExpiration = async (req, res, _next) => {
   try {
     console.log("checkAuthUser", req.session);
-    if (!req.session.isLoggined) {
-      return res.json({ isAuth: false });
+
+    console.log(req.session.cookieExpiration - Date.now());
+    if (req.session.cookieExpiration - Date.now() <= 0) {
+      await User.updateOne(
+        {
+          _id: req.session.user._id,
+        },
+        {
+          isLoggined: false,
+        }
+      );
+      req.session.destroy((err) => console.log(err));
+      return res.json({ expireCookie: true });
+    }
+    if (req.session.isLoggined) {
+      return res.json({ isAuth: true });
     }
 
-    res.json({ isAuth: true });
+    res.json({ expireCookie: false, isAuth: false });
   } catch (error) {
     res.json({ error: error.message });
   }

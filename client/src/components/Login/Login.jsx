@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Container,
@@ -25,7 +25,7 @@ import { fetchLogin, fetchLoginByFirebase } from "../../store/user-creator";
 import { Fade, Flip } from "react-awesome-reveal";
 import Swal from "sweetalert2";
 import { userActions } from "../../store/user-slice";
-import { deleteUser, signInWithPopup } from "firebase/auth";
+import { signInWithPopup } from "firebase/auth";
 import {
   authFirebase,
   googleProvider,
@@ -45,6 +45,14 @@ const Login = (props) => {
   const [isTermsService, setIsTermService] = useState(false);
   const { auth } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+
+  const resetAllUseState = useCallback(() => {
+    setEmail("");
+    setPassword("");
+    setConfirmPass("");
+    setIsRemember(false);
+    setIsTermService(false);
+  }, []);
 
   useEffect(() => {
     if (!props.isSignUp) {
@@ -68,11 +76,7 @@ const Login = (props) => {
     } else {
       props.passResetRef.current = false;
     }
-    setEmail("");
-    setPassword("");
-    setConfirmPass("");
-    setIsRemember(false);
-    setIsTermService(false);
+    resetAllUseState();
   }, [
     props.isSignUp,
     navigate,
@@ -80,6 +84,7 @@ const Login = (props) => {
     props.signupRef,
     props.passResetRef,
     props.isResetPass,
+    resetAllUseState,
   ]);
 
   useEffect(() => {
@@ -104,16 +109,23 @@ const Login = (props) => {
 
     dispatch(
       fetchLogin(
-        `${process.env.REACT_APP_ENDPOINT_SERVER}/${props.formType}`,
+        `${process.env.REACT_APP_ENDPOINT_SERVER}/${
+          props.formType === "new-password"
+            ? props.formType +
+              "/" +
+              new URLSearchParams(window.location.search).get("token")
+            : props.formType
+        }`,
         {
           email,
           password,
           confirmPass,
-          isRemember,
         },
         props.formType,
         navigate,
-        props.signupRef
+        props.signupRef,
+        props.passResetRef,
+        resetAllUseState
       )
     );
   };
@@ -197,24 +209,23 @@ const Login = (props) => {
               <Form
                 isSignup={props.isSignUp}
                 isResetPass={props.isResetPass}
+                formType={props.formType}
                 onSubmit={submitHandle}
               >
-                <input
-                  type="hidden"
-                  name="clientHome"
-                  value={window.location.origin}
-                />
-                <FormGroup>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Email Address"
-                    value={email}
-                    required
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </FormGroup>
-                {!props.isResetPass && (
+                {!(props.formType === "new-password") && (
+                  <FormGroup>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Email Address"
+                      value={email}
+                      required
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </FormGroup>
+                )}
+                {(!(props.formType === "password-reset") ||
+                  props.formType === "new-password") && (
                   <FormGroup>
                     <input
                       type="password"
@@ -226,7 +237,7 @@ const Login = (props) => {
                     />
                   </FormGroup>
                 )}
-                {props.isSignUp && (
+                {(props.isSignUp || props.formType === "new-password") && (
                   <FormGroup>
                     <input
                       type="password"

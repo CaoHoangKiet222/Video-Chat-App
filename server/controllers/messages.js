@@ -4,8 +4,7 @@ const { getConversation } = require("./user");
 const {
   cloudinary,
   destroyAsset,
-  uploadImgs,
-  uploadAttachments,
+  upload,
 } = require("../cloudinary/cloudinary");
 const Reply = require("../models/reply");
 
@@ -21,7 +20,10 @@ exports.newGroup = (req, res, _next) => {
         }
 
         await new Conversation({
-          members: [...req.body.newMembers, { userId: req.session.user }],
+          members: [
+            ...req.body.newMembers,
+            { userId: req.session.user, isAdmin: true },
+          ],
           groupImg: result.url,
           groupName: req.body.groupName,
           messages: [],
@@ -40,15 +42,15 @@ exports.uploadFilesInConversation = (files) => {
   try {
     return new Promise(async (resolve) => {
       const uploadedImgsUrl = await Promise.all(
-        files.images.map(({ url }) => {
-          return uploadImgs(url, "image-preview");
+        files.images.map(({ url, fileName }) => {
+          return upload({ url, fileName }, "image-preview");
         })
       );
       console.log(uploadedImgsUrl);
 
       const uploadedAttachmentsUrl = await Promise.all(
         files.attachments.map(({ url, fileName }) => {
-          return uploadAttachments({ url, fileName }, "attachments");
+          return upload({ url, fileName }, "attachments");
         })
       );
       console.log(uploadedAttachmentsUrl);

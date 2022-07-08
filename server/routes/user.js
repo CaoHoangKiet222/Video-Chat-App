@@ -4,13 +4,11 @@ const router = express.Router();
 const { checkValidation } = require("../middleware/isAuth");
 const userController = require("../controllers/user");
 
-router.get("/isAuth", userController.checkAuthUser);
+router.get("/isExpiredCookie", userController.checkCookieExpiration);
 
 router.get("/Friends/list-friends", userController.getListFriends);
 
 router.get("/Chats/conversation", userController.getConversation);
-
-router.get("/session", userController.getSession);
 
 router.post("/meeting/:conversationId", userController.getCall);
 
@@ -28,9 +26,13 @@ router.post(
   userController.postUserSignUp
 );
 
-router.post("/reset-password", userController.postReset);
+router.post("/password-reset", userController.postReset);
 
-router.post("/reset/new-password", userController.postNewPassword);
+router.post(
+  "/new-password/:token",
+  checkValidation("new-password"),
+  userController.postNewPassword
+);
 
 router.post("/update-user/account", userController.updateUserAccount);
 
