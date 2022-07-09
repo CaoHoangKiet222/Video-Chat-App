@@ -69,7 +69,6 @@ const MeetingRoom = () => {
       });
     }
   }, [showTop]);
-  console.log(type);
 
   useEffect(() => {
     // Callee startCall

@@ -40,13 +40,15 @@ const ModalDialog = (props) => {
   };
 
   const handleFile = (e) => {
-    // console.log(e.target.files[0]);
-    // profilePicture.current = e.target.files[0];
     const fReader = new FileReader();
     fReader.readAsDataURL(e.target.files[0]);
     fReader.onload = (event) => {
       profilePicture.current = event.target.result;
     };
+  };
+
+  const cancelHandler = () => {
+    props.setShowModalDialog(false);
   };
 
   const createGroupHandler = async () => {
@@ -202,7 +204,9 @@ const ModalDialog = (props) => {
             </ModalBody>
             {props.newGroup && (
               <ModalFooter>
-                <button className="cancel">Cancel</button>
+                <button className="cancel" onClick={cancelHandler}>
+                  Cancel
+                </button>
                 <button className="new-group" onClick={createGroupHandler}>
                   {isFetch ? (
                     <LoadingSpinner newGroup={props.newGroup} />

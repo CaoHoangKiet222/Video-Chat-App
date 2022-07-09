@@ -13,6 +13,7 @@ import { FiPhoneOff, FiPhone, FiVideo } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { findImgAndNameGroup } from "../../utilities/utilities";
+import { useAudio } from "../Hook/useAudio";
 
 const MeetingGroup = () => {
   console.log("MeetingGroup running");
@@ -21,16 +22,26 @@ const MeetingGroup = () => {
   const videoGroup = useSelector((state) => state.videoGroup);
   const group = useRef(null);
   const navigate = useNavigate();
+  const [playing, setPlaying] = useAudio(
+    `${process.env.REACT_APP_ENDPOINT_CLIENT}/audio/waiting-ringtone.wav`
+  );
+  console.log("playing", playing);
+
+  useEffect(() => {
+    setPlaying(true);
+  }, [setPlaying]);
 
   useEffect(() => {
     group.current = findImgAndNameGroup(conversation?.conv, params.meetingId);
   }, [conversation?.conv, params.meetingId]);
 
-  const closeVideo = () => {
+  const closeVideo = async () => {
+    await Promise.resolve(setPlaying(false));
     navigate("/video-chat/Chats");
   };
 
-  const acceptVideo = () => {
+  const acceptVideo = async () => {
+    await Promise.resolve(setPlaying(false));
     navigate(`/meeting-group/${params.meetingId}`);
   };
 
@@ -43,7 +54,7 @@ const MeetingGroup = () => {
           <p className="title">{videoGroup.caller?.name}</p>
           <p className="message">
             {" "}
-            in group {group.current?.groupName} starts video
+            in group <strong>"{group.current?.groupName}"</strong> starts video
           </p>
           <Picture>
             <ImgWrapper>

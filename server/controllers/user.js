@@ -57,7 +57,7 @@ exports.getConversation = (req, res, _next) => {
         if (_err) {
           throw new Error("Conversation not found!!");
         }
-        console.log("getConversation", req.session.user);
+
         return res.status(200).json({
           conv: convTest,
           user: req.session.user,

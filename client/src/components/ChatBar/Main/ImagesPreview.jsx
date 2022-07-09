@@ -1,13 +1,12 @@
 import React from "react";
 import styled from "styled-components";
 
-const ImagesPreview = ({ url, isRight }) => {
-  console.log(url);
+const ImagesPreview = ({ url, fileName, isRight }) => {
   return (
-    <FormImg isRight={isRight}>
+    <FormImg isRight={isRight} href={url}>
       <div className="column">
         <div className="lightgallery_item">
-          <img src={url} alt="" />
+          <img src={url} alt={fileName} />
         </div>
       </div>
     </FormImg>
@@ -16,7 +15,7 @@ const ImagesPreview = ({ url, isRight }) => {
 
 export default ImagesPreview;
 
-const FormImg = styled.div`
+const FormImg = styled.a`
   display: flex;
   flex-wrap: wrap;
   margin-right: 7px;

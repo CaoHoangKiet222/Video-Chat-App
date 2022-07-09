@@ -3,6 +3,7 @@ import { Img, Name, PeerInfo, RemotePeer, Status } from "./CommonPeer.styled";
 
 const CommonPeer = (props) => {
   const avatar = props.avatar || props.user?.avatar;
+  console.log(avatar, props.avatar, props.user?.avatar);
 
   return (
     <PeerInfo className={props.className} type={props.type}>

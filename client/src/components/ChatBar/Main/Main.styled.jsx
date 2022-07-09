@@ -139,6 +139,10 @@ export const Content = styled(MessageWrap)`
     justify-content: flex-start;
     flex-wrap: wrap;
     margin: 4px 0;
+
+    .lg-react-element {
+      display: flex;
+    }
   }
   & > span {
     position: relative;

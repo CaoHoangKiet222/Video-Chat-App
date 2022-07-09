@@ -142,10 +142,9 @@ const ChatDetail = (props) => {
                 </div>
 
                 <Collapse showMembers={showMembers}>
-                  {props.members.map(({ userId: member }) => {
-                    console.log(member);
+                  {props.members.map(({ userId: member }, index) => {
                     return (
-                      <div className="card-body">
+                      <div className="card-body" key={index}>
                         <div className="group-content">
                           <div>
                             <div className="avatar">
@@ -183,7 +182,6 @@ const ChatDetail = (props) => {
               <Collapse showMedia={showMedia}>
                 {props.messages.map((message) => {
                   return message.files.images.map((image, index) => {
-                    console.log(image);
                     return (
                       <div className="card-body" key={index}>
                         <div className="card-content">

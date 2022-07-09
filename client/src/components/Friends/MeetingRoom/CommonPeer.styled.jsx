@@ -54,6 +54,7 @@ export const Img = styled.div`
     border-radius: 50%;
     height: inherit;
     width: inherit;
+    object-fit: cover;
   }
 `;
 

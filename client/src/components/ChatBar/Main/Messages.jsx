@@ -40,6 +40,7 @@ import Attachments from "./Attachments";
 import { ImImages } from "react-icons/im";
 import Swal from "sweetalert2";
 import Mark from "mark.js";
+import Gallery from "../../ImageGallery/Gallery";
 
 const Messages = (props) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -152,7 +153,6 @@ const Messages = (props) => {
       })
     );
   };
-  console.log(props.message);
 
   return (
     <Message isRight={props.isRight} id={props.message._id}>
@@ -220,16 +220,18 @@ const Messages = (props) => {
 
           {props.message.files?.images.length !== 0 && (
             <div className="images-row">
-              {props.message.files?.images.map(({ url }, index) => {
-                console.log(url);
-                return (
-                  <ImagesPreview
-                    url={url}
-                    key={index}
-                    isRight={props.isRight}
-                  />
-                );
-              })}
+              <Gallery>
+                {props.message.files?.images.map(({ url, fileName }, index) => {
+                  return (
+                    <ImagesPreview
+                      url={url}
+                      key={index}
+                      fileName={fileName}
+                      isRight={props.isRight}
+                    />
+                  );
+                })}
+              </Gallery>
             </div>
           )}
           {props.message.files?.attachments.length !== 0 &&

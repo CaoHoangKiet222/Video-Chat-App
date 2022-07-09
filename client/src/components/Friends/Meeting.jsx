@@ -15,6 +15,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { answerCall, callToUser, leaveCall } from "../../store/video-creator";
 import { videoActions } from "../../store/video-slice";
 import { errorActions } from "../../store/error-slice";
+import { useAudio } from "../Hook/useAudio";
+import { setPersistence } from "firebase/auth";
 
 const Meeting = () => {
   console.log("Meeting running");
@@ -26,6 +28,13 @@ const Meeting = () => {
   const { meetingSocket } = useSelector((state) => state.socket);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [playing, setPlaying] = useAudio(
+    `${process.env.REACT_APP_ENDPOINT_CLIENT}/audio/waiting-ringtone.wav`
+  );
+
+  useEffect(() => {
+    setPlaying(true);
+  }, [setPlaying]);
 
   useEffect(() => {
     if (callAccepted) {
@@ -39,13 +48,20 @@ const Meeting = () => {
     });
 
     meetingSocket.on("joinMeetingRoom", (callId) => {
+      setPlaying(false);
       navigate(`/meeting/${callId}`);
     });
-  }, [dispatch, meetingSocket, navigate]);
+
+    return () => {
+      meetingSocket.off("callToUser");
+      meetingSocket.off("joinMeetingRoom");
+    };
+  }, [dispatch, meetingSocket, navigate, setPlaying]);
 
   useEffect(() => {
     // Off stream for only 2 members when close video
     meetingSocket.on("notAnswerCall", () => {
+      setPlaying(false);
       dispatch(
         errorActions.setError({
           error: true,
@@ -60,7 +76,7 @@ const Meeting = () => {
     return () => {
       meetingSocket.off("notAnswerCall");
     };
-  }, [dispatch, meetingSocket, navigate, stream, isReceiving]);
+  }, [dispatch, meetingSocket, navigate, stream, isReceiving, setPlaying]);
 
   useEffect(() => {
     console.log(isReceiving);
@@ -82,6 +98,7 @@ const Meeting = () => {
         },
       },
       () => {
+        setPlaying(false);
         dispatch(leaveCall(navigate, stream));
       }
     );

@@ -74,7 +74,9 @@ const MeetingGroupRoom = () => {
   // const calleeInfo = useMemo(() => {
   //   return {
   //     name: "kkkkkkkkkkkk",
-  //     avatar: "/images/user.jpg",
+  //     avatar: {
+  //       url: "/images/user.jpg",
+  //     },
   //   };
   // }, []);
 
@@ -270,7 +272,7 @@ const MeetingGroupRoom = () => {
       userLeaveId: meetingGroupSocket.id,
       room: params.meetingId,
     });
-    leaveGroupCall(navigate, myVideo.current.srcObject);
+    leaveGroupCall(navigate, myStream);
   };
 
   const videoHandle = () => {
