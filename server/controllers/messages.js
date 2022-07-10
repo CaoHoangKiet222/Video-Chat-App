@@ -23,13 +23,14 @@ exports.postInvitation = (req, res, _next) => {
 
     mailer.sendMail(
       {
-        from: "caohoangkiet1720@gmail.com",
+        from: process.env.NODEMAILER_AUTH_USER,
         to: req.body.email,
         subject: "Invite to Video Chat App!!!",
         html: `
               <h3>Hello ${req.body.email}</h3>
-              <p>Your friend <strong>${req.body.user.name}</strong> from <strong>${req.body.user.email}</strong></p>
-              <p>Click <a href="${process.env.ENDPOINT_CLIENT}">here </a> to join with us!!!</p>
+              <p>Your friend <strong>${req.body.user.name}</strong> from <strong>${req.body.user.email}</strong> send you a message.</p>
+              <p><strong>${req.body.message}</strong></p>
+              <p>Click <a href="${process.env.ENDPOINT_CLIENT}">here</a> to join with me!!!</p>
            `,
       },
       (err, result) => {

@@ -81,6 +81,8 @@ const ModalDialog = (props) => {
     }
 
     setIsFetch(false);
+    emailRef.current.value = "";
+    textAreaRef.current.value = "";
     Swal.fire({
       icon: "success",
       html: data.message,

@@ -253,12 +253,13 @@ exports.postReset = (req, res, _next) => {
 
           mailer.sendMail(
             {
-              from: "caohoangkiet1720@gmail.com",
+              from: process.env.NODEMAILER_AUTH_USER,
               to: user.email,
               subject: "Password Reset",
               html: `
+              <h3>Hello ${user.email}</h3>
               <p>You requested a password reset</p>
-              <p>Click <a href="${process.env.ENDPOINT_CLIENT}/reset-password/new-pass?token=${token}">this</a> to reset password </p>
+              <p>Click <a href="${process.env.ENDPOINT_CLIENT}/reset-password/new-pass?token=${token}">this</a> to reset password.</p>
            `,
             },
             (err, result) => {
@@ -474,7 +475,7 @@ exports.postEnable2FA = (req, res, _next) => {
 
           const otpAuth = generateOTPToken(
             updatedUser.name,
-            "kietcaohoang.com",
+            "chk.videochatapp",
             updatedUser.twoFA.secret
           );
 
