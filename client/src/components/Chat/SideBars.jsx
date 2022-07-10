@@ -24,6 +24,7 @@ import ModalGroup from "../ModalGroup/ModalGroup";
 import ChatGroupItems from "./ChatGroupItems";
 import ModalDialog from "../ModalDialog/ModalDialog";
 import { forwardActions } from "../../store/forward-slice";
+import ModalInvitation from "../ModalGroup/ModalInvitation";
 
 const SideBars = (props) => {
   console.log("SideBars running");
@@ -34,6 +35,7 @@ const SideBars = (props) => {
   const [searchName, setSearchName] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [showModalGroup, setShowModalGroup] = useState(false);
+  const [showModalInvitation, setShowModalInvitation] = useState(false);
   const [showModalDialog, setShowModalDialog] = useState(false);
   const { forward } = useSelector((state) => state.forward);
   const dispatch = useDispatch();
@@ -81,6 +83,10 @@ const SideBars = (props) => {
     setShowModalGroup(true);
   };
 
+  const inviteOthersHandler = () => {
+    setShowModalInvitation(true);
+  };
+
   const createNewChatHandler = () => {
     setShowModalDialog(true);
     dispatch(
@@ -101,6 +107,9 @@ const SideBars = (props) => {
         )}
         {showModalGroup && (
           <ModalGroup setShowModalGroup={setShowModalGroup} friends={friends} />
+        )}
+        {showModalInvitation && (
+          <ModalInvitation setShowModalInvitation={setShowModalInvitation} />
         )}
         <ChatsHeader>
           <HeaderContent>
@@ -123,7 +132,7 @@ const SideBars = (props) => {
                         <a href="#" onClick={createGroupHandler}>
                           <span>Create Group</span>
                         </a>
-                        <a href="#">
+                        <a href="#" onClick={inviteOthersHandler}>
                           <span>Invite Others</span>
                         </a>
                       </DropDownContent>

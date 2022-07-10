@@ -123,6 +123,11 @@ exports.checkValidation = (type) => {
             return true;
           }),
       ];
+    case "invite-others":
+      return check("email")
+        .isEmail()
+        .withMessage("Invalid email. Please enter the right one!!!")
+        .normalizeEmail();
     default:
       return null;
   }

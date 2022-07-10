@@ -374,3 +374,18 @@ export const splicePeers = (peers, id) => {
   index !== -1 && peers.splice(index, 1);
   return peers;
 };
+
+export const convertString = (oldString) => {
+  let arrStr = oldString.trim().split("\n");
+
+  return arrStr
+    .map((str) => str.trim())
+    .filter((str) => str.length > 0)
+    .map((str) =>
+      str
+        .split(" ")
+        .filter((x) => x.length > 0)
+        .join(" ")
+    )
+    .join("\n");
+};

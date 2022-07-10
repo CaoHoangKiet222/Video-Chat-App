@@ -2,8 +2,8 @@ import styled from "styled-components";
 
 export const LoadingSpinner = styled.div`
   display: inline-block;
-  ${({ newGroup, settings }) =>
-    newGroup
+  ${({ newGroup, invitation, settings }) =>
+    newGroup || invitation
       ? `
   width: 50px;
   height: 10px;
@@ -28,8 +28,8 @@ export const LoadingSpinner = styled.div`
   &:after {
     content: " ";
     display: block;
-    ${({ newGroup, settings }) =>
-      newGroup
+    ${({ newGroup, invitation, settings }) =>
+      newGroup || invitation
         ? `
     width: 20px;
     height: 20px;

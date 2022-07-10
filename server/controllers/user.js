@@ -12,7 +12,6 @@ const {
   verifyOTPToken,
 } = require("../2FA/2fa");
 const crypto = require("crypto");
-const url = require("url");
 
 exports.getCall = async (req, res, _next) => {
   try {
@@ -429,8 +428,6 @@ exports.updateUserPassword = async (req, res, _next) => {
 
     const { newPass, userId } = req.body;
     console.log(req.body);
-
-    // mailerMain();
 
     User.findOneAndUpdate(
       { _id: userId },

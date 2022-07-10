@@ -1,15 +1,18 @@
 import React, { useRef, useState } from "react";
 import { BsSearch } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
+import Swal from "sweetalert2";
 import { conversationActions } from "../../store/conversations-slice";
 import { errorActions } from "../../store/error-slice";
-import { postData } from "../../utilities/utilities";
+import { convertString, postData } from "../../utilities/utilities";
 import { LoadingSpinner } from "../UI/Loading";
 import DialogItems from "./DialogItems";
 import {
   Container,
   DialogGroupName,
   DialogGroupPicture,
+  DialogInvitation,
+  DialogMessage,
   DialogSearch,
   Document,
   ModalBody,
@@ -26,7 +29,10 @@ const ModalDialog = (props) => {
   const [newMembers, setNewMembers] = useState([]);
   const [isFetch, setIsFetch] = useState(false);
   const { notifySocket } = useSelector((state) => state.socket);
+  const { user } = useSelector((state) => state.user);
   const groupName = useRef(null);
+  const emailRef = useRef("");
+  const textAreaRef = useRef("");
   const profilePicture = useRef(null);
   const dispatch = useDispatch();
   console.log(newMembers);
@@ -49,6 +55,38 @@ const ModalDialog = (props) => {
 
   const cancelHandler = () => {
     props.setShowModalDialog(false);
+  };
+
+  const handleInvitation = async () => {
+    console.log(convertString(textAreaRef.current.value));
+    setIsFetch(true);
+    const data = await postData(
+      `${process.env.REACT_APP_ENDPOINT_SERVER}/invite-others`,
+      "post",
+      {
+        message: convertString(textAreaRef.current.value),
+        email: emailRef.current.value,
+        user,
+      }
+    );
+
+    if (data.error) {
+      return Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        html: data.error,
+        showConfirmButton: false,
+        timer: 5000,
+      });
+    }
+
+    setIsFetch(false);
+    Swal.fire({
+      icon: "success",
+      html: data.message,
+      showConfirmButton: false,
+      timer: 5000,
+    });
   };
 
   const createGroupHandler = async () => {
@@ -90,7 +128,9 @@ const ModalDialog = (props) => {
             profilePicture.current = null;
             props.setShowModalDialog(false);
             setIsFetch(false);
-          } catch (error) {}
+          } catch (error) {
+            console.log(error);
+          }
         } else {
           dispatch(
             errorActions.setError({
@@ -122,7 +162,15 @@ const ModalDialog = (props) => {
       <ModalFade />
       <Container>
         <Document newGroup={props.newGroup} isForward={props.isForward}>
-          <ModalContent>
+          <ModalContent
+            onSubmit={(e) => {
+              e.preventDefault();
+
+              if (props.invitation) {
+                handleInvitation();
+              }
+            }}
+          >
             <ModalHeader>
               <ModalTitle>
                 <h5>
@@ -130,6 +178,8 @@ const ModalDialog = (props) => {
                     ? "Forward"
                     : props.newGroup
                     ? "Create a New Group"
+                    : props.invitation
+                    ? "Invite Others"
                     : "New Chat"}
                 </h5>
               </ModalTitle>
@@ -139,7 +189,41 @@ const ModalDialog = (props) => {
             </ModalHeader>
             <ModalBody>
               <Row>
+                {props.invitation && (
+                  // invite others
+                  <>
+                    <DialogInvitation>
+                      <div>
+                        <label>Email address</label>
+                        <input
+                          type="email"
+                          placeholder="Type email address here"
+                          ref={emailRef}
+                          required
+                          onChange={(e) =>
+                            (emailRef.current.value = e.target.value)
+                          }
+                        />
+                      </div>
+                    </DialogInvitation>
+                    <DialogMessage>
+                      <div>
+                        <label>Invitation message</label>
+                        <textarea
+                          type="text"
+                          ref={textAreaRef}
+                          rows="3"
+                          placeholder="Write your message here"
+                          onChange={(e) =>
+                            (textAreaRef.current.value = e.target.value)
+                          }
+                        ></textarea>
+                      </div>
+                    </DialogMessage>
+                  </>
+                )}
                 {props.newGroup && (
+                  // create new Group
                   <>
                     <DialogGroupName>
                       <div>
@@ -176,32 +260,50 @@ const ModalDialog = (props) => {
                     </DialogGroupPicture>
                   </>
                 )}
-                <DialogSearch newGroup={props.newGroup}>
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="Search for user..."
-                      onChange={startSearch}
-                    ></input>
-                    <div>
+                {!props.invitation && (
+                  <>
+                    <DialogSearch newGroup={props.newGroup}>
                       <div>
-                        <BsSearch />
+                        <input
+                          type="text"
+                          placeholder="Search for user..."
+                          onChange={startSearch}
+                        ></input>
+                        <div>
+                          <div>
+                            <BsSearch />
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </DialogSearch>
-                <DialogItems
-                  conversation={props.conversation}
-                  friends={props.friends}
-                  searchName={searchName}
-                  setSearchName={setSearchName}
-                  setShowModalDialog={props.setShowModalDialog}
-                  isForward={props.isForward}
-                  newGroup={props.newGroup}
-                  setNewMembers={setNewMembers}
-                />
+                    </DialogSearch>
+                    <DialogItems
+                      conversation={props.conversation}
+                      friends={props.friends}
+                      searchName={searchName}
+                      setSearchName={setSearchName}
+                      setShowModalDialog={props.setShowModalDialog}
+                      isForward={props.isForward}
+                      newGroup={props.newGroup}
+                      setNewMembers={setNewMembers}
+                    />
+                  </>
+                )}
               </Row>
             </ModalBody>
+            {props.invitation && (
+              <ModalFooter invitation={true}>
+                <button className="cancel" onClick={cancelHandler}>
+                  Close
+                </button>
+                <button className="invitation">
+                  {isFetch ? (
+                    <LoadingSpinner invitation={props.invitation} />
+                  ) : (
+                    <>Send Invitation</>
+                  )}
+                </button>
+              </ModalFooter>
+            )}
             {props.newGroup && (
               <ModalFooter>
                 <button className="cancel" onClick={cancelHandler}>

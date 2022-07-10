@@ -45,7 +45,7 @@ export const Document = styled.div`
   justify-content: center;
   align-items: center;
 `;
-export const ModalContent = styled.div`
+export const ModalContent = styled.form`
   background: #383f44;
   display: flex;
   flex-direction: column;
@@ -219,7 +219,7 @@ export const ModalFooter = styled.div`
   font-size: 0.875rem;
 
   .cancel {
-    margin-right: auto;
+    margin-right: ${({ invitation }) => !invitation && "auto"};
     color: #adb5bd;
     border: 1px solid transparent;
     padding: 0.4375rem 1.25rem;
@@ -234,7 +234,8 @@ export const ModalFooter = styled.div`
     }
   }
 
-  .new-group {
+  .new-group,
+  .invitation {
     color: #fff;
     background-color: #44a675;
     padding: 0.4375rem 1.25rem;
@@ -246,6 +247,35 @@ export const ModalFooter = styled.div`
 
     &:hover {
       background: #389b62;
+    }
+  }
+`;
+
+export const DialogInvitation = styled(DialogGroupName)``;
+export const DialogMessage = styled(DialogGroupName)`
+  height: 130px;
+
+  div {
+    min-height: 109px;
+    textarea {
+      resize: none;
+      min-height: 77px;
+      width: 100%;
+      padding: 6px 12px;
+      outline: none;
+      background-color: #2a2a2a;
+      color: #fff;
+      border-color: #2a2a2a;
+      border-radius: 5px !important;
+      font-family: inherit;
+
+      &::placeholder {
+        color: #ffffff99;
+      }
+      &:focus {
+        background-color: #383f44;
+        color: #fff;
+      }
     }
   }
 `;
