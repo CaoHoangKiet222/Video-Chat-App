@@ -213,6 +213,14 @@ exports = module.exports = (socket, type, io = null) => {
         deleteMessage(message, conversationId);
       });
       break;
+    case "deleteConversation":
+    case "deleteGroupConversation":
+      socket.on(type, ({ room, userDelete, isAdmin }, callback) => {
+        console.log(type, room);
+        socket.broadcast.to(room).emit(type, { userDelete, isAdmin });
+        callback();
+      });
+      break;
     case "disconnect":
       socket.on(type, () => {
         console.log("A user disconnected to message channel");

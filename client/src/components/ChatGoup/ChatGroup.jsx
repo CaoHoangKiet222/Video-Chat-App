@@ -4,7 +4,6 @@ import { fetchConversation } from "../../store/conversations-creator";
 import ChatFooter from "../ChatBar/ChatFooter/ChatFooter";
 import InfoBarLoading from "../ChatBar/InfoBar/InfoBarLoading";
 import Main from "../ChatBar/Main/Main";
-import { CardGroup, CardMsger } from "./ChatGroup.styled";
 import ChatGroupHeader from "./ChatGroupHeader/ChatGroupHeader";
 import { v4 as uuid4 } from "uuid";
 import ChatDetail from "../ChatBar/InfoBar/ChatDetail";
@@ -142,7 +141,7 @@ const ChatGroup = (props) => {
           handleViewInfo={handleViewInfo}
           groupImg={props.groupImg}
           groupName={props.groupName}
-          numsPeople={props.members.length + 1}
+          numsPeople={props.members.length}
           members={props.members}
           room={props.room}
         />
@@ -172,7 +171,7 @@ const ChatGroup = (props) => {
         isGroup={true}
         groupImg={props.groupImg}
         groupName={props.groupName}
-        numsPeople={props.members.length + 1}
+        numsPeople={props.members.length}
       />
     </Card>
   );

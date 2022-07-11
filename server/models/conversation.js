@@ -3,8 +3,14 @@ const { v4: uuidv4 } = require("uuid");
 
 const conversationSchema = new Schema({
   groupImg: {
-    type: String,
-    default: "",
+    url: {
+      type: String,
+      default: "",
+    },
+    public_id: {
+      type: String,
+      default: "",
+    },
   },
   groupName: {
     type: String,

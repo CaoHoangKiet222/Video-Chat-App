@@ -187,7 +187,7 @@ const SideBars = (props) => {
                     const lastMessage = messages?.slice(-1)[0];
 
                     // Chat for multiple users
-                    if (groupName !== "" && groupImg !== "") {
+                    if (groupName !== "" && groupImg.url !== "") {
                       const sender = members?.find(
                         (member) => member?.userId._id === lastMessage?.senderId
                       );
@@ -195,7 +195,7 @@ const SideBars = (props) => {
                       return (
                         <ChatGroupItems
                           key={_id}
-                          groupImg={groupImg}
+                          groupImg={groupImg.url}
                           groupName={groupName}
                           senderName={sender?.userId.name}
                           content={lastMessage?.content}

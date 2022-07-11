@@ -6,6 +6,7 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { VscMute } from "react-icons/vsc";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { deleteConversation } from "../../../store/conversations-creator";
 import { errorActions } from "../../../store/error-slice";
 import {
   closeComponent,
@@ -65,6 +66,14 @@ const ChatGroupHeader = ({
     setShowDropDown(!showDropDown);
   };
 
+  const deleteHandler = () => {
+    console.log(members);
+    const { isAdmin } = members.find(
+      (member) => member.userId._id.toString() === user._id
+    );
+    dispatch(deleteConversation(room, isAdmin, navigate, "group"));
+  };
+
   return (
     <HeaderBar>
       <Media>
@@ -121,7 +130,7 @@ const ChatGroupHeader = ({
                   <BiBlock />
                   <span>Block</span>
                 </a>
-                <a href="#" className="text-danger">
+                <a href="#" className="text-danger" onClick={deleteHandler}>
                   <RiDeleteBinLine />
                   <span>Delete</span>
                 </a>

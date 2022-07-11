@@ -47,6 +47,7 @@ app.get("/", (_req, res) => {
 
 app.use(require("./routes/user"));
 app.use(require("./routes/messages"));
+app.use(require("./routes/conversation"));
 app.use(require("./routes/meetings"));
 
 const io_notify = io.of("/notify");
@@ -61,6 +62,8 @@ io_notify.on("connection", (socket) => {
   socketNotifyListen(socket, "notifyingUserAddFriend");
 
   socketNotifyListen(socket, "notifyingUserAddGroup");
+
+  socketNotifyListen(socket, "notifyingDeleteUser");
 
   socketNotifyListen(socket, "disconnect");
 });
@@ -80,6 +83,10 @@ io_chat.on("connection", (socket) => {
   socketMessageListen(socket, "forwardGroupMessage", io_chat);
 
   socketMessageListen(socket, "deleteMessage", io_chat);
+
+  socketMessageListen(socket, "deleteConversation");
+
+  socketMessageListen(socket, "deleteGroupConversation");
 
   socketMessageListen(socket, "disconnect", io_chat);
 });

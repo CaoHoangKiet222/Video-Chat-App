@@ -11,16 +11,9 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "notifyingUserIsOffline":
-      socket.on(type, () => {
-        socket.broadcast.emit(type);
-      });
-      break;
     case "notifyingUserAddFriend":
-      socket.on(type, () => {
-        socket.broadcast.emit(type);
-      });
-      break;
     case "notifyingUserAddGroup":
+    case "notifyingDeleteUser":
       socket.on(type, () => {
         socket.broadcast.emit(type);
       });

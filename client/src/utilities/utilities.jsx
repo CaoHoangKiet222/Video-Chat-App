@@ -9,12 +9,7 @@ export const postData = async (url, method, data = {}) => {
     body: JSON.stringify(data),
   });
 
-  switch (method) {
-    case "delete":
-      return;
-    default:
-      return response.json();
-  }
+  return response.json();
 };
 
 export const postDataFile = async (url, { file, newMembers, groupName }) => {

@@ -1,11 +1,6 @@
 const Conversation = require("../models/conversation");
 const Files = require("../models/files");
-const { getConversation } = require("./user");
-const {
-  cloudinary,
-  destroyAsset,
-  upload,
-} = require("../cloudinary/cloudinary");
+const { destroyAsset, upload } = require("../cloudinary/cloudinary");
 const Reply = require("../models/reply");
 const { validationResult } = require("express-validator");
 const { mailer } = require("../mailer/mailer");
@@ -46,36 +41,6 @@ exports.postInvitation = (req, res, _next) => {
     );
   } catch (error) {
     res.send({ error: error.message });
-  }
-};
-
-exports.newGroup = (req, res, _next) => {
-  try {
-    cloudinary.uploader.upload(
-      req.body.groupImg,
-      { upload_preset: "image-group" },
-      async (error, result) => {
-        console.log(result, error);
-        if (error) {
-          return new Error("Upload image error!");
-        }
-
-        await new Conversation({
-          members: [
-            ...req.body.newMembers,
-            { userId: req.session.user, isAdmin: true },
-          ],
-          groupImg: result.url,
-          groupName: req.body.groupName,
-          messages: [],
-        }).save();
-
-        getConversation(req, res, _next);
-      }
-    );
-  } catch (error) {
-    console.log(error);
-    res.json({ error: error.messsage });
   }
 };
 
@@ -169,6 +134,6 @@ exports.deleteMessage = (message, conversationId) => {
       .select({ messages: { $elemMatch: { _id: message._id } } })
       .populate("messages.files");
   } catch (error) {
-    console.log(error);
+    res.send({ error: error.message });
   }
 };

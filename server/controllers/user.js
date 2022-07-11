@@ -112,7 +112,7 @@ exports.postUserLogin = async (req, res, _next) => {
     const user = await User.findOne({
       email: req.body.email,
       loginByFirebase: "",
-    }).select("-password");
+    }).select("-password -twoFA.secret");
 
     if (user.twoFA.is2FAEnabled) {
       setSession(req, user, false);
@@ -128,7 +128,7 @@ exports.postUserLogin = async (req, res, _next) => {
 
         return res.send(updatedUser);
       }
-    ).select("-password");
+    ).select("-password -twoFA.secret");
   } catch (err) {
     console.log(err);
   }
@@ -139,7 +139,7 @@ exports.postUserLoginByFirebase = async (req, res, _next) => {
     const user = await User.findOne({
       email: req.body.email,
       loginByFirebase: req.body.provider,
-    }).select("-password");
+    }).select("-password -twoFA.secret");
 
     console.log(user);
     if (!user) {
@@ -155,7 +155,7 @@ exports.postUserLoginByFirebase = async (req, res, _next) => {
         phone: req.body.phone,
         isLoggined: true,
       }).then(async (user) => {
-        return await User.findById(user._id).select("-password");
+        return await User.findById(user._id).select("-password -twoFA.secret");
       });
       console.log(newUser);
       setSession(req, newUser, true);
@@ -176,7 +176,7 @@ exports.postUserLoginByFirebase = async (req, res, _next) => {
 
         return res.send(updatedUser);
       }
-    ).select("-password");
+    ).select("-password -twoFA.secret");
   } catch (err) {
     console.log(err);
   }
@@ -383,7 +383,7 @@ exports.updateUserAccount = async (req, res, _next) => {
           user: updatedUser,
         });
       }
-    ).select("-password");
+    ).select("-password -twoFA.secret");
   } catch (err) {
     res.send({ error: err.message });
   }
@@ -413,7 +413,7 @@ exports.updateUserSocialNetwork = async (req, res, _next) => {
           user: updatedUser,
         });
       }
-    ).select("-password");
+    ).select("-password -twoFA.secret");
   } catch (err) {
     res.send({ error: err.message });
   }
@@ -447,7 +447,7 @@ exports.updateUserPassword = async (req, res, _next) => {
           user: updatedUser,
         });
       }
-    ).select("-password");
+    ).select("-password -twoFA.secret");
   } catch (err) {
     res.send({ error: err.message });
   }
@@ -458,12 +458,14 @@ exports.postEnable2FA = (req, res, _next) => {
     console.log(req.body);
     const { is2FAEnabled, userId } = req.body;
     if (is2FAEnabled) {
+      const secret = generateUniqueSecret();
+
       User.findByIdAndUpdate(
         userId,
         {
           twoFA: {
             is2FAEnabled,
-            secret: generateUniqueSecret(),
+            secret,
           },
         },
         { new: true },
@@ -476,7 +478,7 @@ exports.postEnable2FA = (req, res, _next) => {
           const otpAuth = generateOTPToken(
             updatedUser.name,
             "chk.videochatapp",
-            updatedUser.twoFA.secret
+            secret
           );
 
           const QRCodeImage = await generateQRCode(otpAuth);
@@ -484,7 +486,7 @@ exports.postEnable2FA = (req, res, _next) => {
 
           return res.status(200).json({ QRCodeImage, user: updatedUser });
         }
-      ).select("-password");
+      ).select("-password -twoFA.secret");
     } else {
       User.findByIdAndUpdate(
         userId,
@@ -507,7 +509,7 @@ exports.postEnable2FA = (req, res, _next) => {
             user: updatedUser,
           });
         }
-      ).select("-password");
+      ).select("-password -twoFA.secret");
     }
   } catch (err) {
     res.send({ error: err.message });
@@ -516,22 +518,27 @@ exports.postEnable2FA = (req, res, _next) => {
 
 exports.postVerify2FA = (req, res, _next) => {
   try {
-    const isValid = verifyOTPToken(req.body.otpToken, req.body.userSecret);
-    if (isValid) {
-      User.findByIdAndUpdate(
-        req.body.userId,
-        { isLoggined: true },
-        { new: true },
-        (err, updatedUser) => {
-          if (err) {
-            return console.log(err);
+    User.findById(req.body.userId, (_err, user) => {
+      if (!user) {
+        return res.send({ error: "Can't find user!!" });
+      }
+      const isValid = verifyOTPToken(req.body.otpToken, user.twoFA.secret);
+      if (isValid) {
+        User.findByIdAndUpdate(
+          req.body.userId,
+          { isLoggined: true },
+          { new: true },
+          (err, updatedUser) => {
+            if (err) {
+              return console.log(err);
+            }
+            console.log(updatedUser);
+            setSession(req, updatedUser, true);
           }
-          console.log(updatedUser);
-          setSession(req, updatedUser, true);
-        }
-      );
-    }
-    res.json({ isValid });
+        ).select("-password -twoFA.secret");
+      }
+      res.json({ isValid });
+    });
   } catch (err) {
     res.send({ error: err.message });
   }

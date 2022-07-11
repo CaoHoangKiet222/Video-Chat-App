@@ -23,6 +23,7 @@ import { getConversationId } from "../../utilities/utilities";
 import ChatGroup from "../ChatGoup/ChatGroup";
 import MeetingGroup from "../MeetingGroup/MeetingGroup";
 import { videoGroupActions } from "../../store/videoGroup-slice";
+import Swal from "sweetalert2";
 
 const Chat = () => {
   const { conversation } = useSelector((state) => state.conversation);
@@ -36,7 +37,9 @@ const Chat = () => {
   const params = useParams();
   const [isChosen, setIsChosen] = useState(false);
   const [showModalDialog, setShowModalDialog] = useState(false);
-  const { notifySocket, meetingSocket } = useSelector((state) => state.socket);
+  const { notifySocket, meetingSocket, chatSocket } = useSelector(
+    (state) => state.socket
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -96,13 +99,52 @@ const Chat = () => {
     notifySocket.on("notifyingUserAddFriend", () => {
       console.log("notifyingUserAddFriend");
       dispatch(fetchConversation());
-      // dispatch(fetchFriends());
     });
 
     notifySocket.on("notifyingUserAddGroup", () => {
       console.log("notifyingUserAddGroup");
       dispatch(fetchConversation());
-      // dispatch(fetchFriends());
+    });
+
+    notifySocket.on("notifyingDeleteUser", () => {
+      console.log("notifyingDeleteUser");
+      dispatch(fetchConversation());
+    });
+
+    chatSocket.on("deleteConversation", ({ userDelete }) => {
+      navigate("/video-chat/Chats");
+      Swal.fire({
+        title: "Conversation deleted!!!",
+        html: `We are so sorry to notify that your friend <strong>${userDelete.name}</strong> has deleted this chat!!!`,
+        icon: "warning",
+        showConfirmButton: true,
+        confirmButtonColor: "#665dfe",
+        allowOutsideClick: false,
+      });
+    });
+
+    chatSocket.on("deleteGroupConversation", ({ userDelete, isAdmin }) => {
+      console.log("deleteGroupConversation", isAdmin);
+      if (isAdmin) {
+        navigate("/video-chat/Chats");
+        return Swal.fire({
+          title: "Group chat deleted!!!",
+          html: `We are so sorry to notify that your admin <strong>${userDelete.name}</strong> has deleted this chat!!!`,
+          icon: "warning",
+          showConfirmButton: true,
+          confirmButtonColor: "#665dfe",
+          allowOutsideClick: false,
+        });
+      }
+
+      Swal.fire({
+        title: "Someone leave group!!!",
+        html: `We are so sorry to notify that your friend <strong>${userDelete.name}</strong> has leaved this chat!!!`,
+        icon: "warning",
+        showConfirmButton: true,
+        confirmButtonColor: "#665dfe",
+        allowOutsideClick: false,
+      });
     });
 
     meetingSocket.on("meetingGroupConnection", ({ room, caller }) => {
@@ -171,10 +213,8 @@ const Chat = () => {
         <Routes>
           {conversation?.conv?.map(
             ({ groupName, groupImg, members, messages, _id: id }) => {
-              if (groupName !== "" && groupImg !== "") {
-                const filteredMembers = members.filter((member) => {
-                  return member.userId._id !== conversation.user._id;
-                });
+              if (groupName !== "" && groupImg.url !== "") {
+                console.log(members);
 
                 return (
                   <Route
@@ -183,8 +223,9 @@ const Chat = () => {
                     element={
                       <ChatGroup
                         groupName={groupName}
-                        groupImg={groupImg}
-                        members={filteredMembers}
+                        groupImg={groupImg.url}
+                        // members={filteredMembers}
+                        members={members}
                         messages={messages}
                         user={conversation.user}
                         room={id}

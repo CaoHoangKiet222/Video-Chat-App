@@ -252,7 +252,6 @@ const Settings = () => {
                         {
                           otpToken,
                           userId: data.user._id,
-                          userSecret: data.user.twoFA.secret,
                         }
                       ).catch((error) => {
                         Swal.showValidationMessage(`Request failed: ${error}`);

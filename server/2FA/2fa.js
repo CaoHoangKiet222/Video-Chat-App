@@ -25,7 +25,7 @@ const generateQRCode = async (otpAuth) => {
     return await qrcode.toDataURL(otpAuth);
   } catch (error) {
     console.log("Could not generate QR code", error);
-    return;
+    return Promise.reject("Could not generate QR code" + error);
   }
 };
 
