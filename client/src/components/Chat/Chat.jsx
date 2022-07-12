@@ -214,8 +214,6 @@ const Chat = () => {
           {conversation?.conv?.map(
             ({ groupName, groupImg, members, messages, _id: id }) => {
               if (groupName !== "" && groupImg.url !== "") {
-                console.log(members);
-
                 return (
                   <Route
                     path={`Chats/group/${encodeURIComponent(groupName)}`}
@@ -224,7 +222,6 @@ const Chat = () => {
                       <ChatGroup
                         groupName={groupName}
                         groupImg={groupImg.url}
-                        // members={filteredMembers}
                         members={members}
                         messages={messages}
                         user={conversation.user}

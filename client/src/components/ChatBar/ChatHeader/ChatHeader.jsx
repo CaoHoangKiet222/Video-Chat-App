@@ -24,7 +24,10 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { VscMute } from "react-icons/vsc";
 import { MdOutlineWallpaper } from "react-icons/md";
 import { closeComponent } from "../../../utilities/utilities";
-import { deleteConversation } from "../../../store/conversations-creator";
+import {
+  blockConversation,
+  deleteConversation,
+} from "../../../store/conversations-creator";
 
 const ChatHeader = (props) => {
   const { member } = props;
@@ -55,6 +58,11 @@ const ChatHeader = (props) => {
 
   const handleDropDown = () => {
     setShowDropDown(!showDropDown);
+  };
+
+  const handleBlock = () => {
+    console.log(props);
+    dispatch(blockConversation(props.room, false, "single"));
   };
 
   const deleteHandler = () => {
@@ -113,7 +121,7 @@ const ChatHeader = (props) => {
                   <BsArchive />
                   <span>Archive</span>
                 </a>
-                <a href="#">
+                <a href="#" onClick={handleBlock}>
                   <BiBlock />
                   <span>Block</span>
                 </a>

@@ -126,6 +126,7 @@ const InfoBar = (props) => {
   const handleViewInfo = () => {
     setShowViewInfo(!showViewInfo);
   };
+  console.log(props);
 
   return (
     <Card>

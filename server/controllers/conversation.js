@@ -35,6 +35,32 @@ exports.newGroup = (req, res, _next) => {
   }
 };
 
+exports.blockConversation = (req, res, _next) => {
+  try {
+    console.log(req.body);
+    Conversation.findOneAndUpdate(
+      {
+        $and: [
+          { _id: req.body.conversationId },
+          { members: { $elemMatch: { userId: req.body.userId } } },
+        ],
+      },
+      {
+        "members.$.isBlock": true,
+      },
+      { new: true },
+      (_err, conversation) => {
+        if (!conversation) {
+          return res.send({ error: "Block conversation fail!!!" });
+        }
+        getConversation(req, res, _next);
+      }
+    );
+  } catch (error) {
+    res.send({ error: error.message });
+  }
+};
+
 exports.deleteConversation = (req, res, _next) => {
   try {
     console.log("deleteConversation", req.body);

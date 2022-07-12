@@ -14,6 +14,8 @@ router.delete(
   conversationController.deleteGroupConversation
 );
 
+router.post("/block-conversation", conversationController.blockConversation);
+
 router.post(
   "/new-group",
   changeMembersToUserId,

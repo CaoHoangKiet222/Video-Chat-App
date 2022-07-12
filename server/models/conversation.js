@@ -26,6 +26,10 @@ const conversationSchema = new Schema({
         type: Boolean,
         default: false,
       },
+      isBlock: {
+        type: Boolean,
+        default: false,
+      },
     },
   ],
   messages: [

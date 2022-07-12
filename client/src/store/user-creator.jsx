@@ -112,6 +112,7 @@ export const fetchLoginByFirebase = (url, user, provider) => {
     }
   };
 };
+
 export const userLogout = (url, userId, navigate) => {
   return async (dispatch, getState) => {
     try {
@@ -129,6 +130,7 @@ export const userLogout = (url, userId, navigate) => {
         notifySocket.emit("notifyingUserIsOffline");
 
         dispatch(socketActions.disconnectSocket());
+        dispatch(socketActions.setupSocket());
       }
     } catch (error) {
       dispatch(errorActions.setError({ error: true, message: error.message }));

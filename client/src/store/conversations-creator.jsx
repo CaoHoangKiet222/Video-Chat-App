@@ -36,76 +36,158 @@ export const fetchConversation = () => {
   };
 };
 
+export const blockConversation = (room, isAdmin, type) => {
+  return (dispatch, getState) => {
+    try {
+      const { user } = getState().user;
+      const { chatSocket, notifySocket } = getState().socket;
+
+      Swal.fire({
+        title: "Block this conversation?",
+        text: "Once you block the conversation, your friend can't chat anything!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#665dfe",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, block it!",
+        showLoaderOnConfirm: true,
+        allowOutsideClick: false,
+        preConfirm: () => {
+          return postData(
+            `${process.env.REACT_APP_ENDPOINT_SERVER}/${
+              type === "single"
+                ? "block-conversation"
+                : // type === "group"
+                  "block-group-conversation"
+            }`,
+            "post",
+            type === "single"
+              ? {
+                  conversationId: room,
+                  userId: user._id,
+                }
+              : {
+                  // type === "group"
+                  conversationId: room,
+                  userId: user._id,
+                  isAdmin,
+                }
+          ).catch((error) => {
+            Swal.showValidationMessage(`Request failed: ${error}`);
+          });
+        },
+      }).then(({ isDismissed, value }) => {
+        if (isDismissed) {
+          return;
+        }
+
+        if (value.error) {
+          return Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            html: value.error,
+            showConfirmButton: false,
+            timer: 5000,
+          });
+        }
+
+        Swal.fire(
+          "Blocked!",
+          "This conversation has been blocked.",
+          "success"
+        ).then(() => {
+          dispatch(
+            conversationActions.setConversation({
+              conversation: value,
+              error: null,
+            })
+          );
+        });
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+};
+
 export const deleteConversation = (room, isAdmin = false, navigate, type) => {
   return async (dispatch, getState) => {
-    const { user } = getState().user;
-    const { chatSocket, notifySocket } = getState().socket;
+    try {
+      const { user } = getState().user;
+      const { chatSocket, notifySocket } = getState().socket;
 
-    Swal.fire({
-      title: "Delete this entire conversation?",
-      text: "Once you delete the conversation, it can't be undone!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#665dfe",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-      showLoaderOnConfirm: true,
-      allowOutsideClick: false,
-      preConfirm: () => {
-        return postData(
-          `${process.env.REACT_APP_ENDPOINT_SERVER}/${
+      Swal.fire({
+        title: "Delete this entire conversation?",
+        text: "Once you delete the conversation, it can't be undone!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#665dfe",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+        showLoaderOnConfirm: true,
+        allowOutsideClick: false,
+        preConfirm: () => {
+          return postData(
+            `${process.env.REACT_APP_ENDPOINT_SERVER}/${
+              type === "single"
+                ? "delete-conversation"
+                : // type === "group"
+                  "delete-group-conversation"
+            }`,
+            "delete",
             type === "single"
-              ? "delete-conversation"
-              : // type === "group"
-                "delete-group-conversation"
-          }`,
-          "delete",
-          type === "single"
-            ? {
-                conversationId: room,
-              }
-            : {
-                // type === "group"
-                conversationId: room,
-                userId: user._id,
-                isAdmin,
-              }
-        ).catch((error) => {
-          Swal.showValidationMessage(`Request failed: ${error}`);
-        });
-      },
-    }).then(({ value }) => {
-      console.log(value);
-      if (value.error) {
-        return Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          html: value.error,
-          showConfirmButton: false,
-          timer: 5000,
-        });
-      }
+              ? {
+                  conversationId: room,
+                }
+              : {
+                  // type === "group"
+                  conversationId: room,
+                  userId: user._id,
+                  isAdmin,
+                }
+          ).catch((error) => {
+            Swal.showValidationMessage(`Request failed: ${error}`);
+          });
+        },
+      }).then(({ isDismissed, value }) => {
+        if (isDismissed) {
+          return;
+        }
+        if (value.error) {
+          return Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            html: value.error,
+            showConfirmButton: false,
+            timer: 5000,
+          });
+        }
 
-      Swal.fire(
-        "Deleted!",
-        "Your conversation has been deleted.",
-        "success"
-      ).then(() => {
-        dispatch(
-          conversationActions.setConversation({
-            conversation: value,
-            error: null,
-          })
-        );
-        chatSocket.emit(
-          type === "single" ? "deleteConversation" : "deleteGroupConversation",
-          { room, userDelete: value.user, isAdmin },
-          () => {
-            navigate("/video-chat/Chats");
-          }
-        );
-        notifySocket.emit("notifyingDeleteUser");
+        Swal.fire(
+          "Deleted!",
+          "Your conversation has been deleted.",
+          "success"
+        ).then(() => {
+          dispatch(
+            conversationActions.setConversation({
+              conversation: value,
+              error: null,
+            })
+          );
+          chatSocket.emit(
+            type === "single"
+              ? "deleteConversation"
+              : "deleteGroupConversation",
+            { room, userDelete: value.user, isAdmin },
+            () => {
+              navigate("/video-chat/Chats");
+            }
+          );
+          notifySocket.emit("notifyingDeleteUser");
+        });
       });
-    });
+    } catch (error) {
+      console.log(error);
+    }
   };
 };

@@ -7,6 +7,7 @@ export const Container = styled.div`
   font-weight: 400;
   line-height: 1.5;
   color: #495057;
+  background-color: #323333;
 `;
 
 export const MainLayout = styled.div`

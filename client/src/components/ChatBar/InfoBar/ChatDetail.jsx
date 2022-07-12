@@ -142,7 +142,7 @@ const ChatDetail = (props) => {
                 </div>
 
                 <Collapse showMembers={showMembers}>
-                  {props.members.map(({ userId: member }, index) => {
+                  {props.members.map(({ userId: member, isAdmin }, index) => {
                     return (
                       <div className="card-body" key={index}>
                         <div className="group-content">
@@ -151,10 +151,8 @@ const ChatDetail = (props) => {
                               <img src={member.avatar.url} alt="" />
                             </div>
                             <div className="member-name">
-                              <h5>
-                                {member.name}
-                                <span>Admin</span>
-                              </h5>
+                              <h5>{member.name}</h5>
+                              {isAdmin && <span>Admin</span>}
                             </div>
                           </div>
                         </div>
@@ -513,24 +511,29 @@ const Collapse = styled.div`
       div {
         display: flex;
         justify-content: flex-start;
+        align-items: center;
 
         .member-name {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+
           h5 {
             font-weight: 600;
             margin: 0;
             margin-bottom: 0.25rem;
             font-size: 18px;
             line-height: 1.7;
-
-            span {
-              font-size: 13px;
-              background-color: rgba(239, 71, 111, 0.18);
-              color: #ef476f;
-              border-radius: 0.25rem;
-              padding: 0.25rem 0.6rem;
-              float: right;
-              line-height: 1;
-            }
+          }
+          span {
+            text-align: left;
+            font-size: 13px;
+            background-color: rgba(239, 71, 111, 0.18);
+            color: #ef476f;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.6rem;
+            float: right;
+            line-height: 1;
           }
         }
 

@@ -108,7 +108,6 @@ exports.postUserLogin = async (req, res, _next) => {
       return res.send({ error: errors.array()[0].msg });
     }
 
-    console.log("login", req.body);
     const user = await User.findOne({
       email: req.body.email,
       loginByFirebase: "",
@@ -131,17 +130,16 @@ exports.postUserLogin = async (req, res, _next) => {
     ).select("-password -twoFA.secret");
   } catch (err) {
     console.log(err);
+    res.send({ erroe: err.message });
   }
 };
 exports.postUserLoginByFirebase = async (req, res, _next) => {
   try {
-    console.log("loginbygoogle", req.body);
     const user = await User.findOne({
       email: req.body.email,
       loginByFirebase: req.body.provider,
     }).select("-password -twoFA.secret");
 
-    console.log(user);
     if (!user) {
       const newUser = await User.create({
         email: req.body.email,
@@ -157,7 +155,6 @@ exports.postUserLoginByFirebase = async (req, res, _next) => {
       }).then(async (user) => {
         return await User.findById(user._id).select("-password -twoFA.secret");
       });
-      console.log(newUser);
       setSession(req, newUser, true);
       return res.send(newUser);
     }
@@ -179,6 +176,7 @@ exports.postUserLoginByFirebase = async (req, res, _next) => {
     ).select("-password -twoFA.secret");
   } catch (err) {
     console.log(err);
+    res.send({ error: err.message });
   }
 };
 
@@ -323,9 +321,9 @@ exports.postNewPassword = async (req, res, _next) => {
 
 exports.checkCookieExpiration = async (req, res, _next) => {
   try {
-    console.log("checkAuthUser", req.session);
+    // console.log("checkAuthUser", req.session);
 
-    console.log(req.session.cookieExpiration - Date.now());
+    // console.log(req.session.cookieExpiration - Date.now());
     if (req.session.cookieExpiration - Date.now() <= 0) {
       await User.updateOne(
         {
@@ -358,7 +356,6 @@ exports.updateUserAccount = async (req, res, _next) => {
     }
 
     const user = await User.findById(userId).select("avatar -password");
-    console.log(user);
     destroyAsset(user.avatar.public_id, "image");
 
     User.findOneAndUpdate(
@@ -376,7 +373,6 @@ exports.updateUserAccount = async (req, res, _next) => {
         if (error) {
           return new Error("Update user account fail!!!");
         }
-        console.log(updatedUser);
         setSession(req, updatedUser, true);
         res.json({
           update: "Your work has been saved. Enjoy our page!!!",
@@ -392,7 +388,6 @@ exports.updateUserAccount = async (req, res, _next) => {
 exports.updateUserSocialNetwork = async (req, res, _next) => {
   try {
     const { facebook, twitter, instagram, linkedin, userId } = req.body;
-    console.log(req.body);
     User.findOneAndUpdate(
       { _id: userId },
       {
@@ -406,7 +401,6 @@ exports.updateUserSocialNetwork = async (req, res, _next) => {
         if (error) {
           return new Error("Update user account fail!!!");
         }
-        console.log(updatedUser);
         setSession(req, updatedUser, true);
         res.json({
           update: "Your work has been saved. Enjoy our page!!!",
@@ -428,7 +422,6 @@ exports.updateUserPassword = async (req, res, _next) => {
     }
 
     const { newPass, userId } = req.body;
-    console.log(req.body);
 
     User.findOneAndUpdate(
       { _id: userId },
@@ -440,7 +433,6 @@ exports.updateUserPassword = async (req, res, _next) => {
         if (error) {
           return res.send({ error: "Update user account fail!!!" });
         }
-        console.log(updatedUser);
         setSession(req, updatedUser, true);
         res.json({
           update: "Your work has been saved. Enjoy our page!!!",
@@ -455,7 +447,6 @@ exports.updateUserPassword = async (req, res, _next) => {
 
 exports.postEnable2FA = (req, res, _next) => {
   try {
-    console.log(req.body);
     const { is2FAEnabled, userId } = req.body;
     if (is2FAEnabled) {
       const secret = generateUniqueSecret();
@@ -473,7 +464,6 @@ exports.postEnable2FA = (req, res, _next) => {
           if (err) {
             return console.log(err);
           }
-          console.log(updatedUser);
 
           const otpAuth = generateOTPToken(
             updatedUser.name,
@@ -501,7 +491,6 @@ exports.postEnable2FA = (req, res, _next) => {
           if (err) {
             return console.log(err);
           }
-          console.log(updatedUser);
           setSession(req, updatedUser, true);
 
           return res.status(200).json({
@@ -532,7 +521,6 @@ exports.postVerify2FA = (req, res, _next) => {
             if (err) {
               return console.log(err);
             }
-            console.log(updatedUser);
             setSession(req, updatedUser, true);
           }
         ).select("-password -twoFA.secret");
