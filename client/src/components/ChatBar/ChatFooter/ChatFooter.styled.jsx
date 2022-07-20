@@ -8,6 +8,42 @@ export const InputForm = styled.form`
   background: #323333;
   padding: 0.75rem 2.25rem;
   border-top: 1px solid #2b2b2f;
+  text-align: center;
+
+  & > .block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+
+    div.btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #b0b3b8;
+      background-color: #3e4042;
+      border-radius: 10px;
+      cursor: pointer;
+      height: 36px;
+      width: 440px;
+      transition: all 0.1s ease-in;
+
+      span {
+        font-size: 16px;
+      }
+
+      &:hover {
+        color: #fff;
+        background-color: #8a8d91;
+      }
+    }
+
+    span {
+      font-size: 22px;
+    }
+  }
 
   // check here
   height: 100%;
@@ -183,6 +219,7 @@ export const FilesContent = styled.div`
           background-color: #3e4042;
           border-radius: 10px;
           cursor: pointer;
+          transition: all 0.1s ease-in;
 
           &:hover {
             color: #fff;
@@ -252,7 +289,7 @@ export const FilesContent = styled.div`
 
           svg {
             position: relative;
-            left: 4px;
+            /* left: 4px; */
           }
 
           &:hover {
@@ -291,7 +328,7 @@ export const FilesContent = styled.div`
 
           svg {
             position: relative;
-            left: 4px;
+            /* left: 4px; */
           }
 
           &:hover {

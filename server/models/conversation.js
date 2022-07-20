@@ -26,9 +26,12 @@ const conversationSchema = new Schema({
         type: Boolean,
         default: false,
       },
-      isBlock: {
-        type: Boolean,
-        default: false,
+      block: {
+        byUserId: Schema.Types.ObjectId,
+        isBlock: {
+          type: Boolean,
+          default: false,
+        },
       },
     },
   ],

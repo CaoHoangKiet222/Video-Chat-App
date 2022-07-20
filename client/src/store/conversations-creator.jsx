@@ -36,20 +36,24 @@ export const fetchConversation = () => {
   };
 };
 
-export const blockConversation = (room, isAdmin, type) => {
+export const blockConversation = (room, { isAdmin, isBlock }, type) => {
   return (dispatch, getState) => {
     try {
       const { user } = getState().user;
       const { chatSocket, notifySocket } = getState().socket;
 
       Swal.fire({
-        title: "Block this conversation?",
-        text: "Once you block the conversation, your friend can't chat anything!",
+        title: isBlock
+          ? "Unblock this conversation?"
+          : "Block this conversation?",
+        text: isBlock
+          ? "Unblock for your friend can chat with you!"
+          : "Once you block the conversation, your friend can't chat anything!",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#665dfe",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, block it!",
+        confirmButtonText: isBlock ? "Yes, unblock it!" : "Yes, block it!",
         showLoaderOnConfirm: true,
         allowOutsideClick: false,
         preConfirm: () => {
@@ -65,11 +69,13 @@ export const blockConversation = (room, isAdmin, type) => {
               ? {
                   conversationId: room,
                   userId: user._id,
+                  isBlock,
                 }
               : {
                   // type === "group"
                   conversationId: room,
                   userId: user._id,
+                  isBlock,
                   isAdmin,
                 }
           ).catch((error) => {
@@ -90,10 +96,11 @@ export const blockConversation = (room, isAdmin, type) => {
             timer: 5000,
           });
         }
-
         Swal.fire(
-          "Blocked!",
-          "This conversation has been blocked.",
+          isBlock ? "Unblock!" : "Block!",
+          isBlock
+            ? "This conversation has been unblocked."
+            : "This conversation has been blocked.",
           "success"
         ).then(() => {
           dispatch(
@@ -102,6 +109,12 @@ export const blockConversation = (room, isAdmin, type) => {
               error: null,
             })
           );
+
+          chatSocket.emit(
+            type === "single" ? "blockConversation" : "blockGroupConversation",
+            { room, userBlock: value.user, isBlock, isAdmin }
+          );
+          notifySocket.emit("notifyingBlockUser");
         });
       });
     } catch (error) {

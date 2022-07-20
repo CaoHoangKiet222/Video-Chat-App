@@ -38,15 +38,13 @@ exports.newGroup = (req, res, _next) => {
 exports.blockConversation = (req, res, _next) => {
   try {
     console.log(req.body);
-    Conversation.findOneAndUpdate(
+    Conversation.findByIdAndUpdate(
+      req.body.conversationId,
       {
-        $and: [
-          { _id: req.body.conversationId },
-          { members: { $elemMatch: { userId: req.body.userId } } },
-        ],
-      },
-      {
-        "members.$.isBlock": true,
+        "members.$[].block": {
+          byUserId: req.body.isBlock ? null : req.body.userId,
+          isBlock: !req.body.isBlock,
+        },
       },
       { new: true },
       (_err, conversation) => {
@@ -56,6 +54,32 @@ exports.blockConversation = (req, res, _next) => {
         getConversation(req, res, _next);
       }
     );
+  } catch (error) {
+    res.send({ error: error.message });
+  }
+};
+
+exports.blockGroupConversation = (req, res, _next) => {
+  try {
+    console.log("blockGroupConversation", req.body);
+    if (req.body.isAdmin) {
+      Conversation.findByIdAndUpdate(
+        req.body.conversationId,
+        {
+          "members.$[].block": {
+            byUserId: req.body.isBlock ? null : req.body.userId,
+            isBlock: !req.body.isBlock,
+          },
+        },
+        { new: true },
+        (_err, conversation) => {
+          if (!conversation) {
+            return res.send({ error: "Block group conversation fail!!!" });
+          }
+          getConversation(req, res, _next);
+        }
+      );
+    }
   } catch (error) {
     res.send({ error: error.message });
   }

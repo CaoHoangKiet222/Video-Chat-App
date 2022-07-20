@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchConversation } from "../../store/conversations-creator";
 import ChatFooter from "../ChatBar/ChatFooter/ChatFooter";
@@ -22,6 +22,12 @@ const ChatGroup = (props) => {
   const [isFetch, setIsFetch] = useState(false);
   const dispatch = useDispatch();
   const chatSocket = useSelector((state) => state.socket.chatSocket);
+  const user = useSelector((state) => state.user.user);
+  const member = useMemo(() => {
+    return props.members.find(
+      (member) => member.userId?._id.toString() === user?._id
+    );
+  }, [props.members, user?._id]);
 
   useEffect(() => {
     chatSocket.emit("joinRoom", props.room, (messages, error = null) => {
@@ -143,6 +149,7 @@ const ChatGroup = (props) => {
           groupName={props.groupName}
           numsPeople={props.members.length}
           members={props.members}
+          member={member}
           room={props.room}
         />
         <SearchBox
@@ -161,7 +168,12 @@ const ChatGroup = (props) => {
             isGroup={props.groupName !== "" ? true : false}
           />
         )}
-        <ChatFooter members={props.members} onSendMessage={sendMessage} />
+        <ChatFooter
+          members={props.members}
+          onSendMessage={sendMessage}
+          block={member?.block}
+          room={props.room}
+        />
       </Msger>
       <ChatDetail
         handleViewInfo={handleViewInfo}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { BiBlock, BiDotsVerticalRounded } from "react-icons/bi";
 import { BsArchive, BsInfoCircle, BsSearch, BsTelephone } from "react-icons/bs";
 import { MdOutlineWallpaper } from "react-icons/md";
@@ -6,7 +6,10 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { VscMute } from "react-icons/vsc";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { deleteConversation } from "../../../store/conversations-creator";
+import {
+  blockConversation,
+  deleteConversation,
+} from "../../../store/conversations-creator";
 import { errorActions } from "../../../store/error-slice";
 import {
   closeComponent,
@@ -27,6 +30,7 @@ const ChatGroupHeader = ({
   groupName,
   numsPeople,
   members,
+  member,
   room,
   handleViewInfo,
   handleSearchBox,
@@ -43,14 +47,28 @@ const ChatGroupHeader = ({
 
   const callGroupHandler = () => {
     const onlineMems = getMembersInGroupOnline(members);
-    console.log(onlineMems);
-    if (onlineMems.length >= 1) {
+    if (onlineMems.length >= 2 && !member.block.isBlock) {
       return meetingSocket.emit(
         "meetingGroupConnection",
         { room, caller: user },
         () => {
           navigate(`/meeting-group/${room}`);
         }
+      );
+    }
+    if (member.block.isBlock) {
+      const { userId } = members.find((member) => {
+        return member.userId._id === member.block.byUserId;
+      });
+
+      return dispatch(
+        errorActions.setError({
+          error: true,
+          message:
+            user._id === member.block?.byUserId
+              ? `Can't call group because you blocked this conversation`
+              : `Can't call group because you was blocked by admin ${userId.name}`,
+        })
       );
     }
 
@@ -68,10 +86,18 @@ const ChatGroupHeader = ({
 
   const deleteHandler = () => {
     console.log(members);
-    const { isAdmin } = members.find(
-      (member) => member.userId._id.toString() === user._id
+    dispatch(deleteConversation(room, member.isAdmin, navigate, "group"));
+  };
+
+  const handleBlock = () => {
+    console.log(members);
+    dispatch(
+      blockConversation(
+        room,
+        { isAdmin: member.isAdmin, isBlock: member.block.isBlock },
+        "group"
+      )
     );
-    dispatch(deleteConversation(room, isAdmin, navigate, "group"));
   };
 
   return (
@@ -126,10 +152,13 @@ const ChatGroupHeader = ({
                   <BsArchive />
                   <span>Archive</span>
                 </a>
-                <a href="#">
-                  <BiBlock />
-                  <span>Block</span>
-                </a>
+                {(!member.block.isBlock ||
+                  (member.block.isBlock && member.isAdmin)) && (
+                  <a href="#" onClick={handleBlock}>
+                    <BiBlock />
+                    <span>{member.block.isBlock ? "Unblock" : "Block"}</span>
+                  </a>
+                )}
                 <a href="#" className="text-danger" onClick={deleteHandler}>
                   <RiDeleteBinLine />
                   <span>Delete</span>

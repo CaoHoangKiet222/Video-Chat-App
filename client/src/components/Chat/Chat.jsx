@@ -75,7 +75,7 @@ const Chat = () => {
     if (error) {
       timer = setTimeout(() => {
         dispatch(errorActions.resetError({ error: false }));
-      }, 2500);
+      }, 6000);
     }
     return () => {
       clearTimeout(timer);
@@ -97,24 +97,60 @@ const Chat = () => {
     });
 
     notifySocket.on("notifyingUserAddFriend", () => {
-      console.log("notifyingUserAddFriend");
       dispatch(fetchConversation());
     });
 
     notifySocket.on("notifyingUserAddGroup", () => {
-      console.log("notifyingUserAddGroup");
       dispatch(fetchConversation());
     });
 
     notifySocket.on("notifyingDeleteUser", () => {
-      console.log("notifyingDeleteUser");
       dispatch(fetchConversation());
     });
+
+    notifySocket.on("notifyingBlockUser", () => {
+      dispatch(fetchConversation());
+    });
+
+    chatSocket.on("blockConversation", ({ userBlock, isBlock }) => {
+      Swal.fire({
+        title: isBlock
+          ? "Conversation is unblocked!!!"
+          : "Conversation is blocked!!!",
+        html: isBlock
+          ? `Your friend <strong>${userBlock.name}</strong> has unblocked this chat!!!`
+          : `We are so sorry to notify that your friend <strong>${userBlock.name}</strong> has blocked this chat!!!`,
+        icon: "warning",
+        showConfirmButton: true,
+        confirmButtonColor: "#665dfe",
+        allowOutsideClick: false,
+      });
+    });
+
+    chatSocket.on(
+      "blockGroupConversation",
+      ({ userBlock, isBlock, isAdmin }) => {
+        if (isAdmin) {
+          return Swal.fire({
+            title: isBlock
+              ? "Group chat is unblocked!!!"
+              : "Group chat is blocked!!!",
+            html: isBlock
+              ? `Your admin <strong>${userBlock.name}</strong> has unblocked this chat!!!`
+              : `We are so sorry to notify that your admin <strong>${userBlock.name}</strong> has blocked this chat!!!`,
+            icon: "warning",
+            showConfirmButton: true,
+            confirmButtonColor: "#665dfe",
+            allowOutsideClick: false,
+          });
+        }
+      }
+    );
 
     chatSocket.on("deleteConversation", ({ userDelete }) => {
       navigate("/video-chat/Chats");
       Swal.fire({
-        title: "Conversation deleted!!!",
+        title: "Conversation is deleted!!!",
         html: `We are so sorry to notify that your friend <strong>${userDelete.name}</strong> has deleted this chat!!!`,
         icon: "warning",
         showConfirmButton: true,
@@ -168,7 +204,7 @@ const Chat = () => {
         );
       }
     );
-  }, [notifySocket, dispatch, navigate, meetingSocket]);
+  }, [notifySocket, dispatch, navigate, meetingSocket, chatSocket]);
 
   const startConversation = () => {
     setShowModalDialog(true);
@@ -231,7 +267,7 @@ const Chat = () => {
                   />
                 );
               }
-              const { userId: member } = members.find((member) => {
+              const { userId: member, block } = members.find((member) => {
                 return member.userId._id !== conversation.user._id;
               });
 
@@ -244,6 +280,7 @@ const Chat = () => {
                       room={id}
                       user={conversation.user}
                       member={member}
+                      block={block}
                       messages={messages}
                       groupName={groupName}
                       groupImg={groupImg}

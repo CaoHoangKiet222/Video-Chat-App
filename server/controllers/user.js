@@ -53,8 +53,8 @@ exports.getConversation = (req, res, _next) => {
         "members.userId": req.session.user,
       },
       (_err, convTest) => {
-        if (_err) {
-          throw new Error("Conversation not found!!");
+        if (!convTest) {
+          return res.send({ error: "Conversation not found!!" });
         }
 
         return res.status(200).json({
@@ -62,7 +62,10 @@ exports.getConversation = (req, res, _next) => {
           user: req.session.user,
         });
       }
-    ).populate({ path: "members.userId", select: "-password" });
+    ).populate({
+      path: "members.userId",
+      select: "-password",
+    });
   } catch (err) {
     console.log(err);
     res.send({ error: err.message });
@@ -71,29 +74,40 @@ exports.getConversation = (req, res, _next) => {
 
 exports.postAddFriend = async (req, res, _next) => {
   try {
-    const convExist = await Conversation.findOne({
-      $and: [
-        { "members.userId": req.body.friendId },
-        { "members.userId": req.session.user._id },
-        { groupName: "" },
-      ],
-    });
+    console.log(req.body);
+    Conversation.findOne(
+      {
+        $and: [
+          { "members.userId": req.body.friendId },
+          { "members.userId": req.session.user._id },
+          { groupName: "" },
+        ],
+      },
+      async (_err, convExist) => {
+        console.log(convExist);
+        if (!convExist) {
+          await new Conversation({
+            members: [
+              { userId: req.session.user },
+              { userId: req.body.friendId },
+            ],
+            messages: [],
+          }).save();
+        }
 
-    if (!convExist) {
-      await new Conversation({
-        members: [{ userId: req.session.user }, { userId: req.body.friendId }],
-        messages: [],
-      }).save();
-    }
-
-    const conversation = await Conversation.find({
-      "members.userId": req.session.user,
-    }).populate({ path: "members.userId" });
-
-    res.send({
-      conv: conversation,
-      user: req.session.user,
-    });
+        Conversation.find(
+          {
+            "members.userId": req.session.user,
+          },
+          (_err, conversation) => {
+            res.send({
+              conv: conversation,
+              user: req.session.user,
+            });
+          }
+        ).populate({ path: "members.userId" });
+      }
+    );
   } catch (err) {
     res.send({ error: err.message });
   }

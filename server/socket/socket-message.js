@@ -221,6 +221,12 @@ exports = module.exports = (socket, type, io = null) => {
         callback();
       });
       break;
+    case "blockConversation":
+    case "blockGroupConversation":
+      socket.on(type, ({ room, userBlock, isBlock, isAdmin }) => {
+        socket.broadcast.to(room).emit(type, { userBlock, isBlock, isAdmin });
+      });
+      break;
     case "disconnect":
       socket.on(type, () => {
         console.log("A user disconnected to message channel");

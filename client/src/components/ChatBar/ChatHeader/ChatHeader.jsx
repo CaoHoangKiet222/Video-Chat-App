@@ -42,9 +42,20 @@ const ChatHeader = (props) => {
   }, [showDropDown]);
 
   const callHandler = () => {
-    if (member.isLoggined) {
+    if (member.isLoggined && !props.block.isBlock) {
       return dispatch(
         beforeStartVideo("Caller", member, user, props.room, navigate, error)
+      );
+    }
+    if (props.block.isBlock) {
+      return dispatch(
+        errorActions.setError({
+          error: true,
+          message:
+            user._id === props.block?.byUserId
+              ? `Can't call ${member.name} because you blocked this user`
+              : `Can't call ${member.name} because you was blocked by this user`,
+        })
       );
     }
 
@@ -61,8 +72,13 @@ const ChatHeader = (props) => {
   };
 
   const handleBlock = () => {
-    console.log(props);
-    dispatch(blockConversation(props.room, false, "single"));
+    dispatch(
+      blockConversation(
+        props.room,
+        { memberId: member._id, isAdmin: false, isBlock: props.block?.isBlock },
+        "single"
+      )
+    );
   };
 
   const deleteHandler = () => {
@@ -121,10 +137,14 @@ const ChatHeader = (props) => {
                   <BsArchive />
                   <span>Archive</span>
                 </a>
-                <a href="#" onClick={handleBlock}>
-                  <BiBlock />
-                  <span>Block</span>
-                </a>
+                {(!props.block.isBlock ||
+                  (props.block.isBlock &&
+                    user._id === props.block?.byUserId)) && (
+                  <a href="#" onClick={handleBlock}>
+                    <BiBlock />
+                    <span>{!props.block.isBlock ? "Block" : "Unblock"}</span>
+                  </a>
+                )}
                 <a href="#" className="text-danger" onClick={deleteHandler}>
                   <RiDeleteBinLine />
                   <span>Delete</span>

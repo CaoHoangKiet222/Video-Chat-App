@@ -126,7 +126,6 @@ const InfoBar = (props) => {
   const handleViewInfo = () => {
     setShowViewInfo(!showViewInfo);
   };
-  console.log(props);
 
   return (
     <Card>
@@ -135,6 +134,7 @@ const InfoBar = (props) => {
           handleSearchBox={handleSearchBox}
           handleViewInfo={handleViewInfo}
           member={props.member}
+          block={props.block}
           room={props.room}
         />
         <SearchBox
@@ -154,7 +154,12 @@ const InfoBar = (props) => {
             />
           </Body>
         )}
-        <ChatFooter member={props.member} onSendMessage={sendMessage} />
+        <ChatFooter
+          member={props.member}
+          onSendMessage={sendMessage}
+          block={props.block}
+          room={props.room}
+        />
       </Msger>
       <ChatDetail
         handleViewInfo={handleViewInfo}

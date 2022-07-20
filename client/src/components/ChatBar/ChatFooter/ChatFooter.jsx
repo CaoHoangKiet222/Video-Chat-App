@@ -14,6 +14,7 @@ import { FilesContent, InputForm, ReplyForm } from "./ChatFooter.styled";
 import { AiFillFileText } from "react-icons/ai";
 import { BsFiles } from "react-icons/bs";
 import { errorActions } from "../../../store/error-slice";
+import { blockConversation } from "../../../store/conversations-creator";
 
 const ChatFooter = (props) => {
   const inputValue = useRef("");
@@ -26,6 +27,12 @@ const ChatFooter = (props) => {
   const dispatch = useDispatch();
   const nameRef = useRef(null);
   const textRef = useRef(null);
+  const [userBlock] = useState(
+    props.members?.find((member) => {
+      return member.block.byUserId === member.userId._id;
+    })
+  );
+  console.log(userBlock);
 
   useEffect(() => {
     if (reply?.isClick) {
@@ -137,159 +144,203 @@ const ChatFooter = (props) => {
     }
   };
 
+  const UnblockHandler = () => {
+    if (userBlock) {
+      return dispatch(
+        blockConversation(
+          props.room,
+          {
+            isAdmin: userBlock.isAdmin,
+            isBlock: props.block.isBlock,
+          },
+          "group"
+        )
+      );
+    }
+
+    dispatch(
+      blockConversation(
+        props.room,
+        {
+          isAdmin: false,
+          isBlock: props.block.isBlock,
+        },
+        "single"
+      )
+    );
+  };
+
   return (
     <InputForm onSubmit={submitHandle}>
-      {!closeRepForm && (
-        <ReplyForm>
-          <div className="container">
-            <div className="text-reply">
-              <div className="text-reply-container">
-                <div>
-                  <span>
-                    Replying to <b ref={nameRef}></b>
-                  </span>
+      {!props.block?.isBlock ? (
+        <>
+          {!closeRepForm && (
+            <ReplyForm>
+              <div className="container">
+                <div className="text-reply">
+                  <div className="text-reply-container">
+                    <div>
+                      <span>
+                        Replying to <b ref={nameRef}></b>
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-muted" ref={textRef}></span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-muted" ref={textRef}></span>
+                <div className="close-btn" onClick={closeHandler}>
+                  <IoClose />
                 </div>
               </div>
-            </div>
-            <div className="close-btn" onClick={closeHandler}>
-              <IoClose />
-            </div>
-          </div>
-        </ReplyForm>
-      )}
-      {attachments.length !== 0 && (
-        <FilesContent>
-          <div className="container">
-            <div className="content">
-              {attachments.map(({ fileName }, index) => {
-                console.log(fileName);
-                return (
-                  <div className="attachments" key={index}>
-                    <div className="content-attachment">
-                      <div className="icon">
-                        <AiFillFileText />
+            </ReplyForm>
+          )}
+          {attachments.length !== 0 && (
+            <FilesContent>
+              <div className="container">
+                <div className="content">
+                  {attachments.map(({ fileName }, index) => {
+                    return (
+                      <div className="attachments" key={index}>
+                        <div className="content-attachment">
+                          <div className="icon">
+                            <AiFillFileText />
+                          </div>
+                          <div className="attachment">{fileName}</div>
+                        </div>
+                        <div
+                          className="close-btn"
+                          onClick={() => {
+                            closeFilesHandler(index, "attachments");
+                          }}
+                        >
+                          <IoClose />
+                        </div>
                       </div>
-                      <div className="attachment">{fileName}</div>
-                    </div>
-                    <div
-                      className="close-btn"
-                      onClick={() => {
-                        closeFilesHandler(index, "attachments");
-                      }}
-                    >
-                      <IoClose />
-                    </div>
+                    );
+                  })}
+                  <div className="upload-another-attach">
+                    <label htmlFor="uploadAnotherAttach">
+                      <BsFiles />
+                    </label>
+                    <input
+                      type="file"
+                      id="uploadAnotherAttach"
+                      accept=".xlsx,.xls,.doc, .docx, .ppt, .pptx,.txt, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                      multiple
+                      style={{ display: "none" }}
+                      onChange={(e) => handleMultipleFiles(e, "attachments")}
+                    />
                   </div>
-                );
-              })}
-              <div className="upload-another-attach">
-                <label htmlFor="uploadAnotherAttach">
-                  <BsFiles />
-                </label>
-                <input
-                  type="file"
-                  id="uploadAnotherAttach"
-                  accept=".xlsx,.xls,.doc, .docx, .ppt, .pptx,.txt, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                  multiple
-                  style={{ display: "none" }}
-                  onChange={(e) => handleMultipleFiles(e, "attachments")}
-                />
+                </div>
               </div>
-            </div>
-          </div>
-        </FilesContent>
-      )}
-      {imagesPreview.length !== 0 && (
-        <FilesContent>
+            </FilesContent>
+          )}
+          {imagesPreview.length !== 0 && (
+            <FilesContent>
+              <div className="container">
+                <div className="content">
+                  {imagesPreview.map(({ url }, index) => {
+                    return (
+                      <div className="image" key={index}>
+                        <img src={url} alt="" />
+                        <div
+                          className="close-btn"
+                          onClick={() => {
+                            closeFilesHandler(index, "images-preview");
+                          }}
+                        >
+                          <IoClose />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="upload-another-image">
+                    <label htmlFor="uploadAnotherImg">
+                      <MdOutlineAddPhotoAlternate />
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="uploadAnotherImg"
+                      multiple
+                      style={{ display: "none" }}
+                      onChange={(e) => handleMultipleFiles(e, "images-preview")}
+                    />
+                  </div>
+                </div>
+              </div>
+            </FilesContent>
+          )}
           <div className="container">
-            <div className="content">
-              {imagesPreview.map(({ url }, index) => {
-                return (
-                  <div className="image" key={index}>
-                    <img src={url} alt="" />
-                    <div
-                      className="close-btn"
-                      onClick={() => {
-                        closeFilesHandler(index, "images-preview");
-                      }}
-                    >
-                      <IoClose />
-                    </div>
-                  </div>
-                );
-              })}
-              <div className="upload-another-image">
-                <label htmlFor="uploadAnotherImg">
-                  <MdOutlineAddPhotoAlternate />
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  id="uploadAnotherImg"
-                  multiple
-                  style={{ display: "none" }}
-                  onChange={(e) => handleMultipleFiles(e, "images-preview")}
-                />
+            <div
+              className="input-group"
+              onClick={(e) => {
+                e.stopPropagation();
+                setClickEmoji(true);
+              }}
+            >
+              <div className="dropdown">
+                <MdOutlineEmojiEmotions />
+                {clickEmoji && <EmojiPicker onEmojiSelect={handleEmoji} />}
               </div>
             </div>
+            <div className="image-attach">
+              <label htmlFor="imageAttach">
+                <ImImages />
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                id="imageAttach"
+                style={{ display: "none" }}
+                multiple
+                onChange={(e) => handleMultipleFiles(e, "images-preview")}
+              />
+            </div>
+            <div className="file-attach">
+              <label htmlFor="fileAttach">
+                <ImAttachment />
+              </label>
+              <input
+                type="file"
+                id="fileAttach"
+                style={{ display: "none" }}
+                accept=".xlsx,.xls,.doc, .docx, .ppt, .pptx,.txt, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                multiple
+                onChange={(e) => handleMultipleFiles(e, "attachments")}
+              />
+            </div>
+            <div className="input">
+              <input
+                type={props.type}
+                placeholder="Enter your message..."
+                ref={inputValue}
+                onChange={inputChangeHanle}
+                multiple
+              />
+            </div>
+            <button type="submit">
+              <RiMailSendLine />
+            </button>
           </div>
-        </FilesContent>
+        </>
+      ) : (
+        <div className="block">
+          {user._id === props.block?.byUserId ? (
+            <>
+              <span>This conversation has been blocked by you</span>
+              <div className="btn" onClick={UnblockHandler}>
+                <span>Unblock</span>
+              </div>
+            </>
+          ) : (
+            <span>
+              This conversation has been blocked by {userBlock?.userId.name}
+            </span>
+          )}
+        </div>
       )}
-      <div className="container">
-        <div
-          className="input-group"
-          onClick={(e) => {
-            e.stopPropagation();
-            setClickEmoji(true);
-          }}
-        >
-          <div className="dropdown">
-            <MdOutlineEmojiEmotions />
-            {clickEmoji && <EmojiPicker onEmojiSelect={handleEmoji} />}
-          </div>
-        </div>
-        <div className="image-attach">
-          <label htmlFor="imageAttach">
-            <ImImages />
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            id="imageAttach"
-            style={{ display: "none" }}
-            multiple
-            onChange={(e) => handleMultipleFiles(e, "images-preview")}
-          />
-        </div>
-        <div className="file-attach">
-          <label htmlFor="fileAttach">
-            <ImAttachment />
-          </label>
-          <input
-            type="file"
-            id="fileAttach"
-            style={{ display: "none" }}
-            accept=".xlsx,.xls,.doc, .docx, .ppt, .pptx,.txt, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-            multiple
-            onChange={(e) => handleMultipleFiles(e, "attachments")}
-          />
-        </div>
-        <div className="input">
-          <input
-            type={props.type}
-            placeholder="Enter your message..."
-            ref={inputValue}
-            onChange={inputChangeHanle}
-            multiple
-          />
-        </div>
-        <button type="submit">
-          <RiMailSendLine />
-        </button>
-      </div>
     </InputForm>
   );
 };

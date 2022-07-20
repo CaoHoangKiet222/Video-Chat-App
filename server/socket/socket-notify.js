@@ -14,6 +14,7 @@ exports = module.exports = (socket, type, io = null) => {
     case "notifyingUserAddFriend":
     case "notifyingUserAddGroup":
     case "notifyingDeleteUser":
+    case "notifyingBlockUser":
       socket.on(type, () => {
         socket.broadcast.emit(type);
       });

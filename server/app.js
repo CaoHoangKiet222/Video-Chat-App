@@ -65,6 +65,8 @@ io_notify.on("connection", (socket) => {
 
   socketNotifyListen(socket, "notifyingDeleteUser");
 
+  socketNotifyListen(socket, "notifyingBlockUser");
+
   socketNotifyListen(socket, "disconnect");
 });
 
@@ -87,6 +89,10 @@ io_chat.on("connection", (socket) => {
   socketMessageListen(socket, "deleteConversation");
 
   socketMessageListen(socket, "deleteGroupConversation");
+
+  socketMessageListen(socket, "blockConversation");
+
+  socketMessageListen(socket, "blockGroupConversation");
 
   socketMessageListen(socket, "disconnect", io_chat);
 });
