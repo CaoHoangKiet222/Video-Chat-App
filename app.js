@@ -22,7 +22,7 @@ const MongoDBStore = require("connect-mongodb-session")(session);
 
 app.use(
   cors({
-    origin: process.env.ENDPOINT_CLIENT,
+    origin: [process.env.ENDPOINT_CLIENT, process.env.ENDPOINT_CLIENT_NETLIFY],
     optionsSuccessStatus: 200,
     credentials: true,
   })
@@ -35,6 +35,8 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
       maxAge: Date.now() + 1000 * 60 * 60 * 2,
     },
     store: new MongoDBStore({
