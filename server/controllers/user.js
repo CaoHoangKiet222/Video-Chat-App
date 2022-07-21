@@ -277,7 +277,7 @@ exports.postReset = (req, res, _next) => {
               html: `
               <h3>Hello ${user.email}</h3>
               <p>You requested a password reset</p>
-              <p>Click <a href="${process.env.ENDPOINT_CLIENT}/reset-password/new-pass?token=${token}">this</a> to reset password.</p>
+              <p>Click <a href="${process.env.ENDPOINT_CLIENT_NETLIFY}/reset-password/new-pass?token=${token}">this</a> to reset password.</p>
            `,
             },
             (err, result) => {
@@ -372,7 +372,7 @@ exports.updateUserAccount = async (req, res, _next) => {
 
     if (avatar) {
       avatar = await uploadImgs(avatar, "image-profile");
-      console.log(avatar);
+      // console.log(avatar);
     }
 
     const user = await User.findById(userId).select(
