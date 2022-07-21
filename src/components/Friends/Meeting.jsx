@@ -16,7 +16,6 @@ import { answerCall, callToUser, leaveCall } from "../../store/video-creator";
 import { videoActions } from "../../store/video-slice";
 import { errorActions } from "../../store/error-slice";
 import { useAudio } from "../Hook/useAudio";
-import { setPersistence } from "firebase/auth";
 
 const Meeting = () => {
   console.log("Meeting running");

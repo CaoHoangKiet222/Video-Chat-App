@@ -183,7 +183,7 @@ export const DropDownContent = styled.div`
   justify-content: center;
   background: #2b2b2b;
 
-  a {
+  div {
     display: flex;
     padding: 0.5rem 1.5rem;
     width: 100%;

@@ -8,7 +8,7 @@ export const NavBar = styled.div`
   background-color: #665dfe;
   justify-content: center;
 
-  & > a {
+  & > div {
     height: 43.5px;
     width: 43.5px;
     padding: 0.375rem;

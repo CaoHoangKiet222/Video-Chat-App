@@ -1,12 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { BiBlock, BiDotsVerticalRounded } from "react-icons/bi";
-import {
-  BsArchive,
-  BsInfoCircle,
-  BsSearch,
-  BsTelephone,
-  BsVolumeMute,
-} from "react-icons/bs";
+import { BsArchive, BsInfoCircle, BsSearch, BsTelephone } from "react-icons/bs";
 import { Link, useNavigate } from "react-router-dom";
 import { Avatar } from "../../Chat/ChatItems.styled";
 import {
@@ -117,38 +111,38 @@ const ChatHeader = (props) => {
           {showDropDown && (
             <DropDown>
               <DropDownContent translate="translate(-200px, -10px)">
-                <a href="#" onClick={props.handleSearchBox}>
+                <div onClick={props.handleSearchBox}>
                   <BsSearch />
                   <span>Search</span>
-                </a>
-                <a href="#" onClick={props.handleViewInfo}>
+                </div>
+                <div onClick={props.handleViewInfo}>
                   <BsInfoCircle />
                   <span>View Info</span>
-                </a>
-                <a href="#">
+                </div>
+                <div>
                   <VscMute />
                   <span>Mute Notifications</span>
-                </a>
-                <a href="#">
+                </div>
+                <div>
                   <MdOutlineWallpaper />
                   <span>Wallpaper</span>
-                </a>
-                <a href="#">
+                </div>
+                <div>
                   <BsArchive />
                   <span>Archive</span>
-                </a>
+                </div>
                 {(!props.block.isBlock ||
                   (props.block.isBlock &&
                     user._id === props.block?.byUserId)) && (
-                  <a href="#" onClick={handleBlock}>
+                  <div onClick={handleBlock}>
                     <BiBlock />
                     <span>{!props.block.isBlock ? "Block" : "Unblock"}</span>
-                  </a>
+                  </div>
                 )}
-                <a href="#" className="text-danger" onClick={deleteHandler}>
+                <div className="text-danger" onClick={deleteHandler}>
                   <RiDeleteBinLine />
                   <span>Delete</span>
-                </a>
+                </div>
               </DropDownContent>
             </DropDown>
           )}

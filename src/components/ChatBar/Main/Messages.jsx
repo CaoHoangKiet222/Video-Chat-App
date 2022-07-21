@@ -258,27 +258,27 @@ const Messages = (props) => {
           {showMenu && (
             <DropDownContent translate="translate(0px, 25px)">
               <CopyToClipboard text={props.message.content}>
-                <a href="#">
+                <div>
                   <IoCopyOutline></IoCopyOutline>
                   <span>Copy</span>
-                </a>
+                </div>
               </CopyToClipboard>
-              <a href="#" onClick={replyHandler}>
+              <div onClick={replyHandler}>
                 <IoReturnUpBack></IoReturnUpBack>
                 <span>Reply</span>
-              </a>
-              <a href="#" onClick={forwardHandler}>
+              </div>
+              <div onClick={forwardHandler}>
                 <IoReturnUpForward></IoReturnUpForward>
                 <span>Forward</span>
-              </a>
-              <a href="#">
+              </div>
+              <div>
                 <AiOutlineStar></AiOutlineStar>
                 <span>Favourite</span>
-              </a>
-              <a href="#" className="text-danger" onClick={deleteHandler}>
+              </div>
+              <div className="text-danger" onClick={deleteHandler}>
                 <RiDeleteBinLine></RiDeleteBinLine>
                 <span>Delete</span>
-              </a>
+              </div>
             </DropDownContent>
           )}
         </DropDown>

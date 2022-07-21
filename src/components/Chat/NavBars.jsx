@@ -26,9 +26,9 @@ const NavBars = () => {
 
   return (
     <NavBar>
-      <a href="#">
+      <div>
         <BsMessenger />
-      </a>
+      </div>
       <MainNav ref={navItems}>
         <li>
           <Link to="/video-chat/Chats" className="active">

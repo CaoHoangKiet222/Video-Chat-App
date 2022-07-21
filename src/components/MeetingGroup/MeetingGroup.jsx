@@ -9,7 +9,7 @@ import {
   Picture,
   RoundedButton,
 } from "../Friends/Meeting.styled";
-import { FiPhoneOff, FiPhone, FiVideo } from "react-icons/fi";
+import { FiPhoneOff, FiVideo } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { findImgAndNameGroup } from "../../utilities/utilities";

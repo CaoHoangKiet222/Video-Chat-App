@@ -193,9 +193,9 @@ const Login = (props) => {
               <Circle />
               <Flip>
                 <Logo>
-                  <a href="#">
+                  <div>
                     <img src="/images/logo-login.png" alt="" />
-                  </a>
+                  </div>
                 </Logo>
               </Flip>
               <MainTitle>

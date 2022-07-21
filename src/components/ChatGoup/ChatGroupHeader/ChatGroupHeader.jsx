@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiBlock, BiDotsVerticalRounded } from "react-icons/bi";
 import { BsArchive, BsInfoCircle, BsSearch, BsTelephone } from "react-icons/bs";
 import { MdOutlineWallpaper } from "react-icons/md";
@@ -132,37 +132,37 @@ const ChatGroupHeader = ({
           {showDropDown && (
             <DropDown>
               <DropDownContent translate="translate(-200px, -10px)">
-                <a href="#" onClick={handleSearchBox}>
+                <div onClick={handleSearchBox}>
                   <BsSearch />
                   <span>Search</span>
-                </a>
-                <a href="#" onClick={handleViewInfo}>
+                </div>
+                <div onClick={handleViewInfo}>
                   <BsInfoCircle />
                   <span>View Info</span>
-                </a>
-                <a href="#">
+                </div>
+                <div>
                   <VscMute />
                   <span>Mute Notifications</span>
-                </a>
-                <a href="#">
+                </div>
+                <div>
                   <MdOutlineWallpaper />
                   <span>Wallpaper</span>
-                </a>
-                <a href="#">
+                </div>
+                <div>
                   <BsArchive />
                   <span>Archive</span>
-                </a>
+                </div>
                 {(!member.block.isBlock ||
                   (member.block.isBlock && member.isAdmin)) && (
-                  <a href="#" onClick={handleBlock}>
+                  <div onClick={handleBlock}>
                     <BiBlock />
                     <span>{member.block.isBlock ? "Unblock" : "Block"}</span>
-                  </a>
+                  </div>
                 )}
-                <a href="#" className="text-danger" onClick={deleteHandler}>
+                <div className="text-danger" onClick={deleteHandler}>
                   <RiDeleteBinLine />
                   <span>Delete</span>
-                </a>
+                </div>
               </DropDownContent>
             </DropDown>
           )}

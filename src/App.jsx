@@ -44,6 +44,7 @@ function App() {
             navigate("/login");
           });
         }
+
         if (!data.isAuth) {
           dispatch(authActions.setAuth({ auth: false }));
           return navigate("/login");

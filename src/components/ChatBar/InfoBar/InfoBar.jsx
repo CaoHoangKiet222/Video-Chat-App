@@ -10,10 +10,10 @@ import { fetchConversation } from "../../../store/conversations-creator";
 import { v4 as uuid4 } from "uuid";
 import SearchBox from "../ChatHeader/SearchBox";
 import ChatDetail from "./ChatDetail";
+import { errorActions } from "../../../store/error-slice";
 
 const InfoBar = (props) => {
   console.log("InfoBar running");
-  const [error, setError] = useState("");
   const [messages, setMessages] = useState([]);
   const [isSendMess, setIsSendMess] = useState(false);
   const [showSearchBox, setShowSearchBox] = useState(false);
@@ -26,7 +26,12 @@ const InfoBar = (props) => {
   useEffect(() => {
     chatSocket.emit("joinRoom", props.room, (messages, error = null) => {
       if (error) {
-        return setError(error);
+        return dispatch(
+          errorActions.setError({
+            error: true,
+            message: error.message,
+          })
+        );
       }
       setMessages(messages);
 
@@ -37,7 +42,7 @@ const InfoBar = (props) => {
       chatSocket.emit("leaveRoom", props.room);
       setIsFetch(false);
     };
-  }, [props.room, chatSocket]);
+  }, [props.room, chatSocket, dispatch]);
 
   useEffect(() => {
     chatSocket.on("leaveRoom", () => {
@@ -107,7 +112,12 @@ const InfoBar = (props) => {
           },
           (error, message) => {
             if (error) {
-              return setError(error);
+              return dispatch(
+                errorActions.setError({
+                  error: true,
+                  message: error.message,
+                })
+              );
             }
             setMessages((preMess) => [...preMess, message]);
             return dispatch(fetchConversation());
