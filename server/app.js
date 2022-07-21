@@ -20,6 +20,9 @@ app.use(express.urlencoded({ limit: "50mb", extended: false })); // Allow us to 
 
 const MongoDBStore = require("connect-mongodb-session")(session);
 
+// trust proxy (https://stackoverflow.com/questions/64958647/express-not-sending-cross-domain-cookies)
+app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: [process.env.ENDPOINT_CLIENT, process.env.ENDPOINT_CLIENT_NETLIFY],
