@@ -37,7 +37,6 @@ exports.newGroup = (req, res, _next) => {
 
 exports.blockConversation = (req, res, _next) => {
   try {
-    console.log(req.body);
     Conversation.findByIdAndUpdate(
       req.body.conversationId,
       {
@@ -61,9 +60,8 @@ exports.blockConversation = (req, res, _next) => {
 
 exports.blockGroupConversation = (req, res, _next) => {
   try {
-    console.log("blockGroupConversation", req.body);
     if (req.body.isAdmin) {
-      Conversation.findByIdAndUpdate(
+      return Conversation.findByIdAndUpdate(
         req.body.conversationId,
         {
           "members.$[].block": {
@@ -80,6 +78,8 @@ exports.blockGroupConversation = (req, res, _next) => {
         }
       );
     }
+
+    res.send({ error: "You are not admin to block other members!!!" });
   } catch (error) {
     res.send({ error: error.message });
   }

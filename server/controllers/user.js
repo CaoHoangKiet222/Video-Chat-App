@@ -17,7 +17,10 @@ exports.getCall = async (req, res, _next) => {
   try {
     const { members } = await Conversation.findOne({
       _id: req.params.conversationId,
-    }).populate({ path: "members.userId", select: "-password" });
+    }).populate({
+      path: "members.userId",
+      select: "-password -avatar.public_id -twoFA.secret -groupImg.public_id",
+    });
 
     const friend = members.find(
       (member) =>
@@ -36,7 +39,7 @@ exports.getListFriends = async (req, res, _next) => {
       _id: {
         $ne: req.session.user._id.toString(),
       },
-    }).select("-password");
+    }).select("-password -avatar.public_id -twoFA.secret");
 
     const sortedName = sortName(listFriends);
 
@@ -56,6 +59,7 @@ exports.getConversation = (req, res, _next) => {
         if (!convTest) {
           return res.send({ error: "Conversation not found!!" });
         }
+        console.log(convTest);
 
         return res.status(200).json({
           conv: convTest,
@@ -64,7 +68,7 @@ exports.getConversation = (req, res, _next) => {
       }
     ).populate({
       path: "members.userId",
-      select: "-password",
+      select: "-password -avatar.public_id -twoFA.secret -groupImg.public_id",
     });
   } catch (err) {
     console.log(err);
@@ -125,7 +129,7 @@ exports.postUserLogin = async (req, res, _next) => {
     const user = await User.findOne({
       email: req.body.email,
       loginByFirebase: "",
-    }).select("-password -twoFA.secret");
+    }).select("-password -avatar.public_id -twoFA.secret");
 
     if (user.twoFA.is2FAEnabled) {
       setSession(req, user, false);
@@ -141,7 +145,7 @@ exports.postUserLogin = async (req, res, _next) => {
 
         return res.send(updatedUser);
       }
-    ).select("-password -twoFA.secret");
+    ).select("-password -avatar.public_id -twoFA.secret");
   } catch (err) {
     console.log(err);
     res.send({ erroe: err.message });
@@ -152,7 +156,7 @@ exports.postUserLoginByFirebase = async (req, res, _next) => {
     const user = await User.findOne({
       email: req.body.email,
       loginByFirebase: req.body.provider,
-    }).select("-password -twoFA.secret");
+    }).select("-password -avatar.public_id -twoFA.secret");
 
     if (!user) {
       const newUser = await User.create({
@@ -167,7 +171,9 @@ exports.postUserLoginByFirebase = async (req, res, _next) => {
         phone: req.body.phone,
         isLoggined: true,
       }).then(async (user) => {
-        return await User.findById(user._id).select("-password -twoFA.secret");
+        return await User.findById(user._id).select(
+          "-password -avatar.public_id -twoFA.secret"
+        );
       });
       setSession(req, newUser, true);
       return res.send(newUser);
@@ -187,7 +193,7 @@ exports.postUserLoginByFirebase = async (req, res, _next) => {
 
         return res.send(updatedUser);
       }
-    ).select("-password -twoFA.secret");
+    ).select("-password -avatar.public_id -twoFA.secret");
   } catch (err) {
     console.log(err);
     res.send({ error: err.message });
@@ -369,7 +375,9 @@ exports.updateUserAccount = async (req, res, _next) => {
       console.log(avatar);
     }
 
-    const user = await User.findById(userId).select("avatar -password");
+    const user = await User.findById(userId).select(
+      "avatar -password -avatar.public_id -twoFA.secret"
+    );
     destroyAsset(user.avatar.public_id, "image");
 
     User.findOneAndUpdate(
@@ -393,7 +401,7 @@ exports.updateUserAccount = async (req, res, _next) => {
           user: updatedUser,
         });
       }
-    ).select("-password -twoFA.secret");
+    ).select("-password -avatar.public_id -twoFA.secret");
   } catch (err) {
     res.send({ error: err.message });
   }
@@ -421,7 +429,7 @@ exports.updateUserSocialNetwork = async (req, res, _next) => {
           user: updatedUser,
         });
       }
-    ).select("-password -twoFA.secret");
+    ).select("-password -avatar.public_id -twoFA.secret");
   } catch (err) {
     res.send({ error: err.message });
   }
@@ -453,7 +461,7 @@ exports.updateUserPassword = async (req, res, _next) => {
           user: updatedUser,
         });
       }
-    ).select("-password -twoFA.secret");
+    ).select("-password -avatar.public_id -twoFA.secret");
   } catch (err) {
     res.send({ error: err.message });
   }
@@ -490,7 +498,7 @@ exports.postEnable2FA = (req, res, _next) => {
 
           return res.status(200).json({ QRCodeImage, user: updatedUser });
         }
-      ).select("-password -twoFA.secret");
+      ).select("-password -avatar.public_id -twoFA.secret");
     } else {
       User.findByIdAndUpdate(
         userId,
@@ -512,7 +520,7 @@ exports.postEnable2FA = (req, res, _next) => {
             user: updatedUser,
           });
         }
-      ).select("-password -twoFA.secret");
+      ).select("-password -avatar.public_id -twoFA.secret");
     }
   } catch (err) {
     res.send({ error: err.message });
@@ -537,7 +545,7 @@ exports.postVerify2FA = (req, res, _next) => {
             }
             setSession(req, updatedUser, true);
           }
-        ).select("-password -twoFA.secret");
+        ).select("-password -avatar.public_id -twoFA.secret");
       }
       res.json({ isValid });
     });

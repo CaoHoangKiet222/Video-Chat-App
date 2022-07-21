@@ -327,7 +327,7 @@ const ChatFooter = (props) => {
         </>
       ) : (
         <div className="block">
-          {user._id === props.block?.byUserId ? (
+          {user?._id === props.block?.byUserId ? (
             <>
               <span>This conversation has been blocked by you</span>
               <div className="btn" onClick={UnblockHandler}>
@@ -336,7 +336,8 @@ const ChatFooter = (props) => {
             </>
           ) : (
             <span>
-              This conversation has been blocked by {userBlock?.userId.name}
+              This conversation has been blocked by{" "}
+              {userBlock ? userBlock.userId.name : props.member.name}
             </span>
           )}
         </div>

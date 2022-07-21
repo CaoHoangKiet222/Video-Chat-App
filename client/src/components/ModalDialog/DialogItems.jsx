@@ -30,12 +30,12 @@ const DialogItems = (props) => {
           }
         })
         .map(({ groupName, groupImg, members, _id: id }) => {
-          if (groupName !== "" && groupImg !== "") {
+          if (groupName !== "" && groupImg.url !== "") {
             return (
               <DialogMain
                 key={id}
                 groupName={groupName}
-                groupImg={groupImg}
+                groupImg={groupImg.url}
                 isGroup={true}
                 room={id}
                 numsPeople={members.length}

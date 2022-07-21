@@ -12,18 +12,6 @@ export const postData = async (url, method, data = {}) => {
   return response.json();
 };
 
-export const postDataFile = async (url, { file, newMembers, groupName }) => {
-  const formData = new FormData();
-  formData.append("groupImg", file);
-  formData.append("groupName", groupName);
-  formData.append("newMembers", JSON.stringify(newMembers));
-  const response = await fetch(url, {
-    method: "post",
-    body: formData,
-  });
-  return response.json();
-};
-
 export const formatHour = (date) => {
   date = new Date(date);
   const h = "0" + date.getHours();

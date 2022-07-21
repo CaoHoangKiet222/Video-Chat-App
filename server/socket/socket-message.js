@@ -13,7 +13,8 @@ exports = module.exports = (socket, type, io = null) => {
         try {
           const conv = await Conversation.findOne({ _id: room }).populate({
             path: "members.userId messages.senderId messages.files messages.reply",
-            select: "-password",
+            select:
+              "-password -avatar.public_id -twoFA.secret -groupImg.public_id",
           });
 
           callback(conv.messages);
@@ -147,7 +148,8 @@ exports = module.exports = (socket, type, io = null) => {
             }
           ).populate({
             path: "messages.senderId messages.files",
-            select: "-password",
+            select:
+              "-password -avatar.public_id -twoFA.secret -groupImg.public_id",
           });
         } catch (err) {
           console.log(err);
@@ -198,7 +200,8 @@ exports = module.exports = (socket, type, io = null) => {
             }
           ).populate({
             path: "messages.senderId messages.files",
-            select: "-password",
+            select:
+              "-password -avatar.public_id -twoFA.secret -groupImg.public_id",
           });
         } catch (err) {
           console.log(err);
