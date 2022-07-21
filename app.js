@@ -34,6 +34,9 @@ app.use(
     secret: "secret",
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      maxAge: Date.now() + 1000 * 60 * 60 * 2,
+    },
     store: new MongoDBStore({
       uri: process.env.MONGODB_URI,
       collection: "session",

@@ -356,6 +356,7 @@ exports.checkCookieExpiration = async (req, res, _next) => {
       req.session.destroy((err) => console.log(err));
       return res.json({ expireCookie: true });
     }
+
     if (req.session.isLoggined) {
       return res.json({ isAuth: true });
     }
