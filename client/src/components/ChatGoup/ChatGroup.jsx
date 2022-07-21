@@ -9,11 +9,11 @@ import { v4 as uuid4 } from "uuid";
 import ChatDetail from "../ChatBar/InfoBar/ChatDetail";
 import { Card, Msger } from "../ChatBar/InfoBar/InfoBar.styled";
 import SearchBox from "../ChatBar/ChatHeader/SearchBox";
+import { errorActions } from "../../store/error-slice";
 let timer;
 
 const ChatGroup = (props) => {
   console.log("ChatGroup running");
-  const [error, setError] = useState("");
   const [messages, setMessages] = useState([]);
   const [isSendMess, setIsSendMess] = useState(false);
   const [showSearchBox, setShowSearchBox] = useState(false);
@@ -32,7 +32,12 @@ const ChatGroup = (props) => {
   useEffect(() => {
     chatSocket.emit("joinRoom", props.room, (messages, error = null) => {
       if (error) {
-        return setError(error);
+        return dispatch(
+          errorActions.setError({
+            error: true,
+            message: error.message,
+          })
+        );
       }
       setMessages(messages);
 
@@ -119,7 +124,12 @@ const ChatGroup = (props) => {
           },
           (error, message) => {
             if (error) {
-              return setError(error);
+              return dispatch(
+                errorActions.setError({
+                  error: true,
+                  message: error.message,
+                })
+              );
             }
             setMessages((preMess) => [...preMess, message]);
             return dispatch(fetchConversation());
@@ -127,7 +137,12 @@ const ChatGroup = (props) => {
         );
       }
     } catch (err) {
-      console.error(err);
+      return dispatch(
+        errorActions.setError({
+          error: true,
+          message: err.message,
+        })
+      );
     }
   };
 

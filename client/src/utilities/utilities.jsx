@@ -221,7 +221,7 @@ export const searchToDisplay = (name, searchName) => {
 };
 
 export const checkIsFriend = (user, friend, conversation) => {
-  for (const [_index, conv] of conversation.entries()) {
+  for (const [_, conv] of conversation.entries()) {
     const member = conv.members.find((mem) => {
       return user._id !== mem.userId._id;
     });

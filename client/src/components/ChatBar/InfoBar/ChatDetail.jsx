@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-import {
-  AiOutlineClose,
-  AiOutlineUserAdd,
-  AiOutlineUsergroupAdd,
-} from "react-icons/ai";
+import { AiOutlineClose } from "react-icons/ai";
 import { GiSelfLove } from "react-icons/gi";
 import { FaMapMarkerAlt, FaUserAlt } from "react-icons/fa";
 import styled from "styled-components";

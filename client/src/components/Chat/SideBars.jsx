@@ -126,15 +126,15 @@ const SideBars = (props) => {
                     <BiDotsVerticalRounded />
                     {showDropdown && (
                       <DropDownContent translate="translate(-140px, 15px)">
-                        <a href="#" onClick={createNewChatHandler}>
+                        <div onClick={createNewChatHandler}>
                           <span>New Chat</span>
-                        </a>
-                        <a href="#" onClick={createGroupHandler}>
+                        </div>
+                        <div onClick={createGroupHandler}>
                           <span>Create Group</span>
-                        </a>
-                        <a href="#" onClick={inviteOthersHandler}>
+                        </div>
+                        <div onClick={inviteOthersHandler}>
                           <span>Invite Others</span>
-                        </a>
+                        </div>
                       </DropDownContent>
                     )}
                   </DropDown>

@@ -69,6 +69,8 @@ const Main = (props) => {
             />
           );
         }
+
+        return <></>;
       });
 
   return (

@@ -17,7 +17,7 @@ const SkeletonComponent = () => {
         .map((_, index) => {
           return (
             <ChatItem key={index}>
-              <a>
+              <div>
                 <Avatar isSkeleton={true}>
                   <Skeleton
                     circle={true}
@@ -57,7 +57,7 @@ const SkeletonComponent = () => {
                     </p>
                   </ChatText>
                 </ChatContent>
-              </a>
+              </div>
             </ChatItem>
           );
         })}

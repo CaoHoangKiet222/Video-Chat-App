@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   CommonControl,
   Container,
@@ -25,13 +25,10 @@ import { HiOutlineMicrophone } from "react-icons/hi";
 import { RiFullscreenExitFill, RiFullscreenFill } from "react-icons/ri";
 import { MdGridView } from "react-icons/md";
 import { VscSplitHorizontal } from "react-icons/vsc";
-import { FaChevronDown, FaChevronLeft } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
-  formatCallTime,
-  shareScreen,
-  findImgAndNameGroup,
   toggleAttributePeers,
   shareGroupScreen,
   splicePeers,

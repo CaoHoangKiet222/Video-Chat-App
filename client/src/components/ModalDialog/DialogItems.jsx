@@ -28,6 +28,7 @@ const DialogItems = (props) => {
           if (groupName !== "") {
             return searchToDisplay(groupName, props.searchName);
           }
+          return true;
         })
         .map(({ groupName, groupImg, members, _id: id }) => {
           if (groupName !== "" && groupImg.url !== "") {
@@ -46,6 +47,8 @@ const DialogItems = (props) => {
               />
             );
           }
+
+          return <></>;
         })}
     </DialogList>
   );

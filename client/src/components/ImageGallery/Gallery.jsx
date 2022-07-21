@@ -19,7 +19,6 @@ import lgRotate from "lightgallery/plugins/rotate";
 import lgShare from "lightgallery/plugins/share";
 import lgAutoPlay from "lightgallery/plugins/autoplay";
 import lgComment from "lightgallery/plugins/comment";
-import lgMediumZoom from "lightgallery/plugins/mediumZoom";
 
 const Gallery = ({ children }) => {
   return (
