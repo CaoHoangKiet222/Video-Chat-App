@@ -1,7 +1,7 @@
 # Realtime Video Chat Application
 
 <p align="center">
- <img src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/messenger.png?raw=true">
+ <img width="50%" height="50%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/messenger.png?raw=true">
 </p>
 
 ## Introduction
