@@ -59,7 +59,7 @@ const MeetingGroup = () => {
           <Picture>
             <ImgWrapper>
               <Avatar>
-                <img src={group.current?.groupImg} alt="" />
+                <img src={group.current?.groupImg.url} alt="" />
               </Avatar>
             </ImgWrapper>
           </Picture>
