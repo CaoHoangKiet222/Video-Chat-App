@@ -75,7 +75,7 @@ exports = module.exports = (socket, type, io = null) => {
     case "toggleSound":
       socket.on(type, ({ room }) => {
         try {
-          console.log(io.adapter.rooms);
+          // console.log(io.adapter.rooms);
           socket.userInfo.muteSound = !socket.userInfo.muteSound;
           socket.broadcast.to(room).emit("toggleSound", { userId: socket.id });
         } catch (error) {
@@ -98,7 +98,7 @@ exports = module.exports = (socket, type, io = null) => {
     case "disconnect":
       socket.on(type, () => {
         console.log("A user disconnected to meeting-group channel");
-        console.log(io.adapter.rooms);
+        // console.log(io.adapter.rooms);
 
         if (socket.room && socket.userInfo) {
           socket.broadcast.to(socket.room).emit("userLeaving", {

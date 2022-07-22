@@ -338,7 +338,7 @@ exports.postNewPassword = async (req, res, _next) => {
 
 exports.checkCookieExpiration = async (req, res, _next) => {
   try {
-    console.log("checkAuthUser", req.session);
+    // console.log("checkAuthUser", req.session);
 
     if (req.session.cookieExpiration - Date.now() <= 0) {
       await User.updateOne(
