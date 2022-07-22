@@ -49,6 +49,14 @@ const Chat = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    if (isLoading && user) {
+      notifySocket.emit("notifyingUserIsOnline", {
+        userId: user._id,
+      });
+    }
+  }, [notifySocket, user, isLoading]);
+
+  useEffect(() => {
     if (forward?.isClick) {
       setShowModalDialog(true);
     }

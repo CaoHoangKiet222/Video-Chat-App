@@ -16,7 +16,7 @@ export const fetchLogin = (
   passResetRef,
   resetAllUseState
 ) => {
-  return async (dispatch, getState) => {
+  return async (dispatch) => {
     dispatch(userActions.login({ user: null, isFetch: true, error: null }));
 
     try {
@@ -43,13 +43,7 @@ export const fetchLogin = (
         );
 
         if (data.error) {
-          return Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            html: data.error,
-            showConfirmButton: false,
-            timer: 5000,
-          });
+          throw new Error(data.error);
         }
 
         Swal.fire({
@@ -64,10 +58,9 @@ export const fetchLogin = (
           resetAllUseState();
         });
       } else {
-        handleTwoFA(data, dispatch, getState);
+        handleTwoFA(data, dispatch, navigate);
       }
     } catch (error) {
-      console.log(error);
       dispatch(
         userActions.login({
           user: null,
@@ -79,8 +72,8 @@ export const fetchLogin = (
   };
 };
 
-export const fetchLoginByFirebase = (url, user, provider) => {
-  return async (dispatch, getState) => {
+export const fetchLoginByFirebase = (url, user, provider, navigate) => {
+  return async (dispatch) => {
     dispatch(userActions.login({ user: null, isFetch: true, error: null }));
 
     try {
@@ -99,9 +92,8 @@ export const fetchLoginByFirebase = (url, user, provider) => {
 
       console.log(data);
 
-      handleTwoFA(data, dispatch, getState);
+      handleTwoFA(data, dispatch, navigate);
     } catch (error) {
-      console.log(error);
       dispatch(
         userActions.login({
           user: null,
@@ -138,7 +130,7 @@ export const userLogout = (url, userId, navigate) => {
   };
 };
 
-const handleTwoFA = (data, dispatch, getState) => {
+const handleTwoFA = (data, dispatch, navigate) => {
   dispatch(userActions.setIsFetch({ isFetch: false }));
   if (data.twoFA.is2FAEnabled) {
     Swal.fire({
@@ -187,16 +179,7 @@ const handleTwoFA = (data, dispatch, getState) => {
               timer: 2000,
             });
 
-            dispatch(
-              userActions.login({
-                user: { ...data },
-                isFetch: false,
-                error: null,
-              })
-            );
-            getState().socket.notifySocket.emit("notifyingUserIsOnline", {
-              userId: data._id,
-            });
+            navigate("/video-chat/Chats");
             break;
           } else {
             await Swal.fire({
@@ -213,15 +196,6 @@ const handleTwoFA = (data, dispatch, getState) => {
       }
     });
   } else {
-    dispatch(
-      userActions.login({
-        user: { ...data },
-        isFetch: false,
-        error: null,
-      })
-    );
-    getState().socket.notifySocket.emit("notifyingUserIsOnline", {
-      userId: data._id,
-    });
+    navigate("/video-chat/Chats");
   }
 };

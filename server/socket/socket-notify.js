@@ -5,6 +5,8 @@ exports = module.exports = (socket, type, io = null) => {
   switch (type) {
     case "notifyingUserIsOnline":
       socket.on(type, async ({ userId }) => {
+        console.log("notifyingUserIsOnline");
+        await User.updateOne({ _id: userId }, { isLoggined: true });
         socket.userId = userId;
         socket.broadcast.emit(type);
       });
@@ -20,8 +22,8 @@ exports = module.exports = (socket, type, io = null) => {
       break;
     case "disconnect":
       socket.on(type, async () => {
-        await User.findByIdAndUpdate(socket.userId, { isLoggined: false });
-        // socket.broadcast.emit("notifyingUserIsOffline");
+        await User.updateOne({ _id: socket.userId }, { isLoggined: false });
+        socket.broadcast.emit("notifyingUserIsOffline");
         socket.userId = null;
       });
       break;
