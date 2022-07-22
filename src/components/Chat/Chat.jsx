@@ -49,6 +49,14 @@ const Chat = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    if (isLoading && user) {
+      notifySocket.emit("notifyingUserIsOnline", {
+        userId: user._id,
+      });
+    }
+  }, [notifySocket, user, isLoading]);
+
+  useEffect(() => {
     if (forward?.isClick) {
       setShowModalDialog(true);
     }
@@ -56,9 +64,7 @@ const Chat = () => {
 
   useEffect(() => {
     if (user?.name || user?.avatar) {
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 500);
+      setIsLoading(false);
     }
   }, [user]);
 
@@ -85,13 +91,11 @@ const Chat = () => {
   useEffect(() => {
     // to be careful to put socket-client in map() because it can run multiple times
     notifySocket.on("notifyingUserIsOnline", () => {
-      console.log("notifyingUserIsOnline");
       dispatch(fetchConversation());
       dispatch(fetchFriends());
     });
 
     notifySocket.on("notifyingUserIsOffline", () => {
-      console.log("notifyingUserIsOffline");
       dispatch(fetchConversation());
       dispatch(fetchFriends());
     });
@@ -160,7 +164,6 @@ const Chat = () => {
     });
 
     chatSocket.on("deleteGroupConversation", ({ userDelete, isAdmin }) => {
-      console.log("deleteGroupConversation", isAdmin);
       if (isAdmin) {
         navigate("/video-chat/Chats");
         return Swal.fire({

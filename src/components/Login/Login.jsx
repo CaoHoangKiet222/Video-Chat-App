@@ -57,7 +57,10 @@ const Login = (props) => {
   useEffect(() => {
     if (!props.isSignUp) {
       // userState.error === null important statement
-      if ((userState.error === null && userState.user) || auth) {
+      // if ((userState.error === null && userState.user) || auth) {
+      //   navigate("/video-chat/Chats");
+      // }
+      if (auth) {
         navigate("/video-chat/Chats");
       }
     }
@@ -138,7 +141,8 @@ const Login = (props) => {
         fetchLoginByFirebase(
           `${process.env.REACT_APP_ENDPOINT_SERVER}/login-by-firebase`,
           user,
-          "google"
+          "google",
+          navigate
         )
       );
     } catch (error) {
@@ -159,7 +163,8 @@ const Login = (props) => {
             photoURL: user.reloadUserInfo.photoUrl,
             phoneNumber: user.phoneNumber,
           },
-          "github"
+          "github",
+          navigate
         )
       );
     } catch (error) {
@@ -175,7 +180,8 @@ const Login = (props) => {
         fetchLoginByFirebase(
           `${process.env.REACT_APP_ENDPOINT_SERVER}/login-by-firebase`,
           user.providerData[0],
-          "facebook"
+          "facebook",
+          navigate
         )
       );
     } catch (error) {
