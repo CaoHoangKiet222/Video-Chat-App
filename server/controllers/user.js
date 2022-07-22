@@ -59,7 +59,6 @@ exports.getConversation = (req, res, _next) => {
         if (!convTest) {
           return res.send({ error: "Conversation not found!!" });
         }
-        console.log(convTest);
 
         return res.status(200).json({
           conv: convTest,
@@ -78,7 +77,6 @@ exports.getConversation = (req, res, _next) => {
 
 exports.postAddFriend = async (req, res, _next) => {
   try {
-    console.log(req.body);
     Conversation.findOne(
       {
         $and: [
@@ -88,7 +86,6 @@ exports.postAddFriend = async (req, res, _next) => {
         ],
       },
       async (_err, convExist) => {
-        console.log(convExist);
         if (!convExist) {
           await new Conversation({
             members: [
@@ -343,7 +340,6 @@ exports.checkCookieExpiration = async (req, res, _next) => {
   try {
     // console.log("checkAuthUser", req.session);
 
-    // console.log(req.session.cookieExpiration - Date.now());
     if (req.session.cookieExpiration - Date.now() <= 0) {
       await User.updateOne(
         {
@@ -372,7 +368,6 @@ exports.updateUserAccount = async (req, res, _next) => {
 
     if (avatar) {
       avatar = await uploadImgs(avatar, "image-profile");
-      // console.log(avatar);
     }
 
     const user = await User.findById(userId).select(

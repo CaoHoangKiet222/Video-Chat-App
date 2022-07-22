@@ -95,7 +95,6 @@ exports = module.exports = (socket, type, io = null) => {
     case "forwardMessage":
       socket.on(type, async ({ message, user, friend }, callback) => {
         try {
-          console.log("forwardMessage", message);
           const {
             _id,
             content,
@@ -142,7 +141,6 @@ exports = module.exports = (socket, type, io = null) => {
                   "receiveMessage",
                   conversation.messages.splice(-1)[0]
                 );
-                console.log("emit done");
               }
               callback();
             }
@@ -159,8 +157,6 @@ exports = module.exports = (socket, type, io = null) => {
     case "forwardGroupMessage":
       socket.on(type, async ({ message, room }, callback) => {
         try {
-          console.log("forwardGroupMessage", message, room);
-
           const {
             _id,
             content,
@@ -171,7 +167,6 @@ exports = module.exports = (socket, type, io = null) => {
             isForward,
           } = message;
           const newFiles = await uploadFilesInConversation(files);
-          console.log(newFiles);
 
           const newMes = {
             _id,
@@ -210,7 +205,6 @@ exports = module.exports = (socket, type, io = null) => {
       break;
     case "deleteMessage":
       socket.on(type, ({ message, conversationId }, callback) => {
-        console.log("deleteMessage", message);
         socket.broadcast.to(conversationId).emit("deleteMessage", message);
         callback();
         deleteMessage(message, conversationId);
@@ -219,7 +213,6 @@ exports = module.exports = (socket, type, io = null) => {
     case "deleteConversation":
     case "deleteGroupConversation":
       socket.on(type, ({ room, userDelete, isAdmin }, callback) => {
-        console.log(type, room);
         socket.broadcast.to(room).emit(type, { userDelete, isAdmin });
         callback();
       });

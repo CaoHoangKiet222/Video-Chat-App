@@ -22,7 +22,7 @@ const upload = ({ url, fileName }, folder) => {
         }
 
         resolve({
-          url: result.url,
+          url: result.secure_url,
           fileName,
           public_id: result.public_id,
           size: (result.bytes / 1024).toFixed(2) + " KB",

@@ -17,7 +17,6 @@ exports = module.exports = (socket, type, io = null) => {
       break;
     case "meetingConnection":
       socket.on(type, ({ room, callee, caller }, callback) => {
-        console.log(callee);
         socket.broadcast.to(room).emit("meetingConnection", {
           callId: room,
           caller,
@@ -46,8 +45,6 @@ exports = module.exports = (socket, type, io = null) => {
             startCall,
             callAccepted,
           }).save();
-
-          console.log("answerCall done");
         } catch (error) {
           console.log(error);
         }

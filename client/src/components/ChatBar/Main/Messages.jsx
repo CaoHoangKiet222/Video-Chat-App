@@ -69,7 +69,6 @@ const Messages = (props) => {
   };
 
   const deleteHandler = async () => {
-    console.log(props);
     if (props.isRight) {
       Swal.fire({
         title: "Are you sure?",
@@ -96,7 +95,6 @@ const Messages = (props) => {
                   1
                 );
                 preMess.forEach((mess) => {
-                  console.log(mess);
                   mess.reply &&
                     console.log(mess.reply.message_id, props.message._id);
                   if (

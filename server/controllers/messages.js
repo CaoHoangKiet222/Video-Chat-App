@@ -7,8 +7,6 @@ const { mailer } = require("../mailer/mailer");
 
 exports.postInvitation = (req, res, _next) => {
   try {
-    console.log(req.body);
-
     const errors = validationResult(req);
     console.log(errors);
 
@@ -75,8 +73,6 @@ exports.uploadFilesInConversation = (files) => {
 
 exports.deleteMessage = (message, conversationId) => {
   try {
-    console.log("deleteMessage", message);
-
     Conversation.findByIdAndUpdate(
       conversationId,
       {
@@ -85,7 +81,6 @@ exports.deleteMessage = (message, conversationId) => {
         },
       },
       async (error, conversation) => {
-        console.log(conversation);
         if (error) {
           return new Error(error.message);
         }
@@ -112,7 +107,6 @@ exports.deleteMessage = (message, conversationId) => {
         );
 
         Files.findByIdAndDelete(conversation.messages[0].files, (err, file) => {
-          console.log(file);
           if (err) {
             return new Error(error.message);
           }
