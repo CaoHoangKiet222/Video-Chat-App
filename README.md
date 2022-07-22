@@ -1,6 +1,8 @@
 # Realtime Video Chat Application
 
-![Video Chat](https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/messenger.png?raw=true)
+<p align="center">
+ <img src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/messenger.png?raw=true">
+</p>
 
 ## Introduction
 
