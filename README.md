@@ -32,7 +32,8 @@ In this app, we're going to use a React Video Chat Application using WebRTC, soc
 ## Main chat
 
 <p align="center">
- <img width="90%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/chat-details.png?raw=true">
+ <img width="45%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/chat-details.png?raw=true">
+ <img width="45%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/group-chat-details.png?raw=true" /> 
 </p>
 
 <p align="center">
