@@ -6,15 +6,15 @@
 
 ## ⚡ Quick setup
 
-- run `npm i && npm start` for both client and server side to start the development server
+- run `npm i && npm start` for both client and server side to start the development application
 
 ## ⚙ Our demo site
 
-Here you can easily visit our Video Chat App with a live preview.
+- Here you can easily visit our Video Chat App with a live preview.
 
-<https://chk-videochatapp.netlify.app/>
+🎯 <https://chk-videochatapp.netlify.app/>
 
-## Introduction
+## 🎓 Introduction
 
 In this app, we're going to use a React Video Chat Application using WebRTC, socket.io, and so on.
 
