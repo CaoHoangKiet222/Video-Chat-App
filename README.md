@@ -16,7 +16,7 @@
 
 ## 🎓 Introduction
 
-In this app, we're going to use a React Video Chat Application using WebRTC, socket.io, and so on.
+In this app, we're going to use a React Video Chat Application using WebRTC, socket.io, 2FA, and so on.
 
 ## Login
 
@@ -27,4 +27,15 @@ In this app, we're going to use a React Video Chat Application using WebRTC, soc
 <p align="center">
  <img width="45%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/register-page.png?raw=true" /> 
  <img width="45%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/reset-password-page.png?raw=true" /> 
+</p>
+
+## Main chat
+
+<p align="center">
+ <img width="90%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/chat-details.png?raw=true">
+</p>
+
+<p align="center">
+ <img width="45%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/new-chat.png?raw=true" /> 
+ <img width="45%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/new-group.png?raw=true" /> 
 </p>
