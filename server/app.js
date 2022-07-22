@@ -25,7 +25,18 @@ app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: [process.env.ENDPOINT_CLIENT, process.env.ENDPOINT_CLIENT_NETLIFY],
+    origin: function (origin, callback) {
+      if (
+        [
+          process.env.ENDPOINT_CLIENT,
+          process.env.ENDPOINT_CLIENT_NETLIFY,
+        ].indexOf(origin) !== -1
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     optionsSuccessStatus: 200,
     credentials: true,
   })
