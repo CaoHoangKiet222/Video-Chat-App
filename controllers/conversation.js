@@ -21,7 +21,7 @@ exports.newGroup = (req, res, _next) => {
             ...req.body.newMembers,
             { userId: req.session.user, isAdmin: true },
           ],
-          groupImg: { url: result.url, public_id: result.public_id },
+          groupImg: { url: result.secure_url, public_id: result.public_id },
           groupName: req.body.groupName,
           messages: [],
         }).save();
