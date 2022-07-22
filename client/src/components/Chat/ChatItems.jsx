@@ -15,7 +15,7 @@ import { HiPhoneIncoming, HiPhoneOutgoing } from "react-icons/hi";
 import { RiPhoneLine } from "react-icons/ri";
 
 const ChatItems = (props) => {
-  console.log("ChatItems running");
+  // console.log("ChatItems running");
   const member = props.member;
   const meetingSocket = useSelector((state) => state.socket.meetingSocket);
 
@@ -32,6 +32,7 @@ const ChatItems = (props) => {
     pathname = `/video-chat/${props.header}/${encodeURIComponent(member.name)}`;
 
   useEffect(() => {
+    // console.log(props);
     if (props.room) {
       meetingSocket.emit("joinVideo", {
         conversationId: props.room,
