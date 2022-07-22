@@ -12,7 +12,7 @@ const socketMessageListen = require("./socket/socket-message");
 const socketMeetingListen = require("./socket/socket-meeting");
 const socketMeetingGroupListen = require("./socket/socket-meeting-group");
 const socketNotifyListen = require("./socket/socket-notify");
-const PORT = process.env.YOUR_PORT || process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
 // Body Parser Middleware
 app.use(express.json({ limit: "50mb" })); // Allow us to handle raw json
