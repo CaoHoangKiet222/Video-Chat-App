@@ -341,27 +341,29 @@ exports.checkCookieExpiration = async (req, res, _next) => {
     // console.log("checkAuthUser", req.session);
 
     if (req.session.cookieExpiration - Date.now() <= 0) {
-      await User.updateOne(
+      return User.updateOne(
         {
           _id: req.session.user._id,
         },
         {
           isLoggined: false,
+        },
+        () => {
+          req.session.destroy((err) => console.log(err));
+          return res.json({ expireCookie: true });
         }
       );
-      req.session.destroy((err) => console.log(err));
-      return res.json({ expireCookie: true });
     }
 
     if (req.session.isLoggined) {
-      res.json({ isAuth: true });
-
       return User.updateOne(
         {
           _id: req.session.user._id,
         },
         { isLoggined: true },
-        (_err, _user) => {}
+        () => {
+          return res.json({ isAuth: true });
+        }
       );
     }
 
