@@ -21,12 +21,13 @@ In this app, we're going to use a React Video Chat Application using WebRTC, soc
 ## Login
 
 <p align="center">
- <img width="90%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/login-page.png?raw=true">
+ <img width="45%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/login-page.png?raw=true">
+ <img width="45%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/register-page.png?raw=true" /> 
 </p>
 
 <p align="center">
- <img width="45%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/register-page.png?raw=true" /> 
  <img width="45%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/reset-password-page.png?raw=true" /> 
+ <img width="45%" src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/images/new-password-page.png?raw=true" /> 
 </p>
 
 ## Main chat
