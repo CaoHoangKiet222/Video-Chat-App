@@ -72,7 +72,7 @@ const MeetingRoom = () => {
 
   useEffect(() => {
     // Callee startCall
-    if (call.isReceiving && !isClickFirstTime) {
+    if (call?.isReceiving && !isClickFirstTime) {
       meetingSocket.emit(
         "showMyVideo",
         { callId: params.meetingId, type, isClickFirstTime },
@@ -86,7 +86,7 @@ const MeetingRoom = () => {
       );
     }
   }, [
-    call.isReceiving,
+    call?.isReceiving,
     meetingSocket,
     params.meetingId,
     type,
@@ -159,8 +159,8 @@ const MeetingRoom = () => {
     meetingSocket.emit("callEnded", {
       callId: params.meetingId,
       callTime: formatCallTime(timeCall),
-      callerId: call.caller._id,
-      calleeId: call.callee._id,
+      callerId: call?.caller._id,
+      calleeId: call?.callee._id,
       startCall: timeCall,
     });
   };
@@ -204,7 +204,7 @@ const MeetingRoom = () => {
           height="120px"
           width="120px"
           type="video-container"
-          user={call.isReceiving ? call.caller : call.callee}
+          user={call?.isReceiving ? call?.caller : call?.callee}
           displayText={
             !muteSound
               ? !showUserVideo
@@ -247,7 +247,7 @@ const MeetingRoom = () => {
                     height="40px"
                     width="40px"
                     type="peer-info"
-                    user={call.isReceiving ? call.caller : call.callee}
+                    user={call?.isReceiving ? call?.caller : call?.callee}
                     className="main-peer"
                     displayText={muteSound ? "Spectator!" : "Audio Only!"}
                   />
