@@ -95,8 +95,6 @@ const Messages = (props) => {
                   1
                 );
                 preMess.forEach((mess) => {
-                  mess.reply &&
-                    console.log(mess.reply.message_id, props.message._id);
                   if (
                     mess.reply !== null &&
                     mess.reply.message_id === props.message._id
