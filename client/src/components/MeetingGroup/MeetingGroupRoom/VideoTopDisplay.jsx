@@ -12,7 +12,6 @@ const VideoTopDisplay = ({
   isShare,
 }) => {
   const userVideo = useRef(null);
-  console.log(name, avatar, showVideo);
 
   useEffect(() => {
     if (showVideo || stream) {

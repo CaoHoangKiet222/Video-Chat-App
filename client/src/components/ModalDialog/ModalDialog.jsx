@@ -104,7 +104,6 @@ const ModalDialog = (props) => {
                 groupName: groupName.current.value,
               }
             );
-            console.log(data);
 
             if (data.error) {
               dispatch(

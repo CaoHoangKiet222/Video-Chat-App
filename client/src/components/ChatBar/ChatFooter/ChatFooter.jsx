@@ -93,8 +93,6 @@ const ChatFooter = (props) => {
 
   const handleMultipleFiles = (e, type) => {
     for (const file of e.target.files) {
-      console.log(file);
-
       if (file.type === "text/x-c++src") {
         return dispatch(
           errorActions.setError({

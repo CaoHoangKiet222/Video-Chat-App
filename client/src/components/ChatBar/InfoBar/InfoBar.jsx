@@ -49,7 +49,6 @@ const InfoBar = (props) => {
         const index = preMess.findIndex((mess) => mess._id === message._id);
         index !== -1 && preMess.splice(index, 1);
         preMess.forEach((mess) => {
-          mess.reply && console.log(mess.reply.message_id, message._id);
           if (mess.reply !== null && mess.reply.message_id === message._id) {
             mess.reply = null;
           }
