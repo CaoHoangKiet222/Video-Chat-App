@@ -51,6 +51,6 @@ In this app, we're going to use a React Video Chat Application using WebRTC, soc
 
 ## Block
 
-<p align="center">
-  <img src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/gif/block.gif" alt="this slowpoke moves"  width="250" />
+<p>
+  <img  src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/gif/block.gif" alt="this slowpoke moves"  width="100%" />
 </p>
