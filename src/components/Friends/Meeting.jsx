@@ -18,7 +18,6 @@ import { errorActions } from "../../store/error-slice";
 import { useAudio } from "../Hook/useAudio";
 
 const Meeting = () => {
-  console.log("Meeting running");
   const params = useParams();
   const { isReceiving, callee, caller } = useSelector(
     (state) => state.video.call
@@ -27,7 +26,7 @@ const Meeting = () => {
   const { meetingSocket } = useSelector((state) => state.socket);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [playing, setPlaying] = useAudio(
+  const [, setPlaying] = useAudio(
     `${process.env.REACT_APP_ENDPOINT_CLIENT}/audio/waiting-ringtone.wav`
   );
 
@@ -78,7 +77,6 @@ const Meeting = () => {
   }, [dispatch, meetingSocket, navigate, stream, isReceiving, setPlaying]);
 
   useEffect(() => {
-    console.log(isReceiving);
     if (stream && !isReceiving) {
       dispatch(callToUser());
     }

@@ -50,7 +50,7 @@ const ChatGroupHeader = ({
     if (onlineMems.length >= 2 && !member.block.isBlock) {
       return meetingSocket.emit(
         "meetingGroupConnection",
-        { room, caller: user },
+        { room, caller: user, members },
         () => {
           navigate(`/meeting-group/${room}`);
         }
@@ -58,7 +58,7 @@ const ChatGroupHeader = ({
     }
     if (member.block.isBlock) {
       const { userId } = members.find((member) => {
-        return member.userId._id === member.block.byUserId;
+        return member.isAdmin === true;
       });
 
       return dispatch(

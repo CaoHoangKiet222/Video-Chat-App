@@ -73,7 +73,6 @@ const MeetingRoom = () => {
   useEffect(() => {
     // Callee startCall
     if (call.isReceiving && !isClickFirstTime) {
-      console.log("emit showMyVideo");
       meetingSocket.emit(
         "showMyVideo",
         { callId: params.meetingId, type, isClickFirstTime },

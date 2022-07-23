@@ -13,7 +13,6 @@ export const fetchConversation = () => {
       });
 
       const data = await response.json();
-      console.log(data);
 
       if (data.error) {
         throw new Error(data.error);
@@ -36,7 +35,11 @@ export const fetchConversation = () => {
   };
 };
 
-export const blockConversation = (room, { isAdmin, isBlock }, type) => {
+export const blockConversation = (
+  room,
+  { memberId, isAdmin, isBlock },
+  type
+) => {
   return (dispatch, getState) => {
     try {
       const { user } = getState().user;
@@ -61,15 +64,19 @@ export const blockConversation = (room, { isAdmin, isBlock }, type) => {
             `${process.env.REACT_APP_ENDPOINT_SERVER}/${
               type === "single"
                 ? "block-conversation"
+                : type === "group-single"
+                ? "block-group-conversation/single"
                 : // type === "group"
                   "block-group-conversation"
             }`,
             "post",
-            type === "single"
+            type === "single" || type === "group-single"
               ? {
                   conversationId: room,
                   userId: user._id,
+                  memberId,
                   isBlock,
+                  isAdmin,
                 }
               : {
                   // type === "group"
@@ -82,41 +89,56 @@ export const blockConversation = (room, { isAdmin, isBlock }, type) => {
             Swal.showValidationMessage(`Request failed: ${error}`);
           });
         },
-      }).then(({ isDismissed, value }) => {
-        if (isDismissed) {
-          return;
-        }
+      })
+        .then(({ isDismissed, value }) => {
+          if (isDismissed) {
+            return;
+          }
 
-        if (value.error) {
+          if (value.error) {
+            throw new Error(value.error);
+          }
+
+          Swal.fire(
+            isBlock ? "Unblock!" : "Block!",
+            isBlock
+              ? "This conversation has been unblocked."
+              : "This conversation has been blocked.",
+            "success"
+          ).then(() => {
+            dispatch(
+              conversationActions.setConversation({
+                conversation: value,
+                error: null,
+              })
+            );
+
+            chatSocket.emit(
+              type === "single"
+                ? "blockConversation"
+                : type === "group-single"
+                ? "blockGroupSingleConversation"
+                : "blockGroupConversation",
+              {
+                room,
+                userBlock: value.user,
+                isBlock,
+                isAdmin,
+                userIsBlockedId: memberId,
+              }
+            );
+            notifySocket.emit("notifyingBlockUser");
+          });
+        })
+        .catch((error) => {
           return Swal.fire({
             icon: "error",
             title: "Oops...",
-            html: value.error,
+            html: error.message,
             showConfirmButton: false,
             timer: 5000,
           });
-        }
-        Swal.fire(
-          isBlock ? "Unblock!" : "Block!",
-          isBlock
-            ? "This conversation has been unblocked."
-            : "This conversation has been blocked.",
-          "success"
-        ).then(() => {
-          dispatch(
-            conversationActions.setConversation({
-              conversation: value,
-              error: null,
-            })
-          );
-
-          chatSocket.emit(
-            type === "single" ? "blockConversation" : "blockGroupConversation",
-            { room, userBlock: value.user, isBlock, isAdmin }
-          );
-          notifySocket.emit("notifyingBlockUser");
         });
-      });
     } catch (error) {
       console.log(error);
     }
@@ -162,43 +184,47 @@ export const deleteConversation = (room, isAdmin = false, navigate, type) => {
             Swal.showValidationMessage(`Request failed: ${error}`);
           });
         },
-      }).then(({ isDismissed, value }) => {
-        if (isDismissed) {
-          return;
-        }
-        if (value.error) {
+      })
+        .then(({ isDismissed, value }) => {
+          if (isDismissed) {
+            return;
+          }
+          if (value.error) {
+            throw new Error(value.error);
+          }
+
+          Swal.fire(
+            "Deleted!",
+            "Your conversation has been deleted.",
+            "success"
+          ).then(() => {
+            dispatch(
+              conversationActions.setConversation({
+                conversation: value,
+                error: null,
+              })
+            );
+            chatSocket.emit(
+              type === "single"
+                ? "deleteConversation"
+                : "deleteGroupConversation",
+              { room, userDelete: value.user, isAdmin },
+              () => {
+                navigate("/video-chat/Chats");
+              }
+            );
+            notifySocket.emit("notifyingDeleteUser");
+          });
+        })
+        .catch((error) => {
           return Swal.fire({
             icon: "error",
             title: "Oops...",
-            html: value.error,
+            html: error.message,
             showConfirmButton: false,
             timer: 5000,
           });
-        }
-
-        Swal.fire(
-          "Deleted!",
-          "Your conversation has been deleted.",
-          "success"
-        ).then(() => {
-          dispatch(
-            conversationActions.setConversation({
-              conversation: value,
-              error: null,
-            })
-          );
-          chatSocket.emit(
-            type === "single"
-              ? "deleteConversation"
-              : "deleteGroupConversation",
-            { room, userDelete: value.user, isAdmin },
-            () => {
-              navigate("/video-chat/Chats");
-            }
-          );
-          notifySocket.emit("notifyingDeleteUser");
         });
-      });
     } catch (error) {
       console.log(error);
     }

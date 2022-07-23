@@ -69,7 +69,7 @@ const ChatHeader = (props) => {
     dispatch(
       blockConversation(
         props.room,
-        { memberId: member._id, isAdmin: false, isBlock: props.block?.isBlock },
+        { isAdmin: false, isBlock: props.block?.isBlock },
         "single"
       )
     );

@@ -186,11 +186,6 @@ const Chat = () => {
       });
     });
 
-    meetingSocket.on("meetingGroupConnection", ({ room, caller }) => {
-      navigate(`/video-chat/Chats/meeting-group/${encodeURIComponent(room)}`);
-      dispatch(videoGroupActions.setCaller({ caller }));
-    });
-
     meetingSocket.on(
       "meetingConnection",
       ({ callId, caller, callee, isReceiving }) => {
@@ -207,7 +202,55 @@ const Chat = () => {
         );
       }
     );
+
+    return () => {
+      notifySocket.removeAllListeners();
+      meetingSocket.removeAllListeners();
+      chatSocket.removeAllListeners();
+    };
   }, [notifySocket, dispatch, navigate, meetingSocket, chatSocket]);
+
+  useEffect(() => {
+    meetingSocket.on("meetingGroupConnection", ({ room, caller, members }) => {
+      const {
+        block: { isBlock },
+      } = members.find((member) => {
+        return member.userId._id === user._id;
+      });
+
+      if (!isBlock) {
+        navigate(`/video-chat/Chats/meeting-group/${encodeURIComponent(room)}`);
+        dispatch(videoGroupActions.setCaller({ caller }));
+      }
+    });
+
+    return () => meetingSocket.off("meetingGroupConnection");
+  }, [dispatch, meetingSocket, navigate, user]);
+
+  useEffect(() => {
+    chatSocket.on(
+      "blockGroupSingleConversation",
+      ({ userBlock, isBlock, isAdmin, userIsBlockedId }) => {
+        if (isAdmin && userIsBlockedId === user?._id) {
+          return Swal.fire({
+            title: isBlock
+              ? "Group chat is unblocked!!!"
+              : "Group chat is blocked!!!",
+            html: isBlock
+              ? `Your admin <strong>${userBlock.name}</strong> has unblocked this chat!!!`
+              : `We are so sorry to notify that your admin <strong>${userBlock.name}</strong> has blocked this chat!!!`,
+            icon: "warning",
+            showConfirmButton: true,
+            confirmButtonColor: "#665dfe",
+            allowOutsideClick: false,
+          });
+        }
+      }
+    );
+    return () => {
+      chatSocket.off("blockGroupSingleConversation");
+    };
+  }, [chatSocket, user]);
 
   const startConversation = () => {
     setShowModalDialog(true);

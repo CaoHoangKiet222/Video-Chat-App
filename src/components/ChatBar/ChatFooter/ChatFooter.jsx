@@ -27,12 +27,12 @@ const ChatFooter = (props) => {
   const dispatch = useDispatch();
   const nameRef = useRef(null);
   const textRef = useRef(null);
+
   const [userBlock] = useState(
     props.members?.find((member) => {
-      return member.block.byUserId === member.userId._id;
+      return member.isAdmin === true;
     })
   );
-  console.log(userBlock);
 
   useEffect(() => {
     if (reply?.isClick) {
@@ -337,7 +337,7 @@ const ChatFooter = (props) => {
           ) : (
             <span>
               This conversation has been blocked by{" "}
-              {userBlock ? userBlock.userId.name : props.member.name}
+              {userBlock ? userBlock.userId.name : props.member?.name}
             </span>
           )}
         </div>

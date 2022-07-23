@@ -105,25 +105,27 @@ export const fetchLoginByFirebase = (url, user, provider, navigate) => {
   };
 };
 
-export const userLogout = (url, userId, navigate) => {
+export const userLogout = (url, navigate) => {
   return async (dispatch, getState) => {
     try {
-      const response = await postData(url, "post", { userId });
+      const { user } = getState().user;
+      const data = await postData(url, "post", { userId: user._id });
       const { notifySocket } = getState().socket;
-      console.log(response);
 
-      if (!response.error) {
-        dispatch(userActions.logout());
-        dispatch(authActions.setAuth({ auth: false }));
-        await signOut(authFirebase);
-
-        navigate("/login");
-
-        notifySocket.emit("notifyingUserIsOffline");
-
-        dispatch(socketActions.disconnectSocket());
-        dispatch(socketActions.setupSocket());
+      if (data.error) {
+        throw new Error(data.error);
       }
+
+      dispatch(userActions.logout());
+      dispatch(authActions.setAuth({ auth: false }));
+      await signOut(authFirebase);
+
+      navigate("/login");
+
+      notifySocket.emit("notifyingUserIsOffline");
+
+      dispatch(socketActions.disconnectSocket());
+      dispatch(socketActions.setupSocket());
     } catch (error) {
       dispatch(errorActions.setError({ error: true, message: error.message }));
     }
@@ -198,4 +200,134 @@ const handleTwoFA = (data, dispatch, navigate) => {
   } else {
     navigate("/video-chat/Chats");
   }
+};
+
+export const handleTwoFASettings = (setIsFetch, authRef) => {
+  return async (dispatch, getState) => {
+    const { user } = getState().user;
+
+    setIsFetch(true);
+    const data = await postData(
+      `${process.env.REACT_APP_ENDPOINT_SERVER}/update-user/enable-2fa`,
+      "post",
+      {
+        is2FAEnabled: authRef.current.classList.contains("active"),
+        userId: user._id,
+      }
+    );
+
+    if (data.update) {
+      Swal.fire({
+        icon: "success",
+        title: data.update,
+        showConfirmButton: false,
+        timer: 5000,
+      });
+    } else if (data.QRCodeImage) {
+      Swal.fire({
+        html: `
+              <strong>Enable two factor authentication!!</strong><br/><br/>
+              <span>Using Google Authenticator App to access code!!!</span>
+            `,
+        width: 500,
+        showConfirmButton: true,
+        confirmButtonText: "Next",
+        showCancelButton: true,
+        allowOutsideClick: false,
+        imageUrl: data.QRCodeImage,
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            while (true) {
+              const result = await Swal.fire({
+                title: "Enter the 6-digit code you see in the app",
+                input: "number",
+                inputPlaceholder: "6-digits",
+                inputAttributes: {
+                  autocapitalize: "off",
+                },
+                showCancelButton: true,
+                confirmButtonText: "Submit",
+                showLoaderOnConfirm: true,
+                allowOutsideClick: false,
+                backdrop: true,
+                preConfirm: (otpToken) => {
+                  return postData(
+                    `${process.env.REACT_APP_ENDPOINT_SERVER}/verify-2fa`,
+                    "post",
+                    {
+                      otpToken,
+                      userId: data.user._id,
+                    }
+                  ).catch((error) => {
+                    Swal.showValidationMessage(`Request failed: ${error}`);
+                  });
+                },
+              });
+              if (result.isDismissed) {
+                authRef.current.classList.remove("active");
+                const response = await postData(
+                  `${process.env.REACT_APP_ENDPOINT_SERVER}/update-user/enable-2fa`,
+                  "post",
+                  {
+                    is2FAEnabled: false,
+                    userId: data.user._id,
+                  }
+                );
+                dispatch(
+                  userActions.setUser({
+                    user: { ...response.user },
+                  })
+                );
+                break;
+              }
+
+              if (result.value.isValid) {
+                await Swal.fire({
+                  icon: "success",
+                  html: "Token valid, security layer 2 authentication completed!",
+                  showConfirmButton: false,
+                  timer: 2000,
+                });
+                dispatch(
+                  userActions.setUser({
+                    user: { ...data.user },
+                  })
+                );
+                break;
+              } else {
+                await Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  html: "Invalid Token!!",
+                  showConfirmButton: false,
+                  timer: 2000,
+                });
+              }
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        } else {
+          authRef.current.classList.remove("active");
+
+          const response = await postData(
+            `${process.env.REACT_APP_ENDPOINT_SERVER}/update-user/enable-2fa`,
+            "post",
+            {
+              is2FAEnabled: false,
+              userId: data.user._id,
+            }
+          );
+
+          dispatch(
+            userActions.setUser({
+              user: response.user,
+            })
+          );
+        }
+      });
+    }
+    return setIsFetch(false);
+  };
 };

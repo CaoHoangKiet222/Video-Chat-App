@@ -13,7 +13,6 @@ import { errorActions } from "../../store/error-slice";
 let timer;
 
 const ChatGroup = (props) => {
-  console.log("ChatGroup running");
   const [messages, setMessages] = useState([]);
   const [isSendMess, setIsSendMess] = useState(false);
   const [showSearchBox, setShowSearchBox] = useState(false);
@@ -51,7 +50,7 @@ const ChatGroup = (props) => {
       setIsFetch(false);
       clearTimeout(timer);
     };
-  }, [props.room, chatSocket]);
+  }, [props.room, chatSocket, dispatch]);
 
   useEffect(() => {
     chatSocket.on("leaveRoom", () => {
@@ -61,14 +60,11 @@ const ChatGroup = (props) => {
 
   useEffect(() => {
     chatSocket.on("deleteMessage", (message) => {
-      console.log(message);
       setMessages((preMess) => {
         const index = preMess.findIndex((mess) => mess._id === message._id);
         index !== -1 && preMess.splice(index, 1);
         if (message.reply) {
           preMess.forEach((mess) => {
-            // console.log(mess);
-            // mess.reply && console.log(mess.reply.message_id, message._id);
             if (mess.reply !== null && mess.reply.message_id === message._id) {
               mess.reply = null;
             }
@@ -87,7 +83,6 @@ const ChatGroup = (props) => {
   useEffect(() => {
     // this is important cannot replace
     chatSocket.on("receiveGroupMessage", (message) => {
-      console.log(message);
       dispatch(fetchConversation());
       setIsSendMess(true);
       setMessages((preMessages) => [...preMessages, message]);
@@ -199,6 +194,8 @@ const ChatGroup = (props) => {
         groupImg={props.groupImg}
         groupName={props.groupName}
         numsPeople={props.members.length}
+        room={props.room}
+        isUserAdmin={member?.isAdmin}
       />
     </Card>
   );

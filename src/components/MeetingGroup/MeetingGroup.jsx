@@ -16,16 +16,14 @@ import { findImgAndNameGroup } from "../../utilities/utilities";
 import { useAudio } from "../Hook/useAudio";
 
 const MeetingGroup = () => {
-  console.log("MeetingGroup running");
   const params = useParams();
   const { conversation } = useSelector((state) => state.conversation);
   const videoGroup = useSelector((state) => state.videoGroup);
   const group = useRef(null);
   const navigate = useNavigate();
-  const [playing, setPlaying] = useAudio(
+  const [, setPlaying] = useAudio(
     `${process.env.REACT_APP_ENDPOINT_CLIENT}/audio/waiting-ringtone.wav`
   );
-  console.log("playing", playing);
 
   useEffect(() => {
     setPlaying(true);

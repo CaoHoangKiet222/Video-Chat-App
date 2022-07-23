@@ -36,11 +36,7 @@ const Profile = () => {
 
   const logoutHandler = () => {
     dispatch(
-      userLogout(
-        `${process.env.REACT_APP_ENDPOINT_SERVER}/logout`,
-        user._id,
-        navigate
-      )
+      userLogout(`${process.env.REACT_APP_ENDPOINT_SERVER}/logout`, navigate)
     );
   };
 

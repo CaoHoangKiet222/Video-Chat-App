@@ -7,10 +7,9 @@ import MeetingRoom from "./components/Friends/MeetingRoom/MeetingRoom";
 import Login from "./components/Login/Login";
 import MeetingGroupRoom from "./components/MeetingGroup/MeetingGroupRoom/MeetingGroupRoom";
 import { authActions } from "./store/auth-slice";
-import { userActions } from "./store/user-slice";
+import { userLogout } from "./store/user-creator";
 
 function App() {
-  console.log("App running");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const signupRef = useRef(false);
@@ -30,7 +29,6 @@ function App() {
         );
 
         const data = await response.json();
-        console.log(data);
 
         if (data.expireCookie) {
           return Swal.fire({
@@ -40,8 +38,12 @@ function App() {
             showConfirmButton: true,
             allowOutsideClick: false,
           }).then(() => {
-            dispatch(userActions.logout());
-            navigate("/login");
+            dispatch(
+              userLogout(
+                `${process.env.REACT_APP_ENDPOINT_SERVER}/logout`,
+                navigate
+              )
+            );
           });
         }
 
