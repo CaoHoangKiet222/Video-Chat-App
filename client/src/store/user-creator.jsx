@@ -3,7 +3,6 @@ import Swal from "sweetalert2";
 import { authFirebase } from "../utilities/firebase";
 import { postData } from "../utilities/utilities";
 import { authActions } from "./auth-slice";
-import { errorActions } from "./error-slice";
 import { socketActions } from "./socket-slice";
 import { userActions } from "./user-slice";
 
@@ -123,7 +122,7 @@ export const userLogout = (url, navigate) => {
       dispatch(socketActions.disconnectSocket());
       dispatch(socketActions.setupSocket());
     } catch (error) {
-      dispatch(errorActions.setError({ error: true, message: error.message }));
+      console.log(error);
     }
   };
 };

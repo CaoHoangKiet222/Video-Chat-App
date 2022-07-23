@@ -200,7 +200,7 @@ exports.postUserLoginByFirebase = async (req, res, _next) => {
 exports.postUserLogout = (req, res, _next) => {
   try {
     User.findByIdAndUpdate(
-      req.session.user._id,
+      req.userId,
       {
         isLoggined: false,
       },

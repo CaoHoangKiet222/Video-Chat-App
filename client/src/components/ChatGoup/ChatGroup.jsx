@@ -10,7 +10,6 @@ import ChatDetail from "../ChatBar/InfoBar/ChatDetail";
 import { Card, Msger } from "../ChatBar/InfoBar/InfoBar.styled";
 import SearchBox from "../ChatBar/ChatHeader/SearchBox";
 import { errorActions } from "../../store/error-slice";
-let timer;
 
 const ChatGroup = (props) => {
   const [messages, setMessages] = useState([]);
@@ -40,23 +39,14 @@ const ChatGroup = (props) => {
       }
       setMessages(messages);
 
-      timer = setTimeout(() => {
-        setIsFetch(true);
-      }, 50);
+      setIsFetch(true);
     });
 
     return () => {
       chatSocket.emit("leaveRoom", props.room);
       setIsFetch(false);
-      clearTimeout(timer);
     };
   }, [props.room, chatSocket, dispatch]);
-
-  useEffect(() => {
-    chatSocket.on("leaveRoom", () => {
-      setIsSendMess(false);
-    });
-  }, [chatSocket]);
 
   useEffect(() => {
     chatSocket.on("deleteMessage", (message) => {
@@ -75,19 +65,25 @@ const ChatGroup = (props) => {
       dispatch(fetchConversation());
     });
 
-    return () => {
-      chatSocket.off("deleteMessage");
-    };
-  }, [chatSocket, dispatch]);
-
-  useEffect(() => {
     // this is important cannot replace
     chatSocket.on("receiveGroupMessage", (message) => {
       dispatch(fetchConversation());
       setIsSendMess(true);
       setMessages((preMessages) => [...preMessages, message]);
     });
+
+    chatSocket.on("leaveRoom", () => {
+      setIsSendMess(false);
+    });
+
+    return () => {
+      chatSocket.off("deleteMessage");
+      chatSocket.off("receiveGroupMessage");
+      chatSocket.off("leaveRoom");
+    };
   }, [chatSocket, dispatch]);
+
+  useEffect(() => {}, [chatSocket, dispatch]);
 
   const sendMessage = (e, replyContent, message, files) => {
     try {
@@ -148,6 +144,7 @@ const ChatGroup = (props) => {
   const handleViewInfo = () => {
     setShowViewInfo(!showViewInfo);
   };
+  console.log(member);
 
   return (
     <Card>
@@ -176,6 +173,7 @@ const ChatGroup = (props) => {
             room={props.room}
             searchName={searchName}
             isGroup={props.groupName !== "" ? true : false}
+            block={member?.block}
           />
         )}
         <ChatFooter

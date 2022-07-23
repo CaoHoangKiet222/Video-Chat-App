@@ -3,14 +3,9 @@ const Meetings = module.require("../models/meetings");
 exports = module.exports = (socket, type, io = null) => {
   switch (type) {
     case "joinVideo":
-      socket.on(type, async ({ conversationId }) => {
-        try {
-          socket.join(conversationId);
-
-          // console.log(io.adapter.rooms);
-        } catch (err) {
-          console.error(err);
-        }
+      socket.on(type, ({ conversationId }) => {
+        socket.join(conversationId);
+        console.log(io.adapter.rooms);
       });
       break;
     case "meetingConnection":
@@ -26,6 +21,7 @@ exports = module.exports = (socket, type, io = null) => {
       break;
     case "callToUser":
       socket.on(type, ({ callId, signalData }) => {
+        console.log(type);
         socket.broadcast.to(callId).emit("callToUser", { signal: signalData });
       });
       break;
@@ -33,9 +29,10 @@ exports = module.exports = (socket, type, io = null) => {
       socket.on(type, async ({ signal, callId, call }, cb) => {
         try {
           const { callerId, calleeId, startCall, callAccepted } = call;
+          console.log(type, callId);
 
           cb();
-          io.to(callId).emit("callAccepted", signal, startCall);
+          socket.to(callId).emit("callAccepted", signal, startCall);
 
           await new Meetings({
             callerId,

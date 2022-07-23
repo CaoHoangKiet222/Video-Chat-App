@@ -35,7 +35,6 @@ const ModalDialog = (props) => {
   const textAreaRef = useRef("");
   const profilePicture = useRef(null);
   const dispatch = useDispatch();
-  console.log(newMembers);
 
   const startSearch = (e) => {
     setSearchName(e.target.value);
@@ -58,7 +57,6 @@ const ModalDialog = (props) => {
   };
 
   const handleInvitation = async () => {
-    console.log(convertString(textAreaRef.current.value));
     setIsFetch(true);
     const data = await postData(
       `${process.env.REACT_APP_ENDPOINT_SERVER}/invite-others`,

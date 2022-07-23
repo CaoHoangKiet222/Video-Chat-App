@@ -96,7 +96,7 @@ const MeetingRoom = () => {
   useEffect(() => {
     // Caller startCall
     if (isClickFirstTime) {
-      return meetingSocket.off("startVideoOrPhone");
+      return meetingSocket.off("startPhone");
     }
 
     meetingSocket.on("startPhone", () => {
@@ -122,11 +122,9 @@ const MeetingRoom = () => {
   }, [showVideo, stream, showUserVideo, userStream, showTop, muteSound]);
 
   useEffect(() => {
-    // if (isClickFirstTime ) {
     meetingSocket.on("showUserVideo", () => {
       setShowUserVideo(!showUserVideo);
     });
-    // }
 
     return () => {
       meetingSocket.off("showUserVideo");
@@ -145,9 +143,12 @@ const MeetingRoom = () => {
 
   useEffect(() => {
     meetingSocket.on("callEnded", () => {
-      // dispatch(leaveCall(navigate, stream, true));
       dispatch(leaveCall(navigate, stream));
     });
+
+    return () => {
+      meetingSocket.off("callEnded");
+    };
   }, [dispatch, meetingSocket, navigate, stream]);
 
   const showTopControls = () => {
@@ -165,12 +166,10 @@ const MeetingRoom = () => {
   };
 
   const videoHandle = () => {
-    // dispatch(videoActions.setType({ type: "video" }));
     meetingSocket.emit(
       "showMyVideo",
       { callId: params.meetingId, isClickFirstTime },
       () => {
-        // setIsClickFirstTime(true);
         setShowVideo(!showVideo);
       }
     );
@@ -290,13 +289,6 @@ const MeetingRoom = () => {
 
           <MeetingBottomControls>
             <CommonControl onClick={videoHandle}>
-              {/* {type === "phone" ? ( */}
-              {/*   <FiVideoOff /> */}
-              {/* ) : showVideo ? ( */}
-              {/*   <FiVideo /> */}
-              {/* ) : ( */}
-              {/*   <FiVideoOff /> */}
-              {/* )} */}
               {showVideo ? <FiVideo /> : <FiVideoOff />}
             </CommonControl>
             <CommonControl onClick={toggleSound}>

@@ -95,6 +95,8 @@ const Login = (props) => {
         icon: "error",
         title: "Oops...",
         text: userState.error,
+        showConfirmButton: true,
+        allowOutsideClick: false,
       }).then(() => {
         dispatch(
           userActions.login({
@@ -135,7 +137,9 @@ const Login = (props) => {
   const loginWithGoogle = async () => {
     try {
       const { user } = await signInWithPopup(authFirebase, googleProvider);
-      console.log(user);
+      if (!user.email) {
+        throw new Error("Login fail due to unspecific email!!");
+      }
       dispatch(
         fetchLoginByFirebase(
           `${process.env.REACT_APP_ENDPOINT_SERVER}/login-by-firebase`,
@@ -146,13 +150,19 @@ const Login = (props) => {
       );
     } catch (error) {
       console.log(error);
+      dispatch(
+        userActions.login({
+          user: null,
+          isFetch: false,
+          error: error.message,
+        })
+      );
     }
   };
 
   const loginWithGithub = async () => {
     try {
       const { user } = await signInWithPopup(authFirebase, githubProvider);
-      console.log(user);
       dispatch(
         fetchLoginByFirebase(
           `${process.env.REACT_APP_ENDPOINT_SERVER}/login-by-firebase`,
@@ -174,7 +184,11 @@ const Login = (props) => {
   const loginWithFacebook = async () => {
     try {
       const { user } = await signInWithPopup(authFirebase, facebookProvider);
-      console.log(user);
+
+      if (!user.providerData[0].email) {
+        throw new Error("Login fail due to unspecific email!!");
+      }
+
       dispatch(
         fetchLoginByFirebase(
           `${process.env.REACT_APP_ENDPOINT_SERVER}/login-by-firebase`,
@@ -185,6 +199,13 @@ const Login = (props) => {
       );
     } catch (error) {
       console.log(error);
+      dispatch(
+        userActions.login({
+          user: null,
+          isFetch: false,
+          error: error.message,
+        })
+      );
     }
   };
 
