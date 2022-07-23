@@ -66,22 +66,8 @@ const MeetingGroupRoom = () => {
     (state) => state.socket.meetingGroupSocket
   );
   const { error, message } = useSelector((state) => state.error);
-  // const timeCall = useSelector((state) => state.timeCall.timeCall);
-
-  // const calleeInfo = useMemo(() => {
-  //   return {
-  //     name: "kkkkkkkkkkkk",
-  //     avatar: {
-  //       url: "/images/user.jpg",
-  //     },
-  //   };
-  // }, []);
 
   const { user: calleeInfo } = useSelector((state) => state.user);
-
-  console.log(peers);
-  console.log(peersRef);
-  console.log(streams);
 
   useEffect(() => {
     navigator.mediaDevices
@@ -161,7 +147,7 @@ const MeetingGroupRoom = () => {
             );
 
             peer.signal(signal);
-            console.log(userInRoomInfo);
+
             setPeers((prePeers) => {
               prePeers.splice(
                 prePeers.findIndex(({ peerId }) => peerId === userInRoomId),
@@ -221,24 +207,18 @@ const MeetingGroupRoom = () => {
 
   useEffect(() => {
     meetingGroupSocket.on("showUserVideo", ({ userId }) => {
-      console.log("showUserVideo", userId);
-
       setPeers((prePeers) => {
         return [...toggleAttributePeers(prePeers, userId, "showVideo")];
       });
     });
 
     meetingGroupSocket.on("toggleSound", ({ userId }) => {
-      console.log("toggleSound", userId);
-
       setPeers((prePeers) => {
         return [...toggleAttributePeers(prePeers, userId, "muteSound")];
       });
     });
 
     meetingGroupSocket.on("toggleControls", ({ userId }) => {
-      console.log("toggleControls", userId);
-
       setPeers((prePeers) => {
         return [...toggleAttributePeers(prePeers, userId, "isShare")];
       });
@@ -350,7 +330,6 @@ const MeetingGroupRoom = () => {
             const { name, showVideo, avatar, muteSound, isShare } = peers.find(
               (peer) => peer.peerId === peerId
             );
-            console.log(isShare);
 
             return (
               <VideosWrapper key={index}>

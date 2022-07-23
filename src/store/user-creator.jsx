@@ -30,8 +30,6 @@ export const fetchLogin = (
         throw new Error(data.error);
       }
 
-      console.log(data);
-
       if (type !== "login") {
         if (type === "password-reset" || type === "new-password") {
           passResetRef.current = false;
@@ -89,8 +87,6 @@ export const fetchLoginByFirebase = (url, user, provider, navigate) => {
       if (data.error) {
         throw new Error(data.error);
       }
-
-      console.log(data);
 
       handleTwoFA(data, dispatch, navigate);
     } catch (error) {
