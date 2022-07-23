@@ -5,18 +5,9 @@ exports = module.exports = (socket, type, io = null) => {
   switch (type) {
     case "notifyingUserIsOnline":
       socket.on(type, async ({ userId }) => {
-        console.log("notifyingUserIsOnline");
+        console.log(type);
         await User.updateOne({ _id: userId }, { isLoggined: true });
         socket.userId = userId;
-        socket.broadcast.emit(type);
-      });
-      break;
-    case "notifyingUserIsOffline":
-    case "notifyingUserAddFriend":
-    case "notifyingUserAddGroup":
-    case "notifyingDeleteUser":
-    case "notifyingBlockUser":
-      socket.on(type, () => {
         socket.broadcast.emit(type);
       });
       break;
@@ -25,6 +16,11 @@ exports = module.exports = (socket, type, io = null) => {
         await User.updateOne({ _id: socket.userId }, { isLoggined: false });
         socket.broadcast.emit("notifyingUserIsOffline");
         socket.userId = null;
+      });
+      break;
+    default:
+      socket.on(type, () => {
+        socket.broadcast.emit(type);
       });
       break;
   }

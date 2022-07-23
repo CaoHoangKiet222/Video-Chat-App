@@ -17,6 +17,11 @@ router.delete(
 router.post("/block-conversation", conversationController.blockConversation);
 
 router.post(
+  "/block-group-conversation/single",
+  conversationController.blockGroupSingleConversation
+);
+
+router.post(
   "/block-group-conversation",
   conversationController.blockGroupConversation
 );

@@ -3,7 +3,7 @@ exports = module.exports = (socket, type, io = null) => {
     case "joinVideoGroup":
       socket.on(type, ({ room, user }) => {
         try {
-          console.log("A user joins meeting-group-rooms", room);
+          // console.log("A user joins meeting-group-rooms", room);
 
           socket.join(room);
 
@@ -75,7 +75,6 @@ exports = module.exports = (socket, type, io = null) => {
     case "toggleSound":
       socket.on(type, ({ room }) => {
         try {
-          // console.log(io.adapter.rooms);
           socket.userInfo.muteSound = !socket.userInfo.muteSound;
           socket.broadcast.to(room).emit("toggleSound", { userId: socket.id });
         } catch (error) {
