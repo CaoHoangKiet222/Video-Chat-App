@@ -85,12 +85,10 @@ const ChatGroupHeader = ({
   };
 
   const deleteHandler = () => {
-    console.log(members);
     dispatch(deleteConversation(room, member.isAdmin, navigate, "group"));
   };
 
   const handleBlock = () => {
-    console.log(members);
     dispatch(
       blockConversation(
         room,

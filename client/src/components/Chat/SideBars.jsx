@@ -27,7 +27,6 @@ import { forwardActions } from "../../store/forward-slice";
 import ModalInvitation from "../ModalGroup/ModalInvitation";
 
 const SideBars = (props) => {
-  console.log("SideBars running");
   const conversation = useSelector((state) => state.conversation.conversation);
   const friends = useSelector((state) => state.friends.friends);
   const calls = useSelector((state) => state.calls.calls);

@@ -35,7 +35,6 @@ import {
 import { VscGithubInverted } from "react-icons/vsc";
 
 const Login = (props) => {
-  console.log("Login running");
   const userState = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
