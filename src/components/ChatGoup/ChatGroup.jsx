@@ -144,7 +144,6 @@ const ChatGroup = (props) => {
   const handleViewInfo = () => {
     setShowViewInfo(!showViewInfo);
   };
-  console.log(member);
 
   return (
     <Card>

@@ -166,6 +166,11 @@ const MeetingGroupRoom = () => {
       .catch((error) => {
         console.log(error);
       });
+    return () => {
+      meetingGroupSocket.off("receivingSignal");
+      meetingGroupSocket.off("userJoined");
+      meetingGroupSocket.off("allUsers");
+    };
   }, [meetingGroupSocket, params.meetingId, calleeInfo, searchParams]);
 
   useEffect(() => {
@@ -223,6 +228,12 @@ const MeetingGroupRoom = () => {
         return [...toggleAttributePeers(prePeers, userId, "isShare")];
       });
     });
+
+    return () => {
+      meetingGroupSocket.off("showUserVideo");
+      meetingGroupSocket.off("toggleSound");
+      meetingGroupSocket.off("toggleControls");
+    };
   }, [meetingGroupSocket]);
 
   useEffect(() => {

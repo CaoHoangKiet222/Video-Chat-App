@@ -11,7 +11,7 @@ const CommonPeer = (props) => {
           {props.user?.name || props.name}
         </Name>
         <Img height={props.height} width={props.width}>
-          <img src={`${avatar.url}`} alt="" />
+          <img src={`${avatar?.url}`} alt="" />
         </Img>
         <Status font-size={props["font-size"]} padding={props.padding}>
           {props.displayText}
