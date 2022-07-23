@@ -24,6 +24,9 @@ export const userSlice = createSlice({
     setUser(state, action) {
       state.user = action.payload.user;
     },
+    setError(state, action) {
+      state.error = action.payload.error;
+    },
   },
 });
 

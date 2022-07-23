@@ -52,6 +52,7 @@ const Main = (props) => {
                 conversationId={props.room}
                 isGroup={props.isGroup}
                 searchName={props.searchName}
+                block={props.block}
               />
             );
           }
@@ -65,6 +66,7 @@ const Main = (props) => {
               conversationId={props.room}
               isGroup={props.isGroup}
               searchName={props.searchName}
+              block={props.block}
             />
           );
         }

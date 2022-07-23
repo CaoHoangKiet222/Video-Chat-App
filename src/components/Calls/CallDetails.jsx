@@ -16,7 +16,6 @@ import CallItem from "./CallItem";
 
 const CallDetails = (props) => {
   const { avatar, name, phone } = props.contactMem;
-  // console.log(arrangePhoneTime(props.calls));
 
   return (
     <Main>

@@ -184,6 +184,7 @@ export const callToUser = () => {
         dispatch(videoActions.setCallAccepted({ callAccepted: true }));
 
         dispatch(timeCallActions.setTimeCall({ timeCall: timeStart }));
+
         // signal of callee answering to caller
         peer.signal(signal);
       });

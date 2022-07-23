@@ -116,6 +116,17 @@ const Chat = () => {
       dispatch(fetchConversation());
     });
 
+    return () => {
+      notifySocket.off("notifyingUserIsOnline");
+      notifySocket.off("notifyingUserIsOffline");
+      notifySocket.off("notifyingUserAddFriend");
+      notifySocket.off("notifyingUserAddGroup");
+      notifySocket.off("notifyingDeleteUser");
+      notifySocket.off("notifyingBlockUser");
+    };
+  }, [notifySocket, dispatch]);
+
+  useEffect(() => {
     chatSocket.on("blockConversation", ({ userBlock, isBlock }) => {
       Swal.fire({
         title: isBlock
@@ -204,11 +215,13 @@ const Chat = () => {
     );
 
     return () => {
-      notifySocket.removeAllListeners();
-      meetingSocket.removeAllListeners();
-      chatSocket.removeAllListeners();
+      meetingSocket.off("meetingConnection");
+      chatSocket.off("blockConversation");
+      chatSocket.off("blockGroupConversation");
+      chatSocket.off("deleteConversation");
+      chatSocket.off("deleteGroupConversation");
     };
-  }, [notifySocket, dispatch, navigate, meetingSocket, chatSocket]);
+  }, [chatSocket, dispatch, meetingSocket, navigate]);
 
   useEffect(() => {
     meetingSocket.on("meetingGroupConnection", ({ room, caller, members }) => {

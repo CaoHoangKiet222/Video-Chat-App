@@ -18,7 +18,6 @@ const ChatGroupItems = (props) => {
   )}`;
 
   useEffect(() => {
-    console.log(props);
     if (props.room) {
       meetingSocket.emit("joinVideo", {
         conversationId: props.room,

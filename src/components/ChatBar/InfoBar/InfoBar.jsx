@@ -13,7 +13,6 @@ import ChatDetail from "./ChatDetail";
 import { errorActions } from "../../../store/error-slice";
 
 const InfoBar = (props) => {
-  console.log("InfoBar running");
   const [messages, setMessages] = useState([]);
   const [isSendMess, setIsSendMess] = useState(false);
   const [showSearchBox, setShowSearchBox] = useState(false);
@@ -45,14 +44,7 @@ const InfoBar = (props) => {
   }, [props.room, chatSocket, dispatch]);
 
   useEffect(() => {
-    chatSocket.on("leaveRoom", () => {
-      setIsSendMess(false);
-    });
-  }, [chatSocket]);
-
-  useEffect(() => {
     chatSocket.on("deleteMessage", (message) => {
-      console.log(message);
       setMessages((preMess) => {
         const index = preMess.findIndex((mess) => mess._id === message._id);
         index !== -1 && preMess.splice(index, 1);
@@ -67,18 +59,21 @@ const InfoBar = (props) => {
       dispatch(fetchConversation());
     });
 
-    return () => {
-      chatSocket.off("deleteMessage");
-    };
-  }, [chatSocket, dispatch]);
-
-  useEffect(() => {
     chatSocket.on("receiveMessage", (message) => {
-      console.log(message);
       dispatch(fetchConversation());
       setIsSendMess(true);
       setMessages((preMessages) => [...preMessages, message]);
     });
+
+    chatSocket.on("leaveRoom", () => {
+      setIsSendMess(false);
+    });
+
+    return () => {
+      chatSocket.off("deleteMessage");
+      chatSocket.off("receiveMessage");
+      chatSocket.off("leaveRoom");
+    };
   }, [chatSocket, dispatch]);
 
   const sendMessage = (e, replyContent, message, files) => {
@@ -161,6 +156,7 @@ const InfoBar = (props) => {
               showSearchBox={showSearchBox}
               searchName={searchName}
               room={props.room}
+              block={props.block}
             />
           </Body>
         )}

@@ -250,35 +250,37 @@ const Messages = (props) => {
           <img src={props.message.senderId.avatar.url} alt="" />
         </Avatar>
         <span>{formatHour(props.time)}</span>
-        <DropDown onClick={dropDownHandle}>
-          <BiDotsHorizontalRounded />
-          {showMenu && (
-            <DropDownContent translate="translate(0px, 25px)">
-              <CopyToClipboard text={props.message.content}>
-                <div>
-                  <IoCopyOutline></IoCopyOutline>
-                  <span>Copy</span>
+        {!props.block?.isBlock && (
+          <DropDown onClick={dropDownHandle}>
+            <BiDotsHorizontalRounded />
+            {showMenu && (
+              <DropDownContent translate="translate(0px, 25px)">
+                <CopyToClipboard text={props.message.content}>
+                  <div>
+                    <IoCopyOutline></IoCopyOutline>
+                    <span>Copy</span>
+                  </div>
+                </CopyToClipboard>
+                <div onClick={replyHandler}>
+                  <IoReturnUpBack></IoReturnUpBack>
+                  <span>Reply</span>
                 </div>
-              </CopyToClipboard>
-              <div onClick={replyHandler}>
-                <IoReturnUpBack></IoReturnUpBack>
-                <span>Reply</span>
-              </div>
-              <div onClick={forwardHandler}>
-                <IoReturnUpForward></IoReturnUpForward>
-                <span>Forward</span>
-              </div>
-              <div>
-                <AiOutlineStar></AiOutlineStar>
-                <span>Favourite</span>
-              </div>
-              <div className="text-danger" onClick={deleteHandler}>
-                <RiDeleteBinLine></RiDeleteBinLine>
-                <span>Delete</span>
-              </div>
-            </DropDownContent>
-          )}
-        </DropDown>
+                <div onClick={forwardHandler}>
+                  <IoReturnUpForward></IoReturnUpForward>
+                  <span>Forward</span>
+                </div>
+                <div>
+                  <AiOutlineStar></AiOutlineStar>
+                  <span>Favourite</span>
+                </div>
+                <div className="text-danger" onClick={deleteHandler}>
+                  <RiDeleteBinLine></RiDeleteBinLine>
+                  <span>Delete</span>
+                </div>
+              </DropDownContent>
+            )}
+          </DropDown>
+        )}
       </MessageOptions>
     </Message>
   );
