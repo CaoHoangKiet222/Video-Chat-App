@@ -35,11 +35,9 @@ export const beforeStartVideo = (
       case "Caller": {
         await getUserMedia({ video: true, audio: true })
           .then((currentStream) => {
-            console.log(currentStream);
             dispatch(videoActions.setStream({ currentStream }));
           })
           .catch((err) => {
-            console.log(err);
             error.current = err.message;
             dispatch(
               errorActions.setError({
@@ -47,7 +45,6 @@ export const beforeStartVideo = (
                 message: err.message,
               })
             );
-            console.log(error);
           });
 
         if (!error.current) {
@@ -60,11 +57,9 @@ export const beforeStartVideo = (
       default: {
         getUserMedia({ video: true, audio: true })
           .then((currentStream) => {
-            console.log(currentStream);
             dispatch(videoActions.setStream({ currentStream }));
           })
           .catch((err) => {
-            console.log(err);
             // dispatch(videoActions.setError({ error: err }));
             dispatch(
               errorActions.setError({
@@ -119,7 +114,6 @@ export const answerCall = (call, type) => {
         video,
         socket: { meetingSocket },
       } = getState();
-      console.log("answerCall video", video);
 
       dispatch(videoActions.setCallAccepted({ callAccepted: true }));
 
@@ -133,7 +127,6 @@ export const answerCall = (call, type) => {
       });
 
       peer.on("signal", (data) => {
-        console.log("peer on signal answerCall running");
         meetingSocket.emit(
           "answerCall",
           {
@@ -148,15 +141,11 @@ export const answerCall = (call, type) => {
       });
 
       peer.on("stream", (currentStream) => {
-        console.log("peer stream answerCall running");
-
         dispatch(videoActions.setUserStream({ userStream: currentStream }));
       });
 
       // video.call.signal is signal of caller
       peer.signal(video.call.signal);
-      console.log("peer signal answerCall done");
-
       dispatch(videoActions.setPeer({ peer }));
     } catch (err) {
       console.error(err);
@@ -167,8 +156,6 @@ export const answerCall = (call, type) => {
 export const callToUser = () => {
   return async (dispatch, getState) => {
     try {
-      console.log("current state callToUser", getState());
-
       const {
         video,
         socket: { meetingSocket },
@@ -182,7 +169,6 @@ export const callToUser = () => {
 
       // Fired when the peer wants to send signaling data to the remote peer (always run)
       peer.on("signal", (data) => {
-        console.log("peer on signal callToUser running");
         meetingSocket.emit("callToUser", {
           callId: video.callId,
           signalData: data,
@@ -190,7 +176,6 @@ export const callToUser = () => {
       });
 
       peer.on("stream", (currentStream) => {
-        console.log("peer stream callToUser running");
         dispatch(videoActions.setUserStream({ userStream: currentStream }));
       });
 
@@ -201,7 +186,6 @@ export const callToUser = () => {
         dispatch(timeCallActions.setTimeCall({ timeCall: timeStart }));
         // signal of callee answering to caller
         peer.signal(signal);
-        console.log("peer signal callToUser done");
       });
 
       dispatch(videoActions.setPeer({ peer }));

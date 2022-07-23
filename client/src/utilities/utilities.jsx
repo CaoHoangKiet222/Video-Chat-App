@@ -221,7 +221,7 @@ export const searchToDisplay = (name, searchName) => {
 };
 
 export const checkIsFriend = (user, friend, conversation) => {
-  for (const [_, conv] of conversation.entries()) {
+  for (const [, conv] of conversation.entries()) {
     const member = conv.members.find((mem) => {
       return user._id !== mem.userId._id;
     });
@@ -248,7 +248,6 @@ export const shareScreen = (stream, peer) => {
         .find((track) => track.kind === "video");
 
       peer.replaceTrack(videoTrack, screenTrack, stream);
-      console.log(screenTrack);
 
       screenTrack.onended = () => {
         peer.replaceTrack(screenTrack, videoTrack, stream);
@@ -293,7 +292,6 @@ export const replacePeersTrack = (
 
   peers.forEach(({ peer }) => {
     peer.replaceTrack(videoTrack, screenTrack, stream);
-    console.log(screenTrack);
   });
 
   screenTrack.onended = () => {

@@ -26,8 +26,7 @@ exports.postInvitation = (req, res, _next) => {
               <p>Click <a href="${process.env.ENDPOINT_CLIENT_NETLIFY}">here</a> to join with me!!!</p>
            `,
       },
-      (err, result) => {
-        console.log("mailer", result);
+      (err, _result) => {
         if (err) {
           return res.send({ error: "Something went wrong!!!" });
         }
@@ -50,14 +49,12 @@ exports.uploadFilesInConversation = (files) => {
           return upload({ url, fileName }, "image-preview");
         })
       );
-      console.log(uploadedImgsUrl);
 
       const uploadedAttachmentsUrl = await Promise.all(
         files.attachments.map(({ url, fileName }) => {
           return upload({ url, fileName }, "attachments");
         })
       );
-      console.log(uploadedAttachmentsUrl);
 
       const newFiles = await new Files({
         images: uploadedImgsUrl,
@@ -90,10 +87,9 @@ exports.deleteMessage = (message, conversationId) => {
           {
             _id: conversation.messages[0].reply,
           },
-          (error, reply) => {
-            console.log("delete reply", reply);
+          (error, _reply) => {
             if (error) {
-              return new Error(error.message);
+              console.log(error.message);
             }
           }
         );

@@ -72,7 +72,6 @@ app.use(require("./routes/meetings"));
 const io_notify = io.of("/notify");
 io_notify.on("connection", (socket) => {
   console.log("A user connected to channel notify");
-  console.log(io_notify.adapter.rooms);
 
   socketNotifyListen(socket, "notifyingUserIsOnline");
 
@@ -110,6 +109,8 @@ io_chat.on("connection", (socket) => {
   socketMessageListen(socket, "deleteGroupConversation");
 
   socketMessageListen(socket, "blockConversation");
+
+  socketMessageListen(socket, "blockGroupSingleConversation");
 
   socketMessageListen(socket, "blockGroupConversation");
 

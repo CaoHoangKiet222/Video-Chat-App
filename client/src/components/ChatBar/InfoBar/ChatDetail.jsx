@@ -17,6 +17,7 @@ import {
 import { CgAttachment } from "react-icons/cg";
 import { FiUsers } from "react-icons/fi";
 import { formatDate } from "../../../utilities/utilities";
+import MemberDetail from "./MemberDetail";
 
 const ChatDetail = (props) => {
   const [showAboutUser, setShowAboutUser] = useState(false);
@@ -138,23 +139,20 @@ const ChatDetail = (props) => {
                 </div>
 
                 <Collapse showMembers={showMembers}>
-                  {props.members.map(({ userId: member, isAdmin }, index) => {
-                    return (
-                      <div className="card-body" key={index}>
-                        <div className="group-content">
-                          <div>
-                            <div className="avatar">
-                              <img src={member.avatar.url} alt="" />
-                            </div>
-                            <div className="member-name">
-                              <h5>{member.name}</h5>
-                              {isAdmin && <span>Admin</span>}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {props.members.map(
+                    ({ userId: member, isAdmin, block }, index) => {
+                      return (
+                        <MemberDetail
+                          key={index}
+                          member={member}
+                          isAdmin={isAdmin}
+                          block={block}
+                          isUserAdmin={props.isUserAdmin}
+                          room={props.room}
+                        />
+                      );
+                    }
+                  )}
                 </Collapse>
               </div>
             )}
@@ -495,6 +493,9 @@ const Collapse = styled.div`
     .group-content {
       padding: 0.5rem;
       margin: 1.5rem 0 !important;
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
       &:first-child {
         margin-top: 0;
@@ -504,10 +505,11 @@ const Collapse = styled.div`
         margin-bottom: 0;
       }
 
-      div {
+      div:first-child {
         display: flex;
         justify-content: flex-start;
         align-items: center;
+        width: 100%;
 
         .member-name {
           display: flex;
@@ -547,6 +549,26 @@ const Collapse = styled.div`
             border-radius: 50%;
             object-fit: cover;
           }
+        }
+      }
+
+      div.block-member {
+        cursor: pointer;
+        border-radius: 0.25rem;
+        width: 75px;
+        height: 25px;
+        background: #364043;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        svg {
+          border-radius: 50%;
+          width: 18px;
+          height: 18px;
+          color: #fff;
+        }
+        &:hover {
+          background: #36404370;
         }
       }
     }

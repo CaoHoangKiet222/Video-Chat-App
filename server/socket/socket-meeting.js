@@ -5,8 +5,6 @@ exports = module.exports = (socket, type, io = null) => {
     case "joinVideo":
       socket.on(type, async ({ conversationId }) => {
         try {
-          console.log("A user joins meeting-rooms", conversationId);
-
           socket.join(conversationId);
 
           // console.log(io.adapter.rooms);
@@ -109,10 +107,10 @@ exports = module.exports = (socket, type, io = null) => {
       });
       break;
     case "meetingGroupConnection":
-      socket.on(type, ({ room, caller }, callback) => {
+      socket.on(type, ({ room, caller, members }, callback) => {
         socket.broadcast
           .to(room)
-          .emit("meetingGroupConnection", { room, caller });
+          .emit("meetingGroupConnection", { room, caller, members });
         callback();
       });
       break;

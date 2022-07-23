@@ -85,9 +85,49 @@ exports.blockGroupConversation = (req, res, _next) => {
   }
 };
 
+exports.blockGroupSingleConversation = (req, res, _next) => {
+  try {
+    // console.log("blockGroupSingleConversation", req.body);
+    if (req.body.isAdmin) {
+      return Conversation.findOneAndUpdate(
+        {
+          $and: [
+            {
+              _id: req.body.conversationId,
+            },
+            {
+              members: {
+                $elemMatch: {
+                  userId: req.body.memberId,
+                },
+              },
+            },
+          ],
+        },
+        {
+          "members.$.block": {
+            byUserId: req.body.isBlock ? null : req.body.userId,
+            isBlock: !req.body.isBlock,
+          },
+        },
+        { new: true },
+        (_err, conversation) => {
+          if (!conversation) {
+            return res.send({ error: "Block group conversation fail!!!" });
+          }
+          getConversation(req, res, _next);
+        }
+      );
+    }
+
+    res.send({ error: "You are not admin to block other members!!!" });
+  } catch (error) {
+    res.send({ error: error.message });
+  }
+};
+
 exports.deleteConversation = (req, res, _next) => {
   try {
-    console.log("deleteConversation", req.body);
     Conversation.findByIdAndDelete(
       req.body.conversationId,
       (_err, conversation) => {
@@ -125,7 +165,6 @@ exports.deleteConversation = (req, res, _next) => {
           });
 
           Files.findByIdAndDelete(message.files, (err, file) => {
-            console.log("file", file);
             if (err) {
               return new Error(error.message);
             }
@@ -172,7 +211,6 @@ exports.deleteGroupConversation = (req, res, _next) => {
             });
 
             Files.findByIdAndDelete(message.files, (err, file) => {
-              console.log("file", file);
               if (err) {
                 return new Error(error.message);
               }

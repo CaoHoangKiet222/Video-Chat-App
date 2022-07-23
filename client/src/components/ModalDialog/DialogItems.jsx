@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { searchToDisplay } from "../../utilities/utilities";
 import { DialogList } from "./DialogItems.styled";
 import DialogMain from "./DialogMain";
@@ -47,8 +47,7 @@ const DialogItems = (props) => {
               />
             );
           }
-
-          return <></>;
+          return <Fragment key={id}></Fragment>;
         })}
     </DialogList>
   );

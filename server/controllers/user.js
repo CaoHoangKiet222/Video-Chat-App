@@ -247,10 +247,9 @@ exports.postReset = (req, res, _next) => {
       if (err) {
         return res.send({ error: err.message });
       }
-      console.log(
-        `${buffer.length} bytes of random data: ${buffer.toString("hex")}`
-      );
+
       const token = buffer.toString("hex");
+
       User.findOneAndUpdate(
         { email: req.body.email, loginByFirebase: "" },
         {
@@ -277,8 +276,7 @@ exports.postReset = (req, res, _next) => {
               <p>Click <a href="${process.env.ENDPOINT_CLIENT_NETLIFY}/reset-password/new-pass?token=${token}">this</a> to reset password.</p>
            `,
             },
-            (err, result) => {
-              console.log("mailer", result);
+            (err, _result) => {
               if (err) {
                 return res.send({ error: "Something went wrong!!!" });
               }
@@ -341,18 +339,10 @@ exports.checkCookieExpiration = async (req, res, _next) => {
     // console.log("checkAuthUser", req.session);
 
     if (req.session.cookieExpiration - Date.now() <= 0) {
-      return User.updateOne(
-        {
-          _id: req.session.user._id,
-        },
-        {
-          isLoggined: false,
-        },
-        () => {
-          req.session.destroy((err) => console.log(err));
-          return res.json({ expireCookie: true });
-        }
-      );
+      if (req.session) {
+        req.session.destroy((error) => console.log(error));
+      }
+      return res.json({ expireCookie: true });
     }
 
     if (req.session.isLoggined) {

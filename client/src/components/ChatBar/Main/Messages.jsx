@@ -141,7 +141,6 @@ const Messages = (props) => {
   };
 
   const forwardHandler = () => {
-    // console.log(props);
     dispatch(
       forwardActions.setForward({
         forward: {
@@ -164,7 +163,7 @@ const Messages = (props) => {
               <BsReplyAllFill />
               <span>
                 {props.message.reply?.senderId._id ===
-                props.message.senderId._id
+                props.message.senderId?._id
                   ? props.isRight
                     ? "You replied to yourself"
                     : props.message.senderId.name + " replied to themself"

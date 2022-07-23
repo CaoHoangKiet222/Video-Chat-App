@@ -21,7 +21,6 @@ exports = module.exports = (socket, type, io = null) => {
 
           socket.join(room);
 
-          console.log("A user joins chat-rooms");
           // console.log(io.adapter.rooms);
         } catch (err) {
           console.error(err);
@@ -60,7 +59,7 @@ exports = module.exports = (socket, type, io = null) => {
               reply,
             });
 
-          console.log(io.adapter.rooms);
+          // console.log(io.adapter.rooms);
 
           callback(null, { _id, content, files, messageDate, senderId, reply });
 
@@ -105,7 +104,7 @@ exports = module.exports = (socket, type, io = null) => {
             isForward,
           } = message;
           const newFiles = await uploadFilesInConversation(files);
-          console.log(newFiles);
+          // console.log(newFiles);
           const newMes = {
             _id,
             content,
@@ -219,9 +218,15 @@ exports = module.exports = (socket, type, io = null) => {
       break;
     case "blockConversation":
     case "blockGroupConversation":
-      socket.on(type, ({ room, userBlock, isBlock, isAdmin }) => {
-        socket.broadcast.to(room).emit(type, { userBlock, isBlock, isAdmin });
-      });
+    case "blockGroupSingleConversation":
+      socket.on(
+        type,
+        ({ room, userBlock, isBlock, isAdmin, userIsBlockedId }) => {
+          socket.broadcast
+            .to(room)
+            .emit(type, { userBlock, isBlock, isAdmin, userIsBlockedId });
+        }
+      );
       break;
     case "disconnect":
       socket.on(type, () => {
