@@ -51,8 +51,4 @@ In this app, we're going to use a React Video Chat Application using WebRTC, soc
 
 ## Block
 
-<p align="center">
- <video width="40%">
-  <source src="https://github.com/CaoHoangKiet222/Video-Chat-App/blob/main/gif/block.gif" type="video/mp4">
-  </video>
-</p>
+![block gif](./gif/block.gif)
