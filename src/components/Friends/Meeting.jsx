@@ -16,6 +16,7 @@ import { answerCall, callToUser, leaveCall } from "../../store/video-creator";
 import { videoActions } from "../../store/video-slice";
 import { errorActions } from "../../store/error-slice";
 import { useAudio } from "../Hook/useAudio";
+import { fetchCalls } from "../../store/calls-creator";
 
 const Meeting = () => {
   const params = useParams();
@@ -68,6 +69,7 @@ const Meeting = () => {
             : "Your callee canceled the call",
         })
       );
+      dispatch(fetchCalls());
       dispatch(leaveCall(navigate, stream));
     });
 
@@ -96,6 +98,7 @@ const Meeting = () => {
       },
       () => {
         setPlaying(false);
+        dispatch(fetchCalls());
         dispatch(leaveCall(navigate, stream));
       }
     );

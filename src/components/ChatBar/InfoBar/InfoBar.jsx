@@ -20,7 +20,7 @@ const InfoBar = (props) => {
   const [searchName, setSearchName] = useState("");
   const [isFetch, setIsFetch] = useState(false);
   const dispatch = useDispatch();
-  const chatSocket = useSelector((state) => state.socket.chatSocket);
+  const { chatSocket, notifySocket } = useSelector((state) => state.socket);
 
   useEffect(() => {
     chatSocket.emit("joinRoom", props.room, (messages, error = null) => {
@@ -59,7 +59,6 @@ const InfoBar = (props) => {
     });
 
     chatSocket.on("receiveMessage", (message) => {
-      dispatch(fetchConversation());
       setIsSendMess(true);
       setMessages((preMessages) => [...preMessages, message]);
     });
@@ -92,7 +91,7 @@ const InfoBar = (props) => {
           _id: uuid4(),
           content: message,
           files,
-          sender: props.user,
+          senderId: props.user,
           messageDate: new Date(Date.now()),
           reply: replyContent,
         };
@@ -104,7 +103,7 @@ const InfoBar = (props) => {
             room: props.room,
             type: "single",
           },
-          (error, message) => {
+          (error) => {
             if (error) {
               return dispatch(
                 errorActions.setError({
@@ -113,10 +112,12 @@ const InfoBar = (props) => {
                 })
               );
             }
-            setMessages((preMess) => [...preMess, message]);
+            notifySocket.emit("notifyingUserSendMess");
             return dispatch(fetchConversation());
           }
         );
+
+        setMessages((preMess) => [...preMess, newMesage]);
       }
     } catch (err) {
       console.error(err);
