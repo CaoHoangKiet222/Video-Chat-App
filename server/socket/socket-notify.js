@@ -5,7 +5,6 @@ exports = module.exports = (socket, type, io = null) => {
   switch (type) {
     case "notifyingUserIsOnline":
       socket.on(type, async ({ userId }) => {
-        console.log(type);
         await User.updateOne({ _id: userId }, { isLoggined: true });
         socket.userId = userId;
         socket.broadcast.emit(type);

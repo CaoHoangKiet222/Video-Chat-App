@@ -15,15 +15,15 @@ const Main = (props) => {
       ?.filter((message) => {
         if (message.content) {
           return searchToDisplay(message.content, props.searchName);
-        } else if (message.files.images.length > 0) {
+        } else if (message.files?.images.length > 0) {
           return (
-            message.files.images.findIndex(({ fileName }) => {
+            message.files?.images.findIndex(({ fileName }) => {
               return searchToDisplay(fileName, props.searchName);
             }) !== -1
           );
         } else {
           return (
-            message.files.attachments.findIndex(({ fileName }) => {
+            message.files?.attachments.findIndex(({ fileName }) => {
               return searchToDisplay(fileName, props.searchName);
             }) !== -1
           );

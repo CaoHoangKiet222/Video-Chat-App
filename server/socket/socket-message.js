@@ -38,30 +38,17 @@ exports = module.exports = (socket, type, io = null) => {
     case "sendMessage":
       socket.on(type, async ({ message, room, type }, callback) => {
         try {
-          const {
-            _id,
-            content,
-            files,
-            messageDate,
-            sender: senderId,
-            reply,
-          } = message;
+          const { _id, content, files, messageDate, senderId, reply } = message;
 
           // type is important
           socket.broadcast
             .to(room)
-            .emit(type === "group" ? "receiveGroupMessage" : "receiveMessage", {
-              _id,
-              content,
-              files,
-              messageDate,
-              senderId,
-              reply,
-            });
+            .emit(
+              type === "group" ? "receiveGroupMessage" : "receiveMessage",
+              message
+            );
 
           // console.log(io.adapter.rooms);
-
-          callback(null, { _id, content, files, messageDate, senderId, reply });
 
           const newFiles = await uploadFilesInConversation(files);
 
@@ -85,6 +72,7 @@ exports = module.exports = (socket, type, io = null) => {
               },
             }
           );
+          callback(null);
         } catch (err) {
           console.error(err);
           callback(err.message, null);
@@ -213,7 +201,7 @@ exports = module.exports = (socket, type, io = null) => {
     case "deleteGroupConversation":
       socket.on(type, ({ room, userDelete, isAdmin }, callback) => {
         socket.broadcast.to(room).emit(type, { userDelete, isAdmin });
-        callback();
+        callback(type);
       });
       break;
     case "blockConversation":

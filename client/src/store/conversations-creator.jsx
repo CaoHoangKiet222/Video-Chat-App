@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 import { postData } from "../utilities/utilities";
+import { fetchCalls } from "./calls-creator";
 import { conversationActions } from "./conversations-slice";
 import { userActions } from "./user-slice";
 
@@ -209,8 +210,11 @@ export const deleteConversation = (room, isAdmin = false, navigate, type) => {
                 ? "deleteConversation"
                 : "deleteGroupConversation",
               { room, userDelete: value.user, isAdmin },
-              () => {
+              (type) => {
                 navigate("/video-chat/Chats");
+                if (type === "deleteConversation") {
+                  dispatch(fetchCalls());
+                }
               }
             );
             notifySocket.emit("notifyingDeleteUser");

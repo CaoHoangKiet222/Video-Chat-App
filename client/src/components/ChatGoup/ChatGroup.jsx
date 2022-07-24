@@ -19,7 +19,7 @@ const ChatGroup = (props) => {
   const [searchName, setSearchName] = useState("");
   const [isFetch, setIsFetch] = useState(false);
   const dispatch = useDispatch();
-  const chatSocket = useSelector((state) => state.socket.chatSocket);
+  const { chatSocket, notifySocket } = useSelector((state) => state.socket);
   const user = useSelector((state) => state.user.user);
   const member = useMemo(() => {
     return props.members.find(
@@ -67,7 +67,6 @@ const ChatGroup = (props) => {
 
     // this is important cannot replace
     chatSocket.on("receiveGroupMessage", (message) => {
-      dispatch(fetchConversation());
       setIsSendMess(true);
       setMessages((preMessages) => [...preMessages, message]);
     });
@@ -101,7 +100,7 @@ const ChatGroup = (props) => {
           _id: uuid4(),
           content: message,
           files,
-          sender: props.user,
+          senderId: props.user,
           messageDate: new Date(Date.now()),
           reply: replyContent,
         };
@@ -113,7 +112,7 @@ const ChatGroup = (props) => {
             room: props.room,
             type: "group",
           },
-          (error, message) => {
+          (error) => {
             if (error) {
               return dispatch(
                 errorActions.setError({
@@ -122,10 +121,12 @@ const ChatGroup = (props) => {
                 })
               );
             }
-            setMessages((preMess) => [...preMess, message]);
+            notifySocket.emit("notifyingUserSendMess");
             return dispatch(fetchConversation());
           }
         );
+
+        setMessages((preMess) => [...preMess, newMesage]);
       }
     } catch (err) {
       return dispatch(

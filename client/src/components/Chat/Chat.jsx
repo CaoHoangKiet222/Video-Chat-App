@@ -100,6 +100,10 @@ const Chat = () => {
       dispatch(fetchFriends());
     });
 
+    notifySocket.on("notifyingUserSendMess", () => {
+      dispatch(fetchConversation());
+    });
+
     notifySocket.on("notifyingUserAddFriend", () => {
       dispatch(fetchConversation());
     });
@@ -110,6 +114,7 @@ const Chat = () => {
 
     notifySocket.on("notifyingDeleteUser", () => {
       dispatch(fetchConversation());
+      dispatch(fetchCalls());
     });
 
     notifySocket.on("notifyingBlockUser", () => {
@@ -119,6 +124,7 @@ const Chat = () => {
     return () => {
       notifySocket.off("notifyingUserIsOnline");
       notifySocket.off("notifyingUserIsOffline");
+      notifySocket.off("notifyingUserSendMess");
       notifySocket.off("notifyingUserAddFriend");
       notifySocket.off("notifyingUserAddGroup");
       notifySocket.off("notifyingDeleteUser");
