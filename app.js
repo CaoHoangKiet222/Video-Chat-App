@@ -77,6 +77,8 @@ io_notify.on("connection", (socket) => {
 
   socketNotifyListen(socket, "notifyingUserIsOffline");
 
+  socketNotifyListen(socket, "notifyingUserSendMess");
+
   socketNotifyListen(socket, "notifyingUserAddFriend");
 
   socketNotifyListen(socket, "notifyingUserAddGroup");
