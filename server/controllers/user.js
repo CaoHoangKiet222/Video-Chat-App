@@ -359,14 +359,18 @@ exports.updateUserAccount = async (req, res, _next) => {
   try {
     let { name, avatar, address, birth, phone, website, userId } = req.body;
 
-    if (avatar) {
+    if (avatar.url) {
       avatar = await upload(avatar, "image-profile");
     }
 
-    const user = await User.findById(userId).select(
-      "avatar -password -avatar.public_id -twoFA.secret"
-    );
-    destroyAsset(user.avatar.public_id, "image");
+    const user = await User.findById(userId).select("avatar");
+
+    if (
+      user.avatar.url !=
+      "https://res.cloudinary.com/dv7uhlgru/image/upload/v1656512818/image-profile/user_ifpemd.jpg"
+    ) {
+      destroyAsset(user.avatar.public_id, "image");
+    }
 
     User.findOneAndUpdate(
       { _id: userId },
@@ -391,6 +395,7 @@ exports.updateUserAccount = async (req, res, _next) => {
       }
     ).select("-password -avatar.public_id -twoFA.secret");
   } catch (err) {
+    console.log(err);
     res.send({ error: err.message });
   }
 };
