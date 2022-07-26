@@ -142,7 +142,10 @@ const Settings = () => {
         const fReader = new FileReader();
         fReader.readAsDataURL(e.target.files[0]);
         fReader.onload = (event) => {
-          accountRef.current.avatar = event.target.result;
+          accountRef.current.avatar = {
+            url: event.target.result,
+            fileName: e.target.files[0].name,
+          };
         };
         break;
       }
