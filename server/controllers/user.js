@@ -3,7 +3,7 @@ const Conversation = require("../models/conversation");
 const bcryptjs = require("bcryptjs");
 const { validationResult } = require("express-validator");
 const { sortName, setSession } = require("../utilities/utilities");
-const { uploadImgs, destroyAsset } = require("../cloudinary/cloudinary");
+const { upload, destroyAsset } = require("../cloudinary/cloudinary");
 const { mailer } = require("../mailer/mailer");
 const {
   generateUniqueSecret,
@@ -360,7 +360,7 @@ exports.updateUserAccount = async (req, res, _next) => {
     let { name, avatar, address, birth, phone, website, userId } = req.body;
 
     if (avatar) {
-      avatar = await uploadImgs(avatar, "image-profile");
+      avatar = await upload(avatar, "image-profile");
     }
 
     const user = await User.findById(userId).select(
