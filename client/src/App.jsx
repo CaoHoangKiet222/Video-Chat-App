@@ -31,20 +31,29 @@ function App() {
         const data = await response.json();
 
         if (data.expireCookie) {
-          return Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            html: "Session cookie had been expired, please login again!!!",
-            showConfirmButton: true,
-            allowOutsideClick: false,
-          }).then(() => {
+          if (auth) {
+            return Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              html: "Session cookie had been expired, please login again!!!",
+              showConfirmButton: true,
+              allowOutsideClick: false,
+            }).then(() => {
+              dispatch(
+                userLogout(
+                  `${process.env.REACT_APP_ENDPOINT_SERVER}/logout`,
+                  navigate
+                )
+              );
+            });
+          } else {
             dispatch(
               userLogout(
                 `${process.env.REACT_APP_ENDPOINT_SERVER}/logout`,
                 navigate
               )
             );
-          });
+          }
         }
 
         if (!data.isAuth) {

@@ -337,16 +337,15 @@ exports.postNewPassword = async (req, res, _next) => {
 exports.checkCookieExpiration = async (req, res, _next) => {
   try {
     // console.log("checkAuthUser", req.session);
-
-    if (req.session.cookieExpiration - Date.now() <= 0) {
-      if (req.session) {
+    if (req.session) {
+      if (req.session.cookieExpiration - Date.now() <= 0) {
         req.session.destroy((error) => console.log(error));
+        return res.json({ expireCookie: true });
       }
-      return res.json({ expireCookie: true });
-    }
 
-    if (req.session.isLoggined) {
-      return res.json({ isAuth: true });
+      if (req.session.isLoggined) {
+        return res.json({ isAuth: true });
+      }
     }
 
     res.json({ expireCookie: false, isAuth: false });
