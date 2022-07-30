@@ -104,11 +104,13 @@ export const userLogout = (url, navigate) => {
   return async (dispatch, getState) => {
     try {
       const { user } = getState().user;
-      const data = await postData(url, "post", { userId: user._id });
       const { notifySocket } = getState().socket;
+      if (user) {
+        const data = await postData(url, "post", { userId: user._id });
 
-      if (data.error) {
-        throw new Error(data.error);
+        if (data.error) {
+          throw new Error(data.error);
+        }
       }
 
       dispatch(userActions.logout());
