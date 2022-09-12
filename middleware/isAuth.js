@@ -38,11 +38,21 @@ exports.checkValidation = (type) => {
             }
           }),
         body(
-          "password",
+          "password"
           // second argument is default error
-          "The password must be 5+ chars long and must contain number or text!!"
+          /* "The password must be 5+ chars long and must contain number, (upper + lower) text and symbol!!" */
         )
           .isLength({ min: 5 })
+          .withMessage("Your password must be 5+ chars")
+          .isStrongPassword({
+            minLowercase: 1,
+            minUppercase: 1,
+            minNumbers: 1,
+            minSymbols: 1,
+          })
+          .withMessage(
+            "Your password must contain number, (upper + lower) text and symbol!!"
+          )
           .trim()
           .isAlphanumeric(),
         body("confirmPassword")
