@@ -53,8 +53,7 @@ exports.checkValidation = (type) => {
           .withMessage(
             "Your password must contain number, (upper + lower) text and symbol!!"
           )
-          .trim()
-          .isAlphanumeric(),
+          .trim(),
         body("confirmPassword")
           .trim()
           .custom((value, { req }) => {
@@ -68,14 +67,19 @@ exports.checkValidation = (type) => {
       ];
     case "new-password":
       return [
-        body(
-          "password",
-          // second argument is default error
-          "The password must be 5+ chars long and must contain number or text!!"
-        )
+        body("password")
           .isLength({ min: 5 })
-          .trim()
-          .isAlphanumeric(),
+          .withMessage("Your password must be 5+ chars")
+          .isStrongPassword({
+            minLowercase: 1,
+            minUppercase: 1,
+            minNumbers: 1,
+            minSymbols: 1,
+          })
+          .withMessage(
+            "Your password must contain number, (upper + lower) text and symbol!!"
+          )
+          .trim(),
         body("confirmPassword")
           .trim()
           .custom((value, { req }) => {
@@ -106,14 +110,19 @@ exports.checkValidation = (type) => {
             }
             return true;
           }),
-        body(
-          "newPass",
-          // second argument is default error
-          "The password must be 5+ chars long and must contain number or text!!"
-        )
+        body("newPass")
           .isLength({ min: 5 })
+          .withMessage("Your password must be 5+ chars")
+          .isStrongPassword({
+            minLowercase: 1,
+            minUppercase: 1,
+            minNumbers: 1,
+            minSymbols: 1,
+          })
+          .withMessage(
+            "Your password must contain number, (upper + lower) text and symbol!!"
+          )
           .trim()
-          .isAlphanumeric()
           .custom((value, { req }) => {
             if (value === req.body.currentPass) {
               throw new Error(
